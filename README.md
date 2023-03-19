@@ -9,7 +9,7 @@ The is the final project of Data Engineering Bootcamp with Northcoders, cohort J
 - team's [Slack channel](https://app.slack.com/client/T01KPE0QGCD/C04U2202TB9)
 - project's [Kanban board](https://trello.com/invite/b/dSISINtB/ATTI1d71e99e2e21210a7dffb1be363771dbF14A7D6E/team-project)
 - dev documentation
-- Tne minimal viable product [diagram](doc/dev/The%20MVP%20diagram.jpg)
+  - Tne minimal viable product [diagram](doc/dev/The%20MVP%20diagram.jpg)
 
 Please do:
 
