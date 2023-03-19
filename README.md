@@ -6,6 +6,7 @@ The is the final project of Data Engineering Bootcamp with Northcoders, cohort J
 
 - [project specification](doc/specification/README.md)
 - Terrific Totes [scenario](doc/specification/TerrificTotes.pdf)
+- AWS Lambda [Operator Guide](https://docs.aws.amazon.com/lambda/latest/operatorguide/intro.html)
 - team's [Slack channel](https://app.slack.com/client/T01KPE0QGCD/C04U2202TB9)
 - project's [Kanban board](https://trello.com/invite/b/dSISINtB/ATTI1d71e99e2e21210a7dffb1be363771dbF14A7D6E/team-project)
 - dev documentation
