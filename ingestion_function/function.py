@@ -1,34 +1,34 @@
-from decimal import Decimal
 import os
 import json
-from connection import con
+from decimal import Decimal
+from ingestion_function.connection import con
 from datetime import datetime
-import math
+
 # Create data dir
-if not os.path.exists('ingestion-function/data'):
-    os.makedirs('ingestion-function/data')
+if not os.path.exists('./ingestion-function/data'):
+    os.makedirs('./ingestion-function/data')
 
 
+# Queries database for table names
 def get_table_names():
     table_names = con.run(
         'SELECT table_name, table_schema FROM information_schema.tables')
     #  print(table_names)
     return [item[0] for item in table_names if item[1] == 'public']
 
-#  print(get_table_names())
 
-
+# Extracts column names for current table
 def get_headers():
     return [c['name'] for c in con.columns]
 
 
+# Extracts list of table data
 def get_table_data(table):
-
     list = con.run(f'SELECT * FROM {table}')
     list.insert(0, get_headers())
     return list
 
-
+# Writes dictionary of table to file
 def data_ingestion():
     for table in get_table_names():
         list = get_table_data(table)
@@ -38,6 +38,7 @@ def data_ingestion():
                     row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
                 elif isinstance(row[i], Decimal):
                     row[i] = float(row[i])
+
         dict = {
             'table_name': table,
             'headers': list[0],
@@ -48,11 +49,12 @@ def data_ingestion():
             f.write(json.dumps(dict))
 
 
+# data_ingestion()
 
-data_ingestion()
 
 def upload_to_s3():
     pass
+
 
 def store_last_updated():
     pass
