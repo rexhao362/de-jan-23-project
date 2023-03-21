@@ -1,49 +1,61 @@
+from decimal import Decimal
 import os
 import json
 from connection import con
-
-
-
+from datetime import datetime
+import math
 # Create data dir
 if not os.path.exists('ingestion-function/data'):
     os.makedirs('ingestion-function/data')
 
 
 def get_table_names():
-    table_names = con.run('SELECT table_name, table_schema FROM information_schema.tables')
-    # print(table_names)
+    table_names = con.run(
+        'SELECT table_name, table_schema FROM information_schema.tables')
+    #  print(table_names)
     return [item[0] for item in table_names if item[1] == 'public']
 
-# print(get_table_names())
+#  print(get_table_names())
+
 
 def get_headers():
-    con.run(f'SELECT * FROM {TABLE} LIMIT 1')
-    # print(con.columns)
     return [c['name'] for c in con.columns]
 
 
 def get_table_data(table):
-    
-    # tables = get_table_names()
-    # print(tables)
-    # for table in tables:
-    return con.run(f'SELECT * FROM {table}')
-        
-        # con.run('SELECT * FROM :table_name', table_name=table)
 
-# print(get_table_data('design'))
+    list = con.run(f'SELECT * FROM {table}')
+    list.insert(0, get_headers())
+    return list
+
 
 def data_ingestion():
     for table in get_table_names():
-        {'table_name': table,
-        'data': get_table_data(table)
+        list = get_table_data(table)
+        for row in list:
+            for i in range(len(row)):
+                if isinstance(row[i], datetime):
+                    row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
+                elif isinstance(row[i], Decimal):
+                    row[i] = float(row[i])
+        dict = {
+            'table_name': table,
+            'headers': list[0],
+            'data': list[1:]
         }
 
+        with open(f'./ingestion-function/data/{table}.json', 'w') as f:
+            f.write(json.dumps(dict))
 
 
 
+data_ingestion()
 
+def upload_to_s3():
+    pass
 
+def store_last_updated():
+    pass
 # Counterparty data
 
 
@@ -64,7 +76,6 @@ def data_ingestion():
 
 #     with open('./ingestion-function/data/counterparty.json', 'w') as file:
 #         file.write(json.dumps(dict_counterparty))
-
 
 
 # # Currency data
@@ -91,7 +102,6 @@ def data_ingestion():
 
 #     with open('./ingestion-function/data/currency.json', 'w') as file:
 #         file.write(json.dumps(dict_currency))
-
 
 
 # # Departments data
@@ -136,7 +146,6 @@ def data_ingestion():
 
 #     with open('./ingestion-function/data/design.json', 'w') as file:
 #         file.write(json.dumps(dict_design))
-
 
 
 # #  Staff data
