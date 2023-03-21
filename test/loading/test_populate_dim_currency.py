@@ -1,25 +1,50 @@
 from pg8000.native import Connection
 from src.loading.populate_dim_currency import populate_dim_currency
-from src.loading.config import (user, passwd, db)
+from src.loading.config import (user, passwd, test_db)
 
 def test_loads_one_row_when_passed_one_currency_item():
-    with Connection(user, password=passwd, database=db) as connection:
+    with Connection(user, password=passwd, database=test_db) as connection:
+        # arrange
         input_currency_data = [
             [1, "USD", "US dollar"]
         ]
+        
+        # act
+        connection.run('DELETE FROM dim_currency')
         populate_dim_currency(connection, input_currency_data)
         rows = connection.run('SELECT * FROM dim_currency')
+
+        # assert
         assert len(rows) == 1
         row = rows[0]
-        assert len(row) == 3
-        assert row[0] == input_currency_data[0][0]
-        assert row[1] == input_currency_data[0][1]
-        assert row[2] == input_currency_data[0][2]
+        columns = len(row)
+        assert columns == 3
 
-# def test_makes_no_chages_to_db_when_passed_empty_data_structure():
-#     with Connection(user, password=passwd, database=db) as connection:
-#         input_currency_data = []
-#         populate_dim_currency(connection, input_currency_data)
-#         rows = connection.run('SELECT * FROM dim_currency')
-#         assert rows == []
+        for index in range(columns):
+            assert row[index] == input_currency_data[0][index]
 
+def test_loads_multiple_rows_when_passed_multiple_currency_item():
+    with Connection(user, password=passwd, database=test_db) as connection:
+        # arrange
+        input_currency_data = [
+            [1, "USD", "US dollar"],
+            [5, "GBP", "pound"],
+            [13, "JPY", "yen"]
+        ]
+        
+        num_columns = len(input_currency_data[0])
+        num_rows = len(input_currency_data)
+        
+        # act
+        connection.run('DELETE FROM dim_currency')
+        populate_dim_currency(connection, input_currency_data)
+        rows = connection.run('SELECT * FROM dim_currency')
+
+        # assert
+        assert len(rows) == num_rows
+        for row_index in range(num_rows):
+            row = rows[row_index]
+            assert len(row) == num_columns
+
+            for column_index in range(num_columns):
+                assert row[column_index] == input_currency_data[row_index][column_index]
