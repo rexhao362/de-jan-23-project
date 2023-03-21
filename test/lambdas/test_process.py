@@ -60,9 +60,6 @@ def test_process_returns_dataframe_containing_input_data():
 def test_print_pd_dataframe_to_csv():
     raw_data = load_file_from_local(full_json)
     dataframe = process(raw_data)
-    headers = ['Name', 'Type', 'Description']
-    j = 0
-    #could refactor this to use enumerate
     print_csv(dataframe, 'test/csv_files/temp_test_1.csv')
     # print(dataframe.head())
     assert True
