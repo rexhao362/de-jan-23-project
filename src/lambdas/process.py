@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import numpy as np
 import pyarrow
+
 #! INGESTION LABELS ARE LOWER CASE
 #! A LOT OF DATA HAS NULL VALUES SO DONT TEST FOR NONE
 
@@ -117,21 +118,24 @@ def build_fact_sales_order(sales_order_dataframe):
 
     """
     sales_order = sales_order_dataframe.copy()
-    #TODO - FIND OUT WHAT FORMAT DATE COMES IN
+    # convert timestamps to datetime objects
+    # sales_order['created_at'] = pd.to_datetime(sales_order['created_at'])
+    # sales_order['created_at'] = sales_order['created_at'].dt.date
+    sales_order = timestamp_to_date(sales_order, 'created_at')
+    print(sales_order)
 
 
 
-
-def timestamp_to_date(timestamp):
+def timestamp_to_date(table, column):
     """
-    Input: timestamp, timestamp 
-    Returns: date, date
+    Input[0]: table, dataframe 
+    Input[1]: column, string
 
-    Example: timestamp_to_date("2022-11-07T15:53:10.153000") -> [07,11,2022]
+    Returns: table, dataframe
     """
-    date = timestamp[:10].split('-')
-    date.reverse()
-    return date
+    table[column] = pd.to_datetime(table[column])
+    table[column] = table[column].dt.date
+    return table
 
 
 def build_dim_staff(staff_dataframe, department_dataframe):
@@ -249,12 +253,10 @@ def generate_local_parquet(table):
     # use in filepath?
 
 def main():
-    department_file = 'test/json_files/department_test_1.json'
-    staff_file = 'test/json_files/staff_test_1.json'
-    department_data = load_file_from_local(department_file)
-    staff_data = load_file_from_local(staff_file)
-    department_dataframe = process(department_data)
-    staff_dataframe = process(staff_data)
+    sales_order_path = 'test/json_files/sales_order_test_1.json'
+    sales_order_data = load_file_from_local(sales_order_path)
+    sales_order_dataframe = process(sales_order_data)
+    build_fact_sales_order(sales_order_dataframe)
 
     # dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
     # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
