@@ -12,11 +12,9 @@ def format_dim_currency_data(parquet_file_name):
     data_frame = pandas.read_parquet(parquet_file_name)
 
     for index, row in data_frame.iterrows():
-        output_row = []
-        for column_name in column_names:
-            output_row.append( row[column_name] )
-    
-        output_data.append(output_row)
+        output_data.append( \
+            [ row[column_name] for column_name in column_names ] \
+        )
 
     return output_data
 
