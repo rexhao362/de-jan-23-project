@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import numpy as np
 
 # injest json
 # TODO BUILD NEW DIM/FACT TABLES 
@@ -100,24 +101,76 @@ def build_dim_location():
     BUILD DIM_LOCATION
     """
 
-def build_dim_dat():
+def build_dim_date():
     """
     BUILD DIM_DATE
     """
 
-def build_dim_counterparty():
+def build_dim_counterparty(original_dataframe, address_dataframe):
     """
     BUILD DIM_COUNTERPARTY
+    
+    input columns = [counterparty_id, counterparty_legal_name, legal_address_id, commercial_contact, delivery_contact, created_at, last_updated]
+     1
+    output columns = [counterparty_id, counterparty_legal_name, counterparty_legal_address_line_1, counterparty_legal_address_line_2, counterparty_legal_district, counterparty_legal_city, counterparty_legal_postal_code, counterparty_legal_county, counterparty_legal_phone_number]
     """
-
+    df = original_dataframe.copy()
+    ids = original_dataframe['legal_address_id']
+    df = df.drop(columns=['last_updated', 'created_at', 'delivery_contact', 'commercial_contact', 'legal_address_id'])
+    #print(ids)
+    length = df.shape[0]
+    #init new cols
+    l_add_1 = np.empty(length, dtype='U10')
+    l_add_2 = np.empty(length, dtype='U10')
+    l_district = np.empty(length, dtype='U10')
+    l_county = np.empty(length, dtype='U10')
+    l_city = np.empty(length, dtype='U10')
+    l_postcode = np.empty(length, dtype='U10')
+    l_phone = np.empty(length, dtype='U10')
+    
+    #for each record in dataframe and corresponding address_id
+    for i, id in enumerate(ids):
+        #query the address table for the right id
+        address = address_dataframe.query(f"address_id == '{id}'")
+        #initialize the columns
+        l_add_1[i] = address['address_line_1'].item()
+        l_add_2[i] = address['address_line_2'].item()
+        l_district[i] = address['district'].item()
+        l_city[i] = address['city'].item()
+        l_county[i] = address['county'].item()
+        l_postcode[i] = address['postal_code'].item()
+        l_phone[i] = address['phone'].item()
+    
+        
+    df['counterparty_legal_address_line_1'] = l_add_1
+    df['counterparty_legal_address_line_2'] = l_add_2
+    df['counterparty_legal_district'] = l_district
+    df['counterparty_legal_county'] = l_county
+    df['counterparty_legal_city'] = l_city
+    df['counterparty_legal_postcode'] = l_postcode
+    df['counterparty_legal_phone'] = l_phone
+        
+    return df
+    
+    
+    # use ids to fetch from address:
+    # counterparty_legal_address_line_1
+    # counterparty_legal_address_line_2
+    # counterparty_legal_district
+    # counterparty_legal_city
+    # counterparty_legal_postcode
+    # counterparty_legal_county
 
 
 def main():
-    table1 = 'test/json_files/currency_test_1.json'
-    table1_data = load_file_from_local(table1)
-    table1_dataframe = process(table1_data)
-    dim_currency = build_dim_currency(table1_dataframe)
-    print(dim_currency)
+    counterparty_file = 'test/json_files/counterparty_test_1.json'
+    address_file = 'test/json_files/address_test_1.json'
+    counteryparty_data = load_file_from_local(counterparty_file)
+    address_data = load_file_from_local(address_file)
+    counterparty_dataframe = process(counteryparty_data)
+    address_dataframe = process(address_data)
+    dim_counterparty = build_dim_counterparty(counterparty_dataframe, address_dataframe)
+    print(dim_counterparty)
 
 if __name__ == "__main__":
     main()
