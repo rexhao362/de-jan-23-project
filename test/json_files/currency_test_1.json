@@ -8,19 +8,19 @@
     "Data":[
        [
           1,
-          "code_1",
+          "GBP",
           "created_1",
           "updated_1"
        ],
        [
         2,
-        "code_2",
+        "USD",
         "created_2",
         "updated_2"
      ],
      [
         3,
-        "code_3",
+        "EUR",
         "created_3",
         "updated_3"
      ]

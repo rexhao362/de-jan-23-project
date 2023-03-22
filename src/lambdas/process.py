@@ -1,10 +1,9 @@
 import pandas as pd
 import json
 
-# injest json
-# TODO BUILD NEW DIM/FACT TABLES 
-# process into parquet
-# upload to s3 / write to local
+#! INGESTION LABELS ARE LOWER CASE
+#! A LOT OF DATA HAS NULL VALUES SO DONT TEST FOR NONE
+
 def load_file_from_s3():
     pass
 
@@ -24,7 +23,7 @@ def process(table):
     Returns: table, pd data frame
     '''
     try:
-        df = pd.DataFrame(table['Data'], columns=table['Headers'])
+        df = pd.DataFrame(table['data'], columns=table['headers'])
     except KeyError as e:
         raise(e)
     return df
@@ -89,7 +88,6 @@ def build_dim_currency(dataframe):
 
     currency_names = []
     for item in dim_currency['currency_code']:
-        print(item)
         if item == "GBP":
             currency_names.append('Pounds')
         elif item == "USD":
@@ -100,7 +98,7 @@ def build_dim_currency(dataframe):
             currency_names.append(None)
 
     dim_currency['currency_name'] = currency_names
-    
+
     return dim_currency
 
 def build_fact_sales_order():
@@ -146,10 +144,10 @@ def build_dim_counterparty():
 
 
 def main():
-    table1 = 'test/json_files/currency_test_1.json'
+    table1 = 'test/json_files/location_test_2.json'
     table1_data = load_file_from_local(table1)
     table1_dataframe = process(table1_data)
-    dim_currency = build_dim_currency(table1_dataframe)
+    dim_currency = build_dim_location(table1_dataframe)
     print(dim_currency)
 
 if __name__ == "__main__":
