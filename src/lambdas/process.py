@@ -106,11 +106,43 @@ def build_fact_sales_order():
     """
     BUILD FACT_SALES_ORDER
 
+    Consider using a dict containing ref memory locations of DataFrames,
+    or keyword arguments or default arguments?
+
+    Arg1: sales_order, DataFrame
+    Arg2: dim_date, DataFrame
+    Arg3: dim_staff, DataFrame
+    Arg4: dim_counterparty, DataFrame
+    Arg5: dim_currency, DataFrame
+    Arg6: dim_design, DataFrame
+    Arg7: dim_location, DataFrame
+
     """
-def build_dim_staff():
+def build_dim_staff(staff_dataframe, department_dataframe):
     """
     BUILD DIM_STAFF
+    Input[0]: staff, DataFrame
+    Input[1]: department, DataFrame
+    Returns: dim_staff, DataFrame
     """
+    dim_staff = staff_dataframe.copy()
+    department_id = dim_staff['department_id']
+    dim_staff = dim_staff.drop(columns=['department_id', 'created_at', 'last_updated'])
+    length = dim_staff.shape[0]
+
+    department_name_col = np.empty(length, dtype='U10')
+    location_col = np.empty(length, dtype='U10')
+
+    for i, id in enumerate(department_id):
+        department = department_dataframe.query(f"department_id == {id}")
+        department_name_col[i] = department['department_name'].item()
+        location_col[i] = department['location'].item()
+    
+    dim_staff['department_name'] = department_name_col
+    dim_staff['location'] = location_col
+
+    return dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
+
 
 def build_dim_location(dataframe):
     """
@@ -194,18 +226,21 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
 
 
 def main():
-    counterparty_file = 'test/json_files/counterparty_test_1.json'
-    address_file = 'test/json_files/address_test_1.json'
-    counteryparty_data = load_file_from_local(counterparty_file)
-    address_data = load_file_from_local(address_file)
-    counterparty_dataframe = process(counteryparty_data)
-    address_dataframe = process(address_data)
-    dim_counterparty = build_dim_counterparty(counterparty_dataframe, address_dataframe)
-    print(dim_counterparty)
+    department_file = 'test/json_files/department_test_1.json'
+    staff_file = 'test/json_files/staff_test_1.json'
+    department_data = load_file_from_local(department_file)
+    staff_data = load_file_from_local(staff_file)
+    department_dataframe = process(department_data)
+    staff_dataframe = process(staff_data)
+
+    dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
+    print(dim_staff)
+
+ 
+
+
 
 if __name__ == "__main__":
     main()
 
-
- 
-
+    
