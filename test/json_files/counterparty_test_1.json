@@ -1,5 +1,5 @@
 {
-    "Headers":[
+    "headers":[
        "counterparty_id",
        "counterparty_legal_name",
        "legal_address_id",
@@ -8,7 +8,7 @@
        "created_at",
        "last_updated"
     ],
-    "Data":[
+    "data":[
        [
           "foo1",
           "bar1",

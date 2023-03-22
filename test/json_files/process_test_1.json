@@ -1,10 +1,10 @@
 {
-    "Headers":[
+    "headers":[
        "Name",
        "Type",
        "Description"
     ],
-    "Data":[
+    "data":[
        [
           "foo1",
           "bar1",

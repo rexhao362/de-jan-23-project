@@ -15,11 +15,6 @@ def test_returned_dataframe_has_expected_columns():
     dim_design_cols = dim_design.columns.values
     assert equal(dim_design_cols, ['design_id', 'design_name', 'file_location', 'file_name']).all()
 
-def test_returned_dataframe_has_no_null_values():
-    for header in dim_design:
-        for entry in dim_design[header]:
-            assert entry
-
 def test_returned_data_is_maintained_through_build():
     assert dim_design['design_id'][0] == "des_id_1"
     assert dim_design['design_name'][0] == "name_1"

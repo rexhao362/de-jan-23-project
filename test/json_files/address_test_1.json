@@ -1,5 +1,5 @@
 {
-  "Headers": [
+  "headers": [
     "address_id",
     "address_line_1",
     "address_line_2",
@@ -9,7 +9,7 @@
     "county",
     "phone"
   ],
-  "Data": [
+  "data": [
     ["0", "foo1", "bar1", "foo1", "barfoo1", "foofoobar1", "foobarfoo1", "booboofar1"],
     ["2", "foo2", "bar2", "foo2", "barfoo2", "foofoobar2", "foobarfoo2", "booboofar2"],
     ["1", "foo3", "bar3", "foo3", "barfoo3", "foofoobar3", "foobarfoo3", "booboofar3"]

@@ -13,11 +13,11 @@ def test_load_file_from_local_returns_dict():
 
 def test_load_file_from_local_dict_contains_data():
     result = load_file_from_local(no_data_json)
-    assert result['Headers'] == []
-    assert result['Data'] == []
+    assert result['headers'] == []
+    assert result['data'] == []
     result = load_file_from_local(full_json)
-    assert result['Headers'] == ["Name", "Type", "Description"]
-    assert result['Data'] == \
+    assert result['headers'] == ["Name", "Type", "Description"]
+    assert result['data'] == \
     [   
     ["foo1", "bar1","foo bar1"],
     ["foo2", "bar2", "foobar2"],
@@ -53,8 +53,8 @@ def test_process_returns_dataframe_containing_input_data():
     j = 0
     #could refactor this to use enumerate
     for header in headers:
-        for i in range(len(raw_data['Data'])):
-            assert dataframe[header][i] == raw_data['Data'][i][j]
+        for i in range(len(raw_data['data'])):
+            assert dataframe[header][i] == raw_data['data'][i][j]
         j += 1
     
 def test_print_pd_dataframe_to_csv():
