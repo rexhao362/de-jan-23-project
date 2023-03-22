@@ -15,6 +15,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# sensitive
+credentials.txt
+
 # pyenv
 .python-version
 
