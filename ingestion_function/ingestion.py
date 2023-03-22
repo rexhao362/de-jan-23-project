@@ -3,6 +3,7 @@ import json
 from decimal import Decimal
 from ingestion_function.connection import con
 from datetime import datetime
+import boto3
 
 # Create data dir
 if not os.path.exists('./ingestion-function/data'):
@@ -48,12 +49,22 @@ def data_ingestion():
         with open(f'./ingestion_function/data/{table_name}.json', 'w') as f:
             f.write(json.dumps(dict))
 
-def last_updated_date():
-    pass
-
 
 def upload_to_s3():
-    pass
+    # terraform will create the bucket
+    # list buckets
+    # choose bucket with right prefix
+    # upload files
+    s3 = boto3.client('s3')
+    list_buckets = s3.list_buckets()
+    bucket_prefix = 's3-de-ingestion-query-queens'
+    bucket_name = ''
+    for bucket in list_buckets['Buckets']:
+        if bucket['Name'].startswith(bucket_prefix):
+            bucket_name = bucket['Name']
+    for file_name in os.listdir('./ingestion_function/data'):
+        with open(f'./ingestion_function/data/{file_name}', 'rb') as f:
+            s3.put_object(Body=f, Bucket=bucket_name, Key=f'data/{file_name}')
 
 
 def store_last_updated():
