@@ -114,16 +114,36 @@ def build_fact_sales_order(sales_order_dataframe):
     Consider using a dict containing ref memory locations of DataFrames,
     or keyword arguments or default arguments?
 
-    Arg1: sales_order, DataFrame
-
+    headers: ["sales_order_id", "created_at", "last_updated", "design_id", "staff_id", "counterparty_id", "units_sold", "unit_price", "currency_id", "agreed_delivery_date", "agreed_payment_date", "agreed_delivery_location_id"]
     """
     sales_order = sales_order_dataframe.copy()
-    # convert timestamps to datetime objects
-    # sales_order['created_at'] = pd.to_datetime(sales_order['created_at'])
-    # sales_order['created_at'] = sales_order['created_at'].dt.date
-    sales_order = timestamp_to_date(sales_order, 'created_at')
-    print(sales_order)
 
+    # convert timestamps to datetime objects for 'last_updated' and 'created_at'
+    sales_order['last_updated'] = pd.to_datetime(sales_order['last_updated'])
+    sales_order['created_at'] = pd.to_datetime(sales_order['created_at'])
+
+    # can now generate 'last_updated_time' and 'created_time'
+    # sales_order['last_updated_time'] = sales_order['last_updated'].dt.strftime('%H:%M:%S')
+    sales_order['last_updated_time'] = sales_order['last_updated'].dt.time
+    sales_order['created_time'] = sales_order['created_at'].dt.time
+
+    # trunkate dates
+    sales_order['last_updated'] = sales_order['last_updated'].dt.date
+    sales_order['created_at'] = sales_order['created_at'].dt.date
+
+    #generate rest of date columns
+    columns = ['agreed_delivery_date', 'agreed_payment_date']
+    for col in columns:
+        sales_order = timestamp_to_date(sales_order, col)
+    
+    # rename columns
+    sales_order = sales_order.rename(columns={"created_at":"created_date", "last_updated":"last_updated_date", "staff_id":"sales_staff_id"})
+
+    order_list = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
+
+    sales_order = sales_order[order_list]
+    sales_order = sales_order.set_index('sales_order_id')
+    return sales_order
 
 
 def timestamp_to_date(table, column):
@@ -256,10 +276,8 @@ def main():
     sales_order_path = 'test/json_files/sales_order_test_1.json'
     sales_order_data = load_file_from_local(sales_order_path)
     sales_order_dataframe = process(sales_order_data)
-    build_fact_sales_order(sales_order_dataframe)
-
-    # dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
-    # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
+    fact_sales_order = build_fact_sales_order(sales_order_dataframe)
+    print_csv(fact_sales_order, './test/csv_files/fact_sales_order.csv')
 
 
  
