@@ -164,10 +164,38 @@ def build_dim_location(dataframe):
     return dim_location
 
 
-def build_dim_date():
+def build_dim_date(start_date, end_date):
     """
     BUILD DIM_DATE
+    arg1 (string): first date (inclusive) in the range to be generated, format yyyy/mm/dd
+    arg2 (string): last date (inclusive) in the range to be generated, format yyyy/mm/dd
+    Returns: Pandas dataframe with date_id index, and columns for year, month, day, day_of_week, day_name, month_name, and quarter.
+    
+    - Generates and populates a dataframe with a range of dates from start_date to end_date
     """
+    #generate a date time index
+    dti = pd.date_range(start=start_date, end=end_date).to_series()
+    # df = dti.to_frame(index=False)
+    years = dti.dt.year
+    months = dti.dt.month
+    days = dti.dt.day
+    day_of_week = dti.dt.day_of_week
+    day_name = dti.dt.day_name()
+    month_name=dti.dt.month_name()
+    quarter = dti.dt.quarter
+    d={
+        'year': years,
+        'month': months,
+        'day': days,
+        'day_of_week': day_of_week,
+        'day_name': day_name,
+        'month_name': month_name,
+        'quarter': quarter
+    }
+    df = pd.DataFrame(data=d, index=dti)
+    df.index.name = 'date_id'
+    return df
+    
 
 def build_dim_counterparty(original_dataframe, address_dataframe):
     """
@@ -234,20 +262,21 @@ def generate_local_parquet(table):
     # use in filepath?
 
 def main():
-    department_file = 'test/json_files/department_test_1.json'
-    staff_file = 'test/json_files/staff_test_1.json'
-    department_data = load_file_from_local(department_file)
-    staff_data = load_file_from_local(staff_file)
-    department_dataframe = process(department_data)
-    staff_dataframe = process(staff_data)
+    # department_file = 'test/json_files/department_test_1.json'
+    # staff_file = 'test/json_files/staff_test_1.json'
+    # department_data = load_file_from_local(department_file)
+    # staff_data = load_file_from_local(staff_file)
+    # department_dataframe = process(department_data)
+    # staff_dataframe = process(staff_data)
 
-    dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
-    print(department_dataframe)
-    print("-----------")
-    print(staff_dataframe)
-    print("-----------")
-    print(dim_staff)
+    # dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
+    # print(department_dataframe)
+    # print("-----------")
+    # print(staff_dataframe)
+    # print("-----------")
+    # print(dim_staff)
     # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
+    build_dim_date('2022/05/01', '2022/05/05')
 
  
 
