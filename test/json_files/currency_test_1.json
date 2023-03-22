@@ -7,22 +7,23 @@
     ],
     "Data":[
        [
-          "foo1",
-          "bar1",
-          "foobar1",
-          "barfoo1"
+          1,
+          "GBP",
+          "created_1",
+          "updated_1"
        ],
        [
-          "foo2",
-          "bar2",
-          "foobar2",
-          "barfoo2"
-       ],
-       [
-        "foo3",
-        "bar3",
-        "foobar3",
-        "barfoo3"
+        2,
+        "USD",
+        "created_2",
+        "updated_2"
+     ],
+     [
+        3,
+        "EUR",
+        "created_3",
+        "updated_3"
      ]
+       
     ]
  }

@@ -2,10 +2,9 @@ import pandas as pd
 import json
 import numpy as np
 
-# injest json
-# TODO BUILD NEW DIM/FACT TABLES 
-# process into parquet
-# upload to s3 / write to local
+#! INGESTION LABELS ARE LOWER CASE
+#! A LOT OF DATA HAS NULL VALUES SO DONT TEST FOR NONE
+
 def load_file_from_s3():
     pass
 
@@ -25,7 +24,7 @@ def process(table):
     Returns: table, pd data frame
     '''
     try:
-        df = pd.DataFrame(table['Data'], columns=table['Headers'])
+        df = pd.DataFrame(table['data'], columns=table['headers'])
     except KeyError as e:
         raise(e)
     return df
@@ -46,6 +45,9 @@ def print_csv(df, filepath):
 def build_dim_design(dataframe):
 
     """
+    Input: design, dataframe
+    Returns: dim_design, dataframe
+
     BUILD DIM_DESIGN
 
     - strips some data from original design table
@@ -58,13 +60,16 @@ def build_dim_design(dataframe):
 
     """
     df = dataframe.copy()
-    df.drop(['created_at', 'last_updated'])
-    return df
+    dim_design = df.drop(columns=['created_at', 'last_updated'])
+    return dim_design
 
 
 def build_dim_currency(dataframe):
 
     """
+    Input: currency, dataframe
+    Returns: dim_currency, dataframe
+
     BUILD DIM_CURRENCY
 
     - strips some data from original currency table
@@ -77,13 +82,24 @@ def build_dim_currency(dataframe):
     [currency_id, currency_code, currency_name]
 
     """
-
     df = dataframe.copy()
     dim_currency = df.drop(columns=['created_at', 'last_updated'])
-    # TODO - FIND OUT WHAT CODES THERE ARE AND BUILD A BETTER NP ARRAY :)
-    # TODO - Possibly implement with a function?
-    currency_names = ['British Pounds' for item in dim_currency['currency_code']]
-    dim_currency['currency_names'] = currency_names
+
+    # {"GBP" : "Pounds", "USD": "Dollars", "EUR": Euros}
+
+    currency_names = []
+    for item in dim_currency['currency_code']:
+        if item == "GBP":
+            currency_names.append('Pounds')
+        elif item == "USD":
+            currency_names.append('Dollars')
+        elif item == "EUR":
+            currency_names.append('Euros')
+        else:
+            currency_names.append(None)
+
+    dim_currency['currency_name'] = currency_names
+
     return dim_currency
 
 def build_fact_sales_order():
@@ -96,10 +112,25 @@ def build_dim_staff():
     BUILD DIM_STAFF
     """
 
-def build_dim_location():
+def build_dim_location(dataframe):
     """
+    Input: addresses, dataframe
+    Returns: dim_location, dataframe
+
     BUILD DIM_LOCATION
+    input columns:
+    [address_id, address_line_1, address_line_2, district, city, postal_code, country, phone, created_at, last_updated]
+
+    output columns:
+    [
+    location_id, address_line_1, address_line_2, district, city, postal_code, country, phone
+    ]
     """
+    df = dataframe.copy()
+    dim_location = df.drop(columns=['created_at', 'last_updated'])
+    dim_location = dim_location.rename(columns={'address_id':'location_id'})
+    return dim_location
+
 
 def build_dim_date():
     """
