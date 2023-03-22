@@ -3,11 +3,13 @@ from ingestion_function.ingestion import data_ingestion
 from ingestion_function.ingestion import get_table_data
 from ingestion_function.ingestion import get_table_names
 from ingestion_function.ingestion import upload_to_s3
+from ingestion_function.ingestion import retrieve_last_updated
 import os.path
 import json
 import re
 from datetime import datetime
 import boto3
+from moto import mock_s3
 
 # test get_table_names
 
@@ -416,13 +418,25 @@ import boto3
 
 
 #test upload files to s3 bucket
-def test_upload_to_s3_function_uploads_files_to_correct_bucket():
-    s3 = boto3.client('s3')
-    upload_to_s3()
-    list_objects = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-4781192')
-    pass
-    # TODO MOTO
+# def test_upload_to_s3_function_uploads_files_to_correct_bucket():
+#     s3 = boto3.client('s3')
+#     upload_to_s3()
+#     list_objects = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-4781192')
+#     pass
+#     # TODO MOTO
 
 
 #test store_last_updated
-def te
+@mock_s3
+def test_retrieve_last_updated_function_returns_correct_value():
+    s3 = boto3.client('s3')
+    bucket = 's3-de-ingestion-query-queens'
+    s3.create_bucket(Bucket=bucket)
+    # upload mock file to mock bucket?
+    result = retrieve_last_updated()
+    print(result)
+    assert False
+
+
+
+
