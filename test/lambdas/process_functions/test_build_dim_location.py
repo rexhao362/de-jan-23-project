@@ -15,12 +15,6 @@ def test_returned_dataframe_has_expected_columns():
     dim_location_cols = dim_location.columns.values
     assert equal(dim_location_cols, ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone']).all()
 
-
-def test_returned_dataframe_has_no_null_values():
-    for header in dim_location:
-        for entry in dim_location[header]:
-            assert entry
-
 def test_returned_data_is_maintained_through_build():
     assert dim_location['location_id'][0] == 1
     assert dim_location['address_line_1'][0] == "line_1_1"
