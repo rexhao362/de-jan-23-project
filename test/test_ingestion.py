@@ -415,11 +415,14 @@ import boto3
 #         assert json_data['headers'] == get_table_data('transaction')[0]
 
 
-
+#test upload files to s3 bucket
 def test_upload_to_s3_function_uploads_files_to_correct_bucket():
     s3 = boto3.client('s3')
     upload_to_s3()
     list_objects = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-4781192')
-    print(list_objects)
-    assert False
-    
+    pass
+    # TODO MOTO
+
+
+#test store_last_updated
+def te

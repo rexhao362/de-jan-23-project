@@ -6,8 +6,8 @@ from datetime import datetime
 import boto3
 
 # Create data dir
-if not os.path.exists('./ingestion-function/data'):
-    os.makedirs('./ingestion-function/data')
+if not os.path.exists('./ingestion_function/data'):
+    os.makedirs('./ingestion_function/data')
 
 
 # Queries database for table names
@@ -50,11 +50,7 @@ def data_ingestion():
             f.write(json.dumps(dict))
 
 
-def upload_to_s3():
-    # terraform will create the bucket
-    # list buckets
-    # choose bucket with right prefix
-    # upload files
+def get_ingested_bucket_name():
     s3 = boto3.client('s3')
     list_buckets = s3.list_buckets()
     bucket_prefix = 's3-de-ingestion-query-queens'
@@ -62,10 +58,51 @@ def upload_to_s3():
     for bucket in list_buckets['Buckets']:
         if bucket['Name'].startswith(bucket_prefix):
             bucket_name = bucket['Name']
+    return bucket_name
+
+
+def upload_to_s3():
+    # terraform will create the bucket
+    # list buckets
+    #  choose bucket with right prefix
+    # upload files
+    s3 = boto3.client('s3')
     for file_name in os.listdir('./ingestion_function/data'):
         with open(f'./ingestion_function/data/{file_name}', 'rb') as f:
-            s3.put_object(Body=f, Bucket=bucket_name, Key=f'data/{file_name}')
+            s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
+                          Key=f'ingested_data/{file_name}')
+
+
+def retrieve_last_updated():
+    s3 = boto3.client('s3')
+    response = s3.get_object(
+        Bucket=get_ingested_bucket_name(), Key='ingested_data/last_updated.json')
+    json_res = json.loads(response['Body'].read())
+    last_updated = json_res['last_updated']
+    return datetime.strptime(last_updated, '%Y-%m-%dT%H:%M:%S.%f')
 
 
 def store_last_updated():
-    pass
+    date_to_store = retrieve_last_updated()
+    for table in get_table_names():
+        last_updated = con.run(
+            f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
+        if last_updated >= date_to_store:
+            date_to_store = last_updated
+
+    with open('./ingestion_function/data/last_updated.json', 'w') as f:
+        date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        date_object = {'last_updated': date_string}
+        f.write(json.dumps(date_object))
+
+    with open('./ingestion_function/data/last_updated.json', 'rb') as f:
+        s3 = boto3.client('s3')
+        s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
+                      Key='ingested_data/last_updated.json')
+
+
+def lambda_handler():
+    data_ingestion()
+    upload_to_s3()
+    store_last_updated()
+
