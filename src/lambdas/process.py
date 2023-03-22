@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import numpy as np
-
+import pyarrow
 #! INGESTION LABELS ARE LOWER CASE
 #! A LOT OF DATA HAS NULL VALUES SO DONT TEST FOR NONE
 
@@ -130,7 +130,7 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     dim_staff = dim_staff.drop(columns=['department_id', 'created_at', 'last_updated'])
     length = dim_staff.shape[0]
 
-    department_name_col = np.empty(length, dtype='U10')
+    department_name_col = np.empty(length, dtype='U15')
     location_col = np.empty(length, dtype='U10')
 
     for i, id in enumerate(department_id):
@@ -224,6 +224,13 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     # counterparty_legal_postcode
     # counterparty_legal_county
 
+def generate_local_parquet(table):
+    """
+    Input: table, dataframe
+    returns: table, parquet
+    """
+    # get table name
+    # use in filepath?
 
 def main():
     department_file = 'test/json_files/department_test_1.json'
@@ -234,7 +241,12 @@ def main():
     staff_dataframe = process(staff_data)
 
     dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
+    print(department_dataframe)
+    print("-----------")
+    print(staff_dataframe)
+    print("-----------")
     print(dim_staff)
+    # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
 
  
 

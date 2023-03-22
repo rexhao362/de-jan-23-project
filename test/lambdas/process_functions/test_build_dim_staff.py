@@ -27,3 +27,31 @@ def test_returned_data_is_of_correct_datatype():
         assert type(dim_staff['department_name'][i]) == str
         assert type(dim_staff['location'][i]) == str
         assert type(dim_staff['email_address'][i]) == str
+
+def test_returned_data_is_maintained_through_build():
+    for i in range(staff_dataframe.shape[0]):
+        dep_id = staff_dataframe['department_id'][i]
+        if dep_id == 1:
+            assert dim_staff['department_name'][i] == 'Sales'
+            assert dim_staff['location'][i] == 'Manchester'
+        if dep_id == 2:
+            assert dim_staff['department_name'][i] == 'Purchasing'
+            assert dim_staff['location'][i] == 'Manchester'
+        if dep_id == 3:
+            assert dim_staff['department_name'][i] == 'Production'
+            assert dim_staff['location'][i] == 'Leeds'
+        if dep_id == 4:
+            assert dim_staff['department_name'][i] == 'Dispatch'
+            assert dim_staff['location'][i] == 'Leds'
+        if dep_id == 5:
+            assert dim_staff['department_name'][i] == 'Finance'
+            assert dim_staff['location'][i] == 'Manchester'
+        if dep_id == 6:
+            assert dim_staff['department_name'][i] == 'Facilities'
+            assert dim_staff['location'][i] == 'Manchester'
+        if dep_id == 7:
+            assert dim_staff['department_name'][i] == 'Communications'
+            assert dim_staff['location'][i] == 'Leeds'
+        if dep_id == 8:
+            assert dim_staff['department_name'][i] == 'HR'
+            assert dim_staff['location'][i] == 'Leeds'
