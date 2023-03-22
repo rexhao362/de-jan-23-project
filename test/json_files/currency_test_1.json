@@ -1,11 +1,11 @@
 {
-    "Headers":[
+    "headers":[
        "currency_id",
        "currency_code",
        "created_at",
        "last_updated"
     ],
-    "Data":[
+    "data":[
        [
           1,
           "GBP",

@@ -1,5 +1,5 @@
 {
-    "Headers":[
+    "headers":[
        "address_id",
        "address_line_1",
        "address_line_2",
@@ -11,7 +11,7 @@
        "created_at",
        "last_updated"
     ],
-    "Data":[
+    "data":[
        [
           1,
           "line_1_1",

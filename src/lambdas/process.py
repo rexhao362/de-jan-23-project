@@ -140,10 +140,12 @@ def build_dim_date():
 def build_dim_counterparty(original_dataframe, address_dataframe):
     """
     BUILD DIM_COUNTERPARTY
+    arg1: original counterparty dataframe
+    arg2: original address dataframe
     
     input columns = [counterparty_id, counterparty_legal_name, legal_address_id, commercial_contact, delivery_contact, created_at, last_updated]
      1
-    output columns = [counterparty_id, counterparty_legal_name, counterparty_legal_address_line_1, counterparty_legal_address_line_2, counterparty_legal_district, counterparty_legal_city, counterparty_legal_postal_code, counterparty_legal_county, counterparty_legal_phone_number]
+    output columns = [counterparty_id, counterparty_legal_name, counterparty_legal_address_line_1, counterparty_legal_address_line_2, counterparty_legal_district, counterparty_legal_city, counterparty_legal_postal_code, counterparty_legal_country, counterparty_legal_phone_number]
     """
     df = original_dataframe.copy()
     ids = original_dataframe['legal_address_id']
@@ -154,32 +156,31 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     l_add_1 = np.empty(length, dtype='U10')
     l_add_2 = np.empty(length, dtype='U10')
     l_district = np.empty(length, dtype='U10')
-    l_county = np.empty(length, dtype='U10')
+    l_country = np.empty(length, dtype='U10')
     l_city = np.empty(length, dtype='U10')
-    l_postcode = np.empty(length, dtype='U10')
+    l_postal_code = np.empty(length, dtype='U10')
     l_phone = np.empty(length, dtype='U10')
     
     #for each record in dataframe and corresponding address_id
     for i, id in enumerate(ids):
         #query the address table for the right id
-        address = address_dataframe.query(f"address_id == '{id}'")
+        address = address_dataframe.query(f"address_id == {id}")
         #initialize the columns
         l_add_1[i] = address['address_line_1'].item()
         l_add_2[i] = address['address_line_2'].item()
         l_district[i] = address['district'].item()
         l_city[i] = address['city'].item()
-        l_county[i] = address['county'].item()
-        l_postcode[i] = address['postal_code'].item()
+        l_country[i] = address['country'].item()
+        l_postal_code[i] = address['postal_code'].item()
         l_phone[i] = address['phone'].item()
-    
         
     df['counterparty_legal_address_line_1'] = l_add_1
     df['counterparty_legal_address_line_2'] = l_add_2
     df['counterparty_legal_district'] = l_district
-    df['counterparty_legal_county'] = l_county
     df['counterparty_legal_city'] = l_city
-    df['counterparty_legal_postcode'] = l_postcode
-    df['counterparty_legal_phone'] = l_phone
+    df['counterparty_legal_postal_code'] = l_postal_code
+    df['counterparty_legal_country'] = l_country
+    df['counterparty_legal_phone_number'] = l_phone
         
     return df
     

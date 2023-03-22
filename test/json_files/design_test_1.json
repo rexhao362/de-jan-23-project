@@ -1,5 +1,5 @@
 {
-    "Headers":[
+    "headers":[
        "design_id",
        "created_at",
        "last_updated",
@@ -7,7 +7,7 @@
        "file_location",
        "file_name"
     ],
-    "Data":[
+    "data":[
        [
           "des_id_1",
           "created_1",

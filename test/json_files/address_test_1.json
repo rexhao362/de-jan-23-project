@@ -1,17 +1,17 @@
 {
-  "Headers": [
+  "headers": [
     "address_id",
     "address_line_1",
     "address_line_2",
     "district",
     "city",
     "postal_code",
-    "county",
+    "country",
     "phone"
   ],
-  "Data": [
-    ["0", "foo1", "bar1", "foo1", "barfoo1", "foofoobar1", "foobarfoo1", "booboofar1"],
-    ["2", "foo2", "bar2", "foo2", "barfoo2", "foofoobar2", "foobarfoo2", "booboofar2"],
-    ["1", "foo3", "bar3", "foo3", "barfoo3", "foofoobar3", "foobarfoo3", "booboofar3"]
+  "data": [
+    [0, "foo1", "bar1", "foo1", "barfoo1", "foofoobar1", "foobarfoo1", "35434528734"],
+    [2, "foo2", "bar2", "foo2", "barfoo2", "foofoobar2", "foobarfoo2", "23656345634"],
+    [1, "foo3", "bar3", "foo3", "barfoo3", "foofoobar3", "foobarfoo3", "34635745634"]
   ]
 }
