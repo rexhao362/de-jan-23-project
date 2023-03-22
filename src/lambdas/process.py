@@ -102,22 +102,38 @@ def build_dim_currency(dataframe):
 
     return dim_currency
 
-def build_fact_sales_order():
+def build_fact_sales_order(sales_order_dataframe):
+
     """
+    Input: dataframes, dict
+    Returns: fact_sales_order, dataframe
+    
     BUILD FACT_SALES_ORDER
 
     Consider using a dict containing ref memory locations of DataFrames,
     or keyword arguments or default arguments?
 
     Arg1: sales_order, DataFrame
-    Arg2: dim_date, DataFrame
-    Arg3: dim_staff, DataFrame
-    Arg4: dim_counterparty, DataFrame
-    Arg5: dim_currency, DataFrame
-    Arg6: dim_design, DataFrame
-    Arg7: dim_location, DataFrame
 
     """
+    sales_order = sales_order_dataframe.copy()
+    #TODO - FIND OUT WHAT FORMAT DATE COMES IN
+
+
+
+
+def timestamp_to_date(timestamp):
+    """
+    Input: timestamp, timestamp 
+    Returns: date, date
+
+    Example: timestamp_to_date("2022-11-07T15:53:10.153000") -> [07,11,2022]
+    """
+    date = timestamp[:10].split('-')
+    date.reverse()
+    return date
+
+
 def build_dim_staff(staff_dataframe, department_dataframe):
     """
     BUILD DIM_STAFF
@@ -240,13 +256,9 @@ def main():
     department_dataframe = process(department_data)
     staff_dataframe = process(staff_data)
 
-    dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
-    print(department_dataframe)
-    print("-----------")
-    print(staff_dataframe)
-    print("-----------")
-    print(dim_staff)
+    # dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
     # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
+
 
  
 
