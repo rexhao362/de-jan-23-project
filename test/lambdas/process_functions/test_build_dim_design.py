@@ -1,4 +1,5 @@
-from src.lambdas.process import (load_file_from_local, process, build_dim_design)
+from src.lambdas.utils import load_file_from_local, process
+from src.lambdas.build import build_dim_design
 from pandas import DataFrame
 from numpy import equal
 

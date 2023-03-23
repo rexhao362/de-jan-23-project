@@ -1,4 +1,5 @@
-from src.lambdas.process import (load_file_from_local, process, build_dim_date)
+from src.lambdas.utils import load_file_from_local, process
+from src.lambdas.build import build_dim_date
 from pandas import DataFrame
 from pandas import testing as pdtesting
 from pandas import to_datetime as to_datetime

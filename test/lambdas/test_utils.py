@@ -1,4 +1,4 @@
-from src.lambdas.process import (load_file_from_local, process, print_csv)
+from src.lambdas.utils import (load_file_from_local, process, print_csv)
 from pandas import DataFrame
 import pytest
 import numpy as np
