@@ -62,7 +62,8 @@ def build_dim_design(dataframe):
     """
     df = dataframe.copy()
     dim_design = df.drop(columns=['created_at', 'last_updated'])
-    return dim_design
+    dim_design = dim_design.set_index('design_id')
+    return dim_design[['design_name', 'file_location', 'file_name']]
 
 
 def build_dim_currency(dataframe):
@@ -100,8 +101,8 @@ def build_dim_currency(dataframe):
             currency_names.append(None)
 
     dim_currency['currency_name'] = currency_names
-
-    return dim_currency
+    dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
+    return dim_currency.set_index('currency_id')
 
 def build_fact_sales_order(sales_order_dataframe):
 
@@ -142,8 +143,7 @@ def build_fact_sales_order(sales_order_dataframe):
     order_list = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
 
     sales_order = sales_order[order_list]
-    sales_order = sales_order.set_index('sales_order_id')
-    return sales_order
+    return sales_order.set_index('sales_order_id')
 
 
 def timestamp_to_date(table, column):
@@ -180,8 +180,8 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     
     dim_staff['department_name'] = department_name_col
     dim_staff['location'] = location_col
-
-    return dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
+    dim_staff = dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
+    return dim_staff.set_index('staff_id')
 
 
 def build_dim_location(dataframe):
@@ -201,7 +201,7 @@ def build_dim_location(dataframe):
     df = dataframe.copy()
     dim_location = df.drop(columns=['created_at', 'last_updated'])
     dim_location = dim_location.rename(columns={'address_id':'location_id'})
-    return dim_location
+    return dim_location.set_index('location_id')
 
 
 def build_dim_date():
@@ -219,6 +219,7 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     """
     df = original_dataframe.copy()
     ids = original_dataframe['legal_address_id']
+    print(ids)
     df = df.drop(columns=['last_updated', 'created_at', 'delivery_contact', 'commercial_contact', 'legal_address_id'])
     #print(ids)
     length = df.shape[0]
@@ -230,12 +231,13 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     l_city = np.empty(length, dtype='U10')
     l_postcode = np.empty(length, dtype='U10')
     l_phone = np.empty(length, dtype='U10')
-    
     #for each record in dataframe and corresponding address_id
     for i, id in enumerate(ids):
         #query the address table for the right id
         address = address_dataframe.query(f"address_id == '{id}'")
+        # print(address['city'])
         #initialize the columns
+        # print(address['address_line_1'].item())
         l_add_1[i] = address['address_line_1'].item()
         l_add_2[i] = address['address_line_2'].item()
         l_district[i] = address['district'].item()
@@ -248,21 +250,12 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     df['counterparty_legal_address_line_1'] = l_add_1
     df['counterparty_legal_address_line_2'] = l_add_2
     df['counterparty_legal_district'] = l_district
-    df['counterparty_legal_county'] = l_county
     df['counterparty_legal_city'] = l_city
-    df['counterparty_legal_postcode'] = l_postcode
-    df['counterparty_legal_phone'] = l_phone
-        
-    return df
-    
-    
-    # use ids to fetch from address:
-    # counterparty_legal_address_line_1
-    # counterparty_legal_address_line_2
-    # counterparty_legal_district
-    # counterparty_legal_city
-    # counterparty_legal_postcode
-    # counterparty_legal_county
+    df['counterparty_legal_postal_code'] = l_postcode
+    df['counterparty_legal_country'] = l_county
+    df['counterparty_legal_phone_number'] = l_phone
+
+    return df.set_index('counterparty_id')
 
 def generate_local_parquet(table):
     """
@@ -273,14 +266,44 @@ def generate_local_parquet(table):
     # use in filepath?
 
 def main():
-    sales_order_path = 'test/json_files/sales_order_test_1.json'
-    sales_order_data = load_file_from_local(sales_order_path)
-    sales_order_dataframe = process(sales_order_data)
-    fact_sales_order = build_fact_sales_order(sales_order_dataframe)
-    print_csv(fact_sales_order, './test/csv_files/fact_sales_order.csv')
+    # BUILD CURRENCY DATAFRAME
+    curr_path = 'test/json_files/currency_test_2.json'
+    curr_data = load_file_from_local(curr_path)
+    curr_dataframe = process(curr_data)
+
+    # BUILD STAFF DATAFRAME
+    staff_path = 'test/json_files/staff_test_1.json'
+    staff_data = load_file_from_local(staff_path)
+    staff_dataframe = process(staff_data)
+
+    # BUILD DEPARTMENT DATAFRAME
+    dep_path = 'test/json_files/department_test_1.json'
+    dep_data = load_file_from_local(dep_path)
+    department_dataframe = process(dep_data)
+
+    # BUILD ADDRESS DATAFRAME
+    address_path = 'test/json_files/address_test_2.json'
+    address_data = load_file_from_local(address_path)
+    address_dataframe = process(address_data)
+
+    # BUILD COUNTERPARTY DATAFRAME
+    counter_path = 'test/json_files/counterparty_test_2.json'
+    counter_data = load_file_from_local(counter_path)
+    counter_dataframe = process(counter_data)
+
+    # BUILD DESIGN DATAFRAME
+    design_path = 'test/json_files/design_test_2.json'
+    design_data = load_file_from_local(design_path)
+    design_dataframe = process(design_data)
+
+    # BUILD SALES DATAFRAME
+    sales_path = 'test/json_files/sales_order_test_1.json'
+    sales_data = load_file_from_local(sales_path)
+    sales_dataframe = process(sales_data)
+    
+    # BUILD DATE DATAFRAME
 
 
- 
 
 
 
