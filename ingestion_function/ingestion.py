@@ -23,16 +23,19 @@ def get_headers():
 
 
 # Extracts list of table data
-def get_table_data(table_name):
-    table_data = con.run(f'SELECT * FROM {table_name}')
+def get_table_data(table_name, check):
+    table_data = con.run(f'SELECT * FROM {table_name} WHERE last_updated > TO_TIMESTAMP(:topic, :topic_two)', topic=check.strftime('%d-%m-%Y %H:%M:%S'), topic_two="dd-mm-yyyy hh24:mi:ss")
     table_data.insert(0, get_headers())
     return table_data
+ 
+
+get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
 
 
 # Writes dictionary of table to file
-def data_ingestion():
+def data_ingestion(check):
     for table_name in get_table_names():
-        table_data = get_table_data(table_name)
+        table_data = get_table_data(table_name, check)
         for row in table_data:
             for i in range(len(row)):
                 if isinstance(row[i], datetime):
@@ -93,8 +96,8 @@ def retrieve_last_updated():
         return datetime.strptime(last_updated, '%Y-%m-%dT%H:%M:%S.%f')
 
 
-def store_last_updated():
-    date_to_store = retrieve_last_updated()
+def store_last_updated(check):
+    date_to_store = check
     for table in get_table_names():
         most_recent = con.run(
             f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
@@ -114,7 +117,7 @@ def store_last_updated():
 
 
 def lambda_handler():
-    last_updated = retrieve_last_updated()
-    data_ingestion()
+    check = retrieve_last_updated()
+    data_ingestion(check)
     upload_to_s3()
-    store_last_updated()
+    store_last_updated(check)
