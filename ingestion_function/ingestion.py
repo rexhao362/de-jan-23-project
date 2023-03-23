@@ -13,8 +13,8 @@ if not os.path.exists('./ingestion_function/data'):
 # Queries database for table names
 def get_table_names():
     table_names = con.run(
-        'SELECT table_name, table_schema FROM information_schema.tables')
-    return [item[0] for item in table_names if item[1] == 'public']
+        'SELECT table_name FROM information_schema.tables WHERE table_schema= :schema', schema='public')
+    return [item[0] for item in table_names]
 
 
 # Extracts column names for current table
@@ -28,8 +28,6 @@ def get_table_data(table_name):
     table_data.insert(0, get_headers())
     return table_data
 
-# check whether processing function team want empty files if no data change or just files where new data
-# and whether they want new folder each time rather than re-writing each file - delete file after it's been used?
 
 # Writes dictionary of table to file
 def data_ingestion():
