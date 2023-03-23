@@ -1,6 +1,6 @@
 \c test_warehouse_db
 
-DROP SCHEMA IF EXISTS project_team_1;
+DROP SCHEMA IF EXISTS project_team_1 CASCADE;
 CREATE SCHEMA project_team_1;
 
 CREATE TABLE project_team_1.fact_sales_order (
