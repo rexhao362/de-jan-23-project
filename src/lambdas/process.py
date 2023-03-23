@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import numpy as np
 import pyarrow
+
 #! INGESTION LABELS ARE LOWER CASE
 #! A LOT OF DATA HAS NULL VALUES SO DONT TEST FOR NONE
 
@@ -61,7 +62,8 @@ def build_dim_design(dataframe):
     """
     df = dataframe.copy()
     dim_design = df.drop(columns=['created_at', 'last_updated'])
-    return dim_design
+    dim_design = dim_design.set_index('design_id')
+    return dim_design[['design_name', 'file_location', 'file_name']]
 
 
 def build_dim_currency(dataframe):
@@ -99,25 +101,63 @@ def build_dim_currency(dataframe):
             currency_names.append(None)
 
     dim_currency['currency_name'] = currency_names
+    dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
+    return dim_currency.set_index('currency_id')
 
-    return dim_currency
+def build_fact_sales_order(sales_order_dataframe):
 
-def build_fact_sales_order():
     """
+    Input: dataframes, dict
+    Returns: fact_sales_order, dataframe
+    
     BUILD FACT_SALES_ORDER
 
     Consider using a dict containing ref memory locations of DataFrames,
     or keyword arguments or default arguments?
 
-    Arg1: sales_order, DataFrame
-    Arg2: dim_date, DataFrame
-    Arg3: dim_staff, DataFrame
-    Arg4: dim_counterparty, DataFrame
-    Arg5: dim_currency, DataFrame
-    Arg6: dim_design, DataFrame
-    Arg7: dim_location, DataFrame
-
+    headers: ["sales_order_id", "created_at", "last_updated", "design_id", "staff_id", "counterparty_id", "units_sold", "unit_price", "currency_id", "agreed_delivery_date", "agreed_payment_date", "agreed_delivery_location_id"]
     """
+    sales_order = sales_order_dataframe.copy()
+
+    # convert timestamps to datetime objects for 'last_updated' and 'created_at'
+    sales_order['last_updated'] = pd.to_datetime(sales_order['last_updated'])
+    sales_order['created_at'] = pd.to_datetime(sales_order['created_at'])
+
+    # can now generate 'last_updated_time' and 'created_time'
+    # sales_order['last_updated_time'] = sales_order['last_updated'].dt.strftime('%H:%M:%S')
+    sales_order['last_updated_time'] = sales_order['last_updated'].dt.time
+    sales_order['created_time'] = sales_order['created_at'].dt.time
+
+    # trunkate dates
+    sales_order['last_updated'] = sales_order['last_updated'].dt.date
+    sales_order['created_at'] = sales_order['created_at'].dt.date
+
+    #generate rest of date columns
+    columns = ['agreed_delivery_date', 'agreed_payment_date']
+    for col in columns:
+        sales_order = timestamp_to_date(sales_order, col)
+    
+    # rename columns
+    sales_order = sales_order.rename(columns={"created_at":"created_date", "last_updated":"last_updated_date", "staff_id":"sales_staff_id"})
+
+    order_list = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
+
+    sales_order = sales_order[order_list]
+    return sales_order.set_index('sales_order_id')
+
+
+def timestamp_to_date(table, column):
+    """
+    Input[0]: table, dataframe 
+    Input[1]: column, string
+
+    Returns: table, dataframe
+    """
+    table[column] = pd.to_datetime(table[column])
+    table[column] = table[column].dt.date
+    return table
+
+
 def build_dim_staff(staff_dataframe, department_dataframe):
     """
     BUILD DIM_STAFF
@@ -140,8 +180,8 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     
     dim_staff['department_name'] = department_name_col
     dim_staff['location'] = location_col
-
-    return dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
+    dim_staff = dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
+    return dim_staff.set_index('staff_id')
 
 
 def build_dim_location(dataframe):
@@ -161,7 +201,7 @@ def build_dim_location(dataframe):
     df = dataframe.copy()
     dim_location = df.drop(columns=['created_at', 'last_updated'])
     dim_location = dim_location.rename(columns={'address_id':'location_id'})
-    return dim_location
+    return dim_location.set_index('location_id')
 
 
 def build_dim_date(start_date, end_date):
@@ -209,6 +249,7 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     """
     df = original_dataframe.copy()
     ids = original_dataframe['legal_address_id']
+    print(ids)
     df = df.drop(columns=['last_updated', 'created_at', 'delivery_contact', 'commercial_contact', 'legal_address_id'])
     #print(ids)
     length = df.shape[0]
@@ -220,12 +261,14 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     l_city = np.empty(length, dtype='U10')
     l_postal_code = np.empty(length, dtype='U10')
     l_phone = np.empty(length, dtype='U10')
-    
     #for each record in dataframe and corresponding address_id
     for i, id in enumerate(ids):
+    
         #query the address table for the right id
         address = address_dataframe.query(f"address_id == {id}")
+
         #initialize the columns
+        # print(address['address_line_1'].item())
         l_add_1[i] = address['address_line_1'].item()
         l_add_2[i] = address['address_line_2'].item()
         l_district[i] = address['district'].item()
@@ -262,27 +305,47 @@ def generate_local_parquet(table):
     # use in filepath?
 
 def main():
-    # department_file = 'test/json_files/department_test_1.json'
-    # staff_file = 'test/json_files/staff_test_1.json'
-    # department_data = load_file_from_local(department_file)
-    # staff_data = load_file_from_local(staff_file)
-    # department_dataframe = process(department_data)
-    # staff_dataframe = process(staff_data)
+    # BUILD CURRENCY DATAFRAME
+    curr_path = 'test/json_files/currency_test_2.json'
+    curr_data = load_file_from_local(curr_path)
+    curr_dataframe = process(curr_data)
 
-    # dim_staff = build_dim_staff(staff_dataframe, department_dataframe)
-    # print(department_dataframe)
-    # print("-----------")
-    # print(staff_dataframe)
-    # print("-----------")
-    # print(dim_staff)
-    # dim_currency.to_parquet(f'test/parquets/dim_currency.parquet', compression=None)
-    build_dim_date('2022/05/01', '2022/05/05')
+    # BUILD STAFF DATAFRAME
+    staff_path = 'test/json_files/staff_test_1.json'
+    staff_data = load_file_from_local(staff_path)
+    staff_dataframe = process(staff_data)
 
- 
+    # BUILD DEPARTMENT DATAFRAME
+    dep_path = 'test/json_files/department_test_1.json'
+    dep_data = load_file_from_local(dep_path)
+    department_dataframe = process(dep_data)
+
+    # BUILD ADDRESS DATAFRAME
+    address_path = 'test/json_files/address_test_2.json'
+    address_data = load_file_from_local(address_path)
+    address_dataframe = process(address_data)
+
+    # BUILD COUNTERPARTY DATAFRAME
+    counter_path = 'test/json_files/counterparty_test_2.json'
+    counter_data = load_file_from_local(counter_path)
+    counter_dataframe = process(counter_data)
+
+    # BUILD DESIGN DATAFRAME
+    design_path = 'test/json_files/design_test_2.json'
+    design_data = load_file_from_local(design_path)
+    design_dataframe = process(design_data)
+
+    # BUILD SALES DATAFRAME
+    sales_path = 'test/json_files/sales_order_test_1.json'
+    sales_data = load_file_from_local(sales_path)
+    sales_dataframe = process(sales_data)
+    
+    # BUILD DATE DATAFRAME
+
 
 
 
 if __name__ == "__main__":
     main()
 
-    
+  
