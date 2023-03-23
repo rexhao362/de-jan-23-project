@@ -35,4 +35,4 @@ except Exception as e:
     exit( str(e) )
 
 with Connection(user, password=password, host=host, port=port, database=database) as connection:
-    populate_dim_currency(connection, input_data)
+    populate_dim_currency(connection, input_data, schema)
