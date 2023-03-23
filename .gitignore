@@ -17,6 +17,8 @@ coverage.xml
 
 # sensitive
 credentials.txt
+setup_production_chedentials.sh
+setup_test_credentials.sh
 
 # pyenv
 .python-version
