@@ -26,5 +26,3 @@ setup_test_credentials.sh
 # Environments
 venv/
 
-# loading module
-src/loading/config.py
