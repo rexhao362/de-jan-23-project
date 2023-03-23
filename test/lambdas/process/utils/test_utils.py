@@ -2,6 +2,7 @@ from src.lambdas.process.utils import (load_file_from_local, process, print_csv)
 from pandas import DataFrame
 import pytest
 import numpy as np
+import moto
 full_json = 'test/json_files/process_test_1.json'
 empty_json = 'test/json_files/process_test_2.json'
 no_data_json = 'test/json_files/process_test_3.json'
