@@ -2,8 +2,7 @@ import pandas as pd
 import json
 import numpy as np
 import pyarrow
-from lambdas.process.utils import (load_file_from_local, process, load_file_from_s3)
-
+from src.lambdas.process.utils import (load_file_from_local, process, load_file_from_s3)
 def main():
     # LOAD CURRENCY DATAFRAME
     curr_path = 'test/json_files/currency_test_2.json'
@@ -39,12 +38,7 @@ def main():
     sales_path = 'test/json_files/sales_order_test_1.json'
     sales_data = load_file_from_local(sales_path)
     sales_dataframe = process(sales_data)
-    
-    bucket_name = 'de-final-project-gv-ingestion'
-    key_name = 'counterparty_test_2.json'
-    object = load_file_from_s3(bucket_name, key_name)
-    print(object)
-    
+   
 
 if __name__ == "__main__":
     main()
