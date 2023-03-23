@@ -4,12 +4,15 @@ from ingestion_function.ingestion import get_table_data
 from ingestion_function.ingestion import get_table_names
 from ingestion_function.ingestion import upload_to_s3
 from ingestion_function.ingestion import retrieve_last_updated
+from ingestion_function.ingestion import get_ingested_bucket_name
 import os.path
+import os
 import json
 import re
 from datetime import datetime
 import boto3
 from moto import mock_s3
+import pytest
 
 # test get_table_names
 
@@ -417,6 +420,88 @@ from moto import mock_s3
 #         assert json_data['headers'] == get_table_data('transaction')[0]
 
 
+# Mocking AWS credentials
+@pytest.fixture
+def aws_credentials():
+
+    '''Mocked AWS credentials for moto.'''
+
+    os.environ['AWS_ACCESS_KEY_ID'] = 'test'
+    os.environ['AWS_SECRET_ACCESS_KEY'] = 'test'
+    os.environ['AWS_SECURITY_TOKEN'] = 'test'
+    os.environ['AWS_SESSION_TOKEN'] = 'test'
+    os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+
+@pytest.fixture
+def s3(aws_credentials):
+    with mock_s3():
+        yield boto3.client('s3')
+
+@pytest.fixture
+def bucket(s3):
+    s3.create_bucket(
+        Bucket='s3-de-ingestion-query-queens-test-bucket'
+    )
+
+def test_get_ingested_bucket_name_function_gets_correct_bucket_name(bucket, s3):
+    s3.create_bucket(
+        Bucket='bucket-test-2'
+    )
+    s3.create_bucket(
+        Bucket='bucket-test-3'
+    )
+    s3.create_bucket(
+        Bucket='bucket-test-4'
+    )
+    assert get_ingested_bucket_name() == 's3-de-ingestion-query-queens-test-bucket'
+
+def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
+    table_names = ['counterparty', 'currency', 'department', 'design', 'payment', 'transaction', 'staff', 'sales_order', 'address', 'purchase_order', 'payment_type']
+    for table in table_names:
+        with open(f'./ingestion_function/data/{table}.json', 'w') as f:
+            f.write('')
+    upload_to_s3()
+    response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket')
+    list_of_files = [item['Key'] for item in response['Contents']]
+    print(list_of_files)
+    for table in table_names:
+        assert f'ingested_data/{table}.json' in list_of_files
+
+
+def test_retrieve_last_updated_function_retrieves_last_updated(bucket, s3):
+    with open('./last_updated.json', 'rb') as f:
+        s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
+                      Key='date/last_updated.json')
+    assert retrieve_last_updated() == datetime(2000, 11, 3, 14, 20, 49, 962000)
+
+
+def test_retrieve_last_updated_returns_default_date_if_last_updated_file_not_in_bucket(bucket, s3):
+    result = retrieve_last_updated()
+    assert result == datetime(2022, 10, 5, 16, 30, 42, 962000)
+
+
+# def test_store_last_updated_stores_last_updated(bucket, s3):
+#     data_ingestion()
+#     response = s3.get_object(
+#         Bucket=get_ingested_bucket_name(), Key='non_existent_file.json')
+#     print(response)
+#     assert False
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
 #test upload files to s3 bucket
 # def test_upload_to_s3_function_uploads_files_to_correct_bucket():
 #     s3 = boto3.client('s3')
@@ -427,15 +512,15 @@ from moto import mock_s3
 
 
 #test store_last_updated
-@mock_s3
-def test_retrieve_last_updated_function_returns_correct_value():
-    s3 = boto3.client('s3')
-    bucket = 's3-de-ingestion-query-queens'
-    s3.create_bucket(Bucket=bucket)
-    # upload mock file to mock bucket?
-    result = retrieve_last_updated()
-    print(result)
-    assert False
+# @mock_s3
+# def test_retrieve_last_updated_function_returns_correct_value():
+#     s3 = boto3.client('s3')
+#     bucket = 's3-de-ingestion-query-queens'
+#     s3.create_bucket(Bucket=bucket)
+#     # upload mock file to mock bucket?
+#     result = retrieve_last_updated()
+#     print(result)
+#     assert False
 
 
 
