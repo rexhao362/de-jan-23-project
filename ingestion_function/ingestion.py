@@ -23,9 +23,8 @@ def get_headers():
 
 
 # Extracts list of table data
-def get_table_data(table_name, last_updated):
-    table_data = con.run(f'SELECT * FROM {table_name} WHERE last_updated > 
-    {last_updated}')
+def get_table_data(table_name):
+    table_data = con.run(f'SELECT * FROM {table_name}')
     table_data.insert(0, get_headers())
     return table_data
 
@@ -33,9 +32,9 @@ def get_table_data(table_name, last_updated):
 # and whether they want new folder each time rather than re-writing each file - delete file after it's been used?
 
 # Writes dictionary of table to file
-def data_ingestion(last_updated):
+def data_ingestion():
     for table_name in get_table_names():
-        table_data = get_table_data(table_name, last_updated)
+        table_data = get_table_data(table_name)
         for row in table_data:
             for i in range(len(row)):
                 if isinstance(row[i], datetime):
@@ -73,8 +72,11 @@ def upload_to_s3():
     s3 = boto3.client('s3')
     for file_name in os.listdir('./ingestion_function/data'):
         with open(f'./ingestion_function/data/{file_name}', 'rb') as f:
+            dt_now = datetime.now()
+            current_day = dt_now.strftime('%d-%m-%Y')
+            current_time = dt_now.strftime('%H:%M:%S')
             s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
-                          Key=f'ingested_data/{file_name}')
+                          Key=f'{current_day}/{current_time}/{file_name}')
 
 
 # returns a date which gets passed to store_last_updated function
@@ -90,8 +92,8 @@ def retrieve_last_updated():
         return datetime.strptime(last_updated, '%Y-%m-%dT%H:%M:%S.%f')
 
 
-def store_last_updated(last_updated):
-    date_to_store = last_updated
+def store_last_updated():
+    date_to_store = retrieve_last_updated()
     for table in get_table_names():
         most_recent = con.run(
             f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
@@ -112,6 +114,6 @@ def store_last_updated(last_updated):
 
 def lambda_handler():
     last_updated = retrieve_last_updated()
-    data_ingestion(last_updated)
+    data_ingestion()
     upload_to_s3()
-    store_last_updated(last_updated)
+    store_last_updated()
