@@ -1,6 +1,6 @@
 import pyarrow.parquet as pq
 
-table = pq.read_table("test/loading/input_files/dim_currency.parquet")
+table = pq.read_table("test/load/input_files/dim_currency.parquet")
 
 columns = table.column_names
 

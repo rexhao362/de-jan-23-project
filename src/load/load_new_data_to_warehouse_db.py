@@ -1,11 +1,11 @@
 import pyarrow.parquet as pq
-import src.loading.format_functions as format_namespace
+import src.load.format_functions as format_namespace
 
 def load_new_data_to_warehouse_db():
     input_data_list = [
         {
             "table_name": "dim_currency",
-            "file_name": "test/loading/input_files/dim_currency.parquet"
+            "file_name": "test/load/input_files/dim_currency.parquet"
         }
     ]
 

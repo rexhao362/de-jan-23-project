@@ -5,8 +5,8 @@ import pyarrow.parquet as pq
 import pandas
 from pg8000.native import Connection
 
-from src.loading.format_dim_currency_data import format_dim_currency_data
-from src.loading.populate_dim_currency import populate_dim_currency
+from src.load.format_dim_currency_data import format_dim_currency_data
+from src.load.populate_dim_currency import populate_dim_currency
 
 # setup credentials fron env variables
 # based on https://github.com/tlocke/pg8000#use-environment-variables-as-connection-defaults
@@ -18,10 +18,10 @@ database = environ.get('WAREHOUSE_DB_DATABASE')
 schema = environ.get('WAREHOUSE_DB_DATABASE_SCHEMA')
 
 #input_file_name = ""
-#input_file_name = "test/loading/input_files/invalid.parquet"
+#input_file_name = "test/load/input_files/invalid.parquet"
 #input_file_name = "./README.md"
 
-input_file_name = "test/loading/input_files/dim_currency.parquet"
+input_file_name = "test/load/input_files/dim_currency.parquet"
 #input_file_name = "s3://parquet-101/dim_currency.parquet"
 input_data = []
 

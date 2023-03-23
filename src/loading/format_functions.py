@@ -1,1 +1,0 @@
-from src.loading.format_dim_currency_data import format_dim_currency_data
