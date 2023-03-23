@@ -1,4 +1,3 @@
-from os import environ
 from src.loading.utils.test_populate_tables import _test_populate_independent_table
 
 table_name = "dim_currency"
