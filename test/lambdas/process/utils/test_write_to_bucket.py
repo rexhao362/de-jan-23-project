@@ -3,7 +3,7 @@ from moto import mock_s3
 from moto.core import patch_client
 import os
 import boto3
-from src.lambdas.utils import write_to_bucket
+# from src.lambdas.process.utils import write_to_bucket
 import pandas as pd
 
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.lambdas.utils import (timestamp_to_date)
+from src.lambdas.process.utils import (timestamp_to_date)
 """
 Functions used to build dimension & fact table dataframes from given table dataframes.
 """

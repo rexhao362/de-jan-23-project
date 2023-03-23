@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import numpy as np
 import pyarrow
-from utils import (load_file_from_local, process)
+from src.lambdas.process.utils import (load_file_from_local, process)
 
 def main():
     # LOAD CURRENCY DATAFRAME
