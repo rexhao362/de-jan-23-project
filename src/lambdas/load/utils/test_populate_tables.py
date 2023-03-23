@@ -1,5 +1,5 @@
 from pg8000.native import Connection
-import src.load.populate_functions as populate_functions
+import src.lambdas.load.populate_functions as populate_functions
 from src.environ.warehouse_db import env_warehouse_db as env
 
 def _test_populate_independent_table(table_name, input_data):

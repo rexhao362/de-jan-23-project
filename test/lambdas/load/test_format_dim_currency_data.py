@@ -1,9 +1,9 @@
 import pytest
 import pandas
-from src.load.format_dim_currency_data import format_dim_currency_data
+from src.lambdas.load.format_dim_currency_data import format_dim_currency_data
 
 # happy path
-test_path = "test/load/input_files"
+test_path = "test/lambdas/load/input_files"
 
 def _test_format_dim_currency_data(path, ref_output = None):
     data_frame = pandas.read_parquet(path)
@@ -45,7 +45,7 @@ def test_raises_exception_on_errors():
 
     # # file of 0 bytes
     # with pytest.raises(Exception) as e:
-    #     format_dim_currency_data("test/load/input_files/invalid.parquet")
+    #     format_dim_currency_data("test/lambdas/load/input_files/invalid.parquet")
 
     # # invalid format type
     # with pytest.raises(Exception) as e:
@@ -55,4 +55,4 @@ def test_raises_exception_on_errors():
 
     # inalid data types - MAYBE TODO?
     # with pytest.raises(Exception) as e:
-    #     format_dim_currency_data("test/load/input_files/dim_currency.parquet")
+    #     format_dim_currency_data("test/lambdas/load/input_files/dim_currency.parquet")
