@@ -62,8 +62,8 @@ def build_dim_design(dataframe):
     """
     df = dataframe.copy()
     dim_design = df.drop(columns=['created_at', 'last_updated'])
-    dim_design = dim_design.set_index('design_id')
-    return dim_design[['design_name', 'file_location', 'file_name']]
+    dim_design = dim_design
+    return dim_design[['design_id', 'design_name', 'file_location', 'file_name']]
 
 
 def build_dim_currency(dataframe):
@@ -102,7 +102,7 @@ def build_dim_currency(dataframe):
 
     dim_currency['currency_name'] = currency_names
     dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
-    return dim_currency.set_index('currency_id')
+    return dim_currency
 
 def build_fact_sales_order(sales_order_dataframe):
 
@@ -143,7 +143,7 @@ def build_fact_sales_order(sales_order_dataframe):
     order_list = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
 
     sales_order = sales_order[order_list]
-    return sales_order.set_index('sales_order_id')
+    return sales_order
 
 
 def timestamp_to_date(table, column):
@@ -181,7 +181,7 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     dim_staff['department_name'] = department_name_col
     dim_staff['location'] = location_col
     dim_staff = dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
-    return dim_staff.set_index('staff_id')
+    return dim_staff
 
 
 def build_dim_location(dataframe):
@@ -201,8 +201,7 @@ def build_dim_location(dataframe):
     df = dataframe.copy()
     dim_location = df.drop(columns=['created_at', 'last_updated'])
     dim_location = dim_location.rename(columns={'address_id':'location_id'})
-    return dim_location.set_index('location_id')
-
+    return dim_location
 
 def build_dim_date(start_date, end_date):
     """
@@ -224,6 +223,7 @@ def build_dim_date(start_date, end_date):
     month_name=dti.dt.month_name()
     quarter = dti.dt.quarter
     d={
+        'date_id': dti,
         'year': years,
         'month': months,
         'day': days,
@@ -232,8 +232,7 @@ def build_dim_date(start_date, end_date):
         'month_name': month_name,
         'quarter': quarter
     }
-    df = pd.DataFrame(data=d, index=dti)
-    df.index.name = 'date_id'
+    df = pd.DataFrame(data=d)
     return df
     
 
