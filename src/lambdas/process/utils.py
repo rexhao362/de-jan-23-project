@@ -1,8 +1,9 @@
 import pandas as pd
-import json
 import boto3
-import re
+import json
 import logging
+import re
+
 # import pyarrow
 
 def load_file_from_local(filepath):
@@ -19,6 +20,37 @@ def load_file_from_local(filepath):
     json_data.close()
     return data
 
+def load_file_from_s3(bucket, key):
+    """
+    Loads JSON from S3.
+
+    Args:
+        param1: bucket name, string
+        param2: object key, string
+
+    Returns: JSON, dict
+    
+    Raises:
+        KeyError: Raises an exception.
+    """
+    client = boto3.client('s3')
+    file_wrapper = {
+        "status": 404,
+        "table": None,
+    }
+    try:
+        response = client.get_object(
+            Bucket=bucket,
+            Key=key
+        )
+        file_wrapper["status"] = 200
+        file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
+    except Exception as e:
+        print(e)
+        print(key)
+        logging.error('Could not get file from bucket')
+    return file_wrapper
+        
 def process(table):
     """
     Converts dictionary into a pandas DataFrame.
@@ -32,7 +64,9 @@ def process(table):
         KeyError: Raises an exception.
     """
     try:
-        df = pd.DataFrame(table['data'], columns=table['headers'])
+
+        df = pd.DataFrame(table["data"], columns=table["headers"])
+
     except KeyError as e:
         raise(e)
     return df
