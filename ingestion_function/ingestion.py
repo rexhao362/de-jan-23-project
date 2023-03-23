@@ -41,11 +41,14 @@ def data_ingestion():
                     row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
                 elif isinstance(row[i], Decimal):
                     row[i] = float(row[i])
+        data = []
+        if len(table_data) > 1:
+            data = table_data[1:]
 
         dict = {
             'table_name': table_name,
             'headers': table_data[0],
-            'data': table_data[1:]
+            'data': data
         }
 
         # if len(dict['data']) > 0:

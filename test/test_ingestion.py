@@ -459,9 +459,6 @@ def test_get_ingested_bucket_name_function_gets_correct_bucket_name(bucket, s3):
 @ freeze_time("2012-01-14 12:00:01")
 def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
     table_names = ['counterparty', 'currency', 'department', 'design', 'payment', 'transaction', 'staff', 'sales_order', 'address', 'purchase_order', 'payment_type']
-    for table in table_names:
-        with open(f'./ingestion_function/data/{table}.json', 'w') as f:
-            f.write('')
     upload_to_s3()
     response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket')
     list_of_files = [item['Key'] for item in response['Contents']]
