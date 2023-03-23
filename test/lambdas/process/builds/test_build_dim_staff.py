@@ -3,8 +3,8 @@ from src.lambdas.process.build import build_dim_staff
 from pandas import DataFrame
 from numpy import (equal, int64)
 
-department_file = 'test/json_files/department_test_1.json'
-staff_file = 'test/json_files/staff_test_1.json'
+department_file = 'test/lambdas/process/json_files/department_test_1.json'
+staff_file = 'test/lambdas/process/json_files/staff_test_1.json'
 department_data = load_file_from_local(department_file)
 staff_data = load_file_from_local(staff_file)
 department_dataframe = process(department_data)

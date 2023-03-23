@@ -6,9 +6,9 @@ from moto import mock_s3
 import boto3
 import os
 from pandas import read_parquet
-full_json = 'test/json_files/process_test_1.json'
-empty_json = 'test/json_files/process_test_2.json'
-no_data_json = 'test/json_files/process_test_3.json'
+full_json = 'test/lambdas/process/json_files/process_test_1.json'
+empty_json = 'test/lambdas/process/json_files/process_test_2.json'
+no_data_json = 'test/lambdas/process/json_files/process_test_3.json'
 parquet = 'test/parquets/dim_currency_formatted.parquet'
 
 @pytest.fixture(scope='function')
@@ -97,6 +97,6 @@ def test_process_returns_dataframe_containing_input_data():
 def test_print_pd_dataframe_to_csv():
     raw_data = load_file_from_local(full_json)
     dataframe = process(raw_data)
-    print_csv(dataframe, 'test/csv_files/temp_test_1.csv')
+    print_csv(dataframe, 'test/lambdas/process/csv_files/temp_test_1.csv')
     # print(dataframe.head())
     assert True

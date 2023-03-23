@@ -3,7 +3,7 @@ from src.lambdas.process.build import build_dim_currency
 from pandas import DataFrame
 from numpy import equal
 
-currency_json_path = 'test/json_files/currency_test_1.json'
+currency_json_path = 'test/lambdas/process/json_files/currency_test_1.json'
 
 currency_data = load_file_from_local(currency_json_path)
 currency_dataframe = process(currency_data)
