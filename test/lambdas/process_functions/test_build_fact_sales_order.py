@@ -13,12 +13,10 @@ def test_returns_dataframe():
     assert isinstance(fact_sales_order, DataFrame)
 
 def test_returned_dataframe_has_expected_columns():
-    fact_sales_order_cols = list(fact_sales_order.columns.values)
-    index = [fact_sales_order.index.name]
-    index_and_cols = index + fact_sales_order_cols
+    cols = list(fact_sales_order.columns.values)
 
     expected = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
-    assert equal(index_and_cols, expected).all()
+    assert equal(cols, expected).all()
 
 def test_returns_date_entries_in_YYYY_MM_SS_format():
     date_cols = ['created_date', 'last_updated_date', 'agreed_payment_date', 'agreed_delivery_date']
