@@ -18,9 +18,3 @@ def format_dim_currency_data(data_frame, column_names=default_column_names):
             [ row[column_name] for column_name in column_names ]
                 for index, row in data_frame.iterrows()
         ]
-
-    # try:
-        
-
-    # except Exception as e:
-    #     raise Exception( str(e) )
