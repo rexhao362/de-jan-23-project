@@ -2,6 +2,7 @@ import pandas as pd
 import boto3
 import json
 import logging
+import re
 # import pyarrow
 
 def load_file_from_local(filepath):
@@ -44,6 +45,8 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
+        print(e)
+        print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
         
