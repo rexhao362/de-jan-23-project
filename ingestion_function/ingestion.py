@@ -29,7 +29,7 @@ def get_table_data(table_name, check):
     return table_data
  
 
-get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
+# get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
 
 
 # Writes dictionary of table to file

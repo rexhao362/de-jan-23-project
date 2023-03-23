@@ -36,7 +36,7 @@ def test_get_table_names_queries_database_for_table_names():
 
 # test get_headers
 def test_get_headers_extracts_column_names_for_address():
-    result = get_table_data('address')
+    result = get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'address_id' in result[0]
     assert 'address_line_1' in result[0]
     assert 'address_line_2' in result[0]
@@ -50,7 +50,7 @@ def test_get_headers_extracts_column_names_for_address():
 
 
 def test_get_headers_extracts_column_names_for_counterparty():
-    result = get_table_data('counterparty')
+    result = get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'counterparty_id' in result[0]
     assert 'counterparty_legal_name' in result[0]
     assert 'legal_address_id' in result[0]
@@ -61,7 +61,7 @@ def test_get_headers_extracts_column_names_for_counterparty():
 
 
 def test_get_headers_extracts_column_names_for_currency():
-    result = get_table_data('currency')
+    result = get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'currency_id' in result[0]
     assert 'currency_code' in result[0]
     assert 'created_at' in result[0]
@@ -69,7 +69,7 @@ def test_get_headers_extracts_column_names_for_currency():
 
 
 def test_get_headers_extracts_column_names_for_department():
-    result = get_table_data('department')
+    result = get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'department_id' in result[0]
     assert 'department_name' in result[0]
     assert 'location' in result[0]
@@ -79,7 +79,7 @@ def test_get_headers_extracts_column_names_for_department():
 
 
 def test_get_headers_extracts_column_names_for_design():
-    result = get_table_data('design')
+    result = get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'design_id' in result[0]
     assert 'created_at' in result[0]
     assert 'last_updated' in result[0]
@@ -89,7 +89,7 @@ def test_get_headers_extracts_column_names_for_design():
 
 
 def test_get_headers_extracts_column_names_for_payment_type():
-    result = get_table_data('payment_type')
+    result = get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'payment_type_id' in result[0]
     assert 'payment_type_name' in result[0]
     assert 'created_at' in result[0]
@@ -97,7 +97,7 @@ def test_get_headers_extracts_column_names_for_payment_type():
 
 
 def test_get_headers_extracts_column_names_for_payment():
-    result = get_table_data('payment')
+    result = get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'payment_id' in result[0]
     assert 'created_at' in result[0]
     assert 'last_updated' in result[0]
@@ -113,7 +113,7 @@ def test_get_headers_extracts_column_names_for_payment():
 
 
 def test_get_headers_extracts_column_names_for_purchase_order():
-    result = get_table_data('purchase_order')
+    result = get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'purchase_order_id' in result[0]
     assert 'created_at' in result[0]
     assert 'last_updated' in result[0]
@@ -129,7 +129,7 @@ def test_get_headers_extracts_column_names_for_purchase_order():
 
 
 def test_get_headers_extracts_column_names_for_sales_order():
-    result = get_table_data('sales_order')
+    result = get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'sales_order_id' in result[0]
     assert 'created_at' in result[0]
     assert 'last_updated' in result[0]
@@ -145,7 +145,7 @@ def test_get_headers_extracts_column_names_for_sales_order():
 
 
 def test_get_headers_extracts_column_names_for_staff():
-    result = get_table_data('staff')
+    result = get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'staff_id' in result[0]
     assert 'first_name' in result[0]
     assert 'last_name' in result[0]
@@ -156,7 +156,7 @@ def test_get_headers_extracts_column_names_for_staff():
 
 
 def test_get_headers_extracts_column_names_for_transaction():
-    result = get_table_data('transaction')
+    result = get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))
     assert 'transaction_id' in result[0]
     assert 'transaction_type' in result[0]
     assert 'sales_order_id' in result[0]
@@ -167,7 +167,7 @@ def test_get_headers_extracts_column_names_for_transaction():
 
 # test get_table_data
 def test_get_table_data_extracts_list_table_data_address():
-    result = get_table_data('address')
+    result = get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -183,7 +183,7 @@ def test_get_table_data_extracts_list_table_data_address():
 
 
 def test_get_table_data_extracts_list_table_data_counterparty():
-    result = get_table_data('counterparty')
+    result = get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -195,7 +195,7 @@ def test_get_table_data_extracts_list_table_data_counterparty():
 
 
 def test_get_table_data_extracts_list_table_data_currency():
-    result = get_table_data('currency')
+    result = get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str and len(
@@ -205,7 +205,7 @@ def test_get_table_data_extracts_list_table_data_currency():
 
 
 def test_get_table_data_extracts_list_table_data_department():
-    result = get_table_data('department')
+    result = get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -216,7 +216,7 @@ def test_get_table_data_extracts_list_table_data_department():
 
 
 def test_get_table_data_extracts_list_table_data_design():
-    result = get_table_data('design')
+    result = get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -227,7 +227,7 @@ def test_get_table_data_extracts_list_table_data_design():
 
 
 def test_get_table_data_extracts_list_table_data_payment_type():
-    result = get_table_data('payment_type')
+    result = get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -236,7 +236,7 @@ def test_get_table_data_extracts_list_table_data_payment_type():
 
 
 def test_get_table_data_extracts_list_table_data_payment():
-    result = get_table_data('payment')
+    result = get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -253,7 +253,7 @@ def test_get_table_data_extracts_list_table_data_payment():
 
 
 def test_get_table_data_extracts_list_table_data_purchase_order():
-    result = get_table_data('purchase_order')
+    result = get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -270,7 +270,7 @@ def test_get_table_data_extracts_list_table_data_purchase_order():
 
 
 def test_get_table_data_extracts_list_table_data_sales_order():
-    result = get_table_data('sales_order')
+    result = get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -287,7 +287,7 @@ def test_get_table_data_extracts_list_table_data_sales_order():
 
 
 def test_get_table_data_extracts_list_table_data_staff():
-    result = get_table_data('staff')
+    result = get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -299,7 +299,7 @@ def test_get_table_data_extracts_list_table_data_staff():
 
 
 def test_get_table_data_extracts_list_table_data_transaction():
-    result = get_table_data('transaction')
+    result = get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -310,116 +310,119 @@ def test_get_table_data_extracts_list_table_data_transaction():
 
 # test data ingestion
 
-
 def test_data_ingestion_address():
-    data_ingestion()
+    data_ingestion(datetime(2022, 10, 5, 16, 30, 42, 962000))
     filepath = './ingestion_function/data/address.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'address'
-        assert json_data['headers'] == get_table_data('address')[0]
+        assert json_data['headers'] == get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_counterparty():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/counterparty.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'counterparty'
-        assert json_data['headers'] == get_table_data('counterparty')[0]
+        assert json_data['headers'] == get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_currency():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/currency.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'currency'
-        assert json_data['headers'] == get_table_data('currency')[0]
+        assert json_data['headers'] == get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_department():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/department.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'department'
-        assert json_data['headers'] == get_table_data('department')[0]
+        assert json_data['headers'] == get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_design():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/design.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'design'
-        assert json_data['headers'] == get_table_data('design')[0]
+        assert json_data['headers'] == get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_payment_type():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/payment_type.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'payment_type'
-        assert json_data['headers'] == get_table_data('payment_type')[0]
+        assert json_data['headers'] == get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_payment():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/payment.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'payment'
-        assert json_data['headers'] == get_table_data('payment')[0]
+        assert json_data['headers'] == get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_purchase_order():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/purchase_order.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'purchase_order'
-        assert json_data['headers'] == get_table_data('purchase_order')[0]
+        assert json_data['headers'] == get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_sales_order():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/sales_order.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'sales_order'
-        assert json_data['headers'] == get_table_data('sales_order')[0]
+        assert json_data['headers'] == get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_staff():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/staff.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'staff'
-        assert json_data['headers'] == get_table_data('staff')[0]
+        assert json_data['headers'] == get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
 
 def test_data_ingestion_transaction():
-    data_ingestion()
+    datetime(2022, 10, 5, 16, 30, 42, 962000)
     filepath = './ingestion_function/data/transaction.json'
     assert os.path.isfile(filepath)
     with open(filepath, 'r') as f:
         json_data = json.loads(f.read())
         assert json_data['table_name'] == 'transaction'
-        assert json_data['headers'] == get_table_data('transaction')[0]
+        assert json_data['headers'] == get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
 
+def test_get_table_data_function_returns_rows_newer_than_last_updated_date():
+    table_data = get_table_data('address', datetime(2022, 12, 5, 10, 30, 41, 962000))
+    print(table_data)
+    assert len(table_data) == 1
 
 # Mocking AWS credentials
 @pytest.fixture
@@ -480,7 +483,7 @@ def test_retrieve_last_updated_returns_default_date_if_last_updated_file_not_in_
 
 
 # def test_store_last_updated_stores_last_updated(bucket, s3):
-#     data_ingestion()
+#     datetime(2022, 10, 5, 16, 30, 42, 962000)
 #     response = s3.get_object(
 #         Bucket=get_ingested_bucket_name(), Key='non_existent_file.json')
 #     print(response)
