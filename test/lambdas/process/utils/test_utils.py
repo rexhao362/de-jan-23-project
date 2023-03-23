@@ -46,9 +46,7 @@ def test_load_file_from_local_dict_contains_data():
     assert result['data'] == []
     result = load_file_from_local(full_json)
     assert result['headers'] == ["Name", "Type", "Description"]
-    assert result['data'] == \
-
-    [   
+    assert result['data'] == [   
     ["foo1", "bar1","foo bar1"],
     ["foo2", "bar2", "foobar2"],
     ["foo3", "bar3", "foobar3"]
