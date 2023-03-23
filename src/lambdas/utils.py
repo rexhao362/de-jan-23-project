@@ -61,15 +61,14 @@ def timestamp_to_date(table, column):
     table[column] = table[column].dt.date
     return table
 
-def write_to_bucket(bucket_name, table, table_name, key_path):
+def write_to_bucket(bucket_name, table, key):
     """
     Posts given object to given s3 bucket.
 
     Args:
         param1: bucket, string
         param2: table, dataframe
-        param3: table_name, string
-        param4: datetime, string, "YYYY-MM-DD/HH-MM-SS"
+        param3: key, string
 
     Returns: {"status" : int, "response" : dict}
     }
@@ -82,13 +81,8 @@ def write_to_bucket(bucket_name, table, table_name, key_path):
     s3 = boto3.client("s3")
     parquet_binary = table.to_parquet()
 
-    match = re.match(r'\d{4}-\d{2}-\d{2}/\d{2}-\d{2}-\d{2}', key_path)
-    if not match:
-        logging.error("Date bucket key should follow : YYYY-MM-DD/HH-MM-SS")
-        return response_object
-
     try:
-        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'test/{key_path}/{table_name}.parquet') 
+        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'test/{key}.parquet') 
         status = response["ResponseMetadata"]["HTTPStatusCode"]
         if status == 200:
             response_object["status"] = status
@@ -98,8 +92,3 @@ def write_to_bucket(bucket_name, table, table_name, key_path):
         logging.error("Could not load table into bucket")
     
     return response_object
-
-    
-
-
-

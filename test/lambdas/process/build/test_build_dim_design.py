@@ -3,7 +3,7 @@ from src.lambdas.build import build_dim_design
 from pandas import DataFrame
 from numpy import equal
 
-design_json_path = 'test/json_files/design_test_1.json'
+design_json_path = 'test/lambdas/process/json_files/design_test_1.json'
 
 design_data = load_file_from_local(design_json_path)
 design_dataframe = process(design_data)

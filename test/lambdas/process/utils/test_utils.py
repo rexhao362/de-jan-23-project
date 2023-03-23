@@ -2,9 +2,9 @@ from src.lambdas.utils import (load_file_from_local, process, print_csv)
 from pandas import DataFrame
 import pytest
 import numpy as np
-full_json = 'test/json_files/process_test_1.json'
-empty_json = 'test/json_files/process_test_2.json'
-no_data_json = 'test/json_files/process_test_3.json'
+full_json = 'test/lambdas/process/json_files/process_test_1.json'
+empty_json = 'test/lambdas/process/json_files/process_test_2.json'
+no_data_json = 'test/lambdas/process/json_files/process_test_3.json'
 
 
 def test_load_file_from_local_returns_dict():
@@ -60,6 +60,6 @@ def test_process_returns_dataframe_containing_input_data():
 def test_print_pd_dataframe_to_csv():
     raw_data = load_file_from_local(full_json)
     dataframe = process(raw_data)
-    print_csv(dataframe, 'test/csv_files/temp_test_1.csv')
+    print_csv(dataframe, 'test/lambdas/process/csv_files/temp_test_1.csv')
     # print(dataframe.head())
     assert True

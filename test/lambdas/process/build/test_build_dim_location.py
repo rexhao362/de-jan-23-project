@@ -3,7 +3,7 @@ from src.lambdas.build import build_dim_location
 from pandas import DataFrame
 from numpy import equal
 
-location_json_path = 'test/json_files/location_test_1.json'
+location_json_path = 'test/lambdas/process/json_files/location_test_1.json'
 
 location_data = load_file_from_local(location_json_path)
 location_dataframe = process(location_data)

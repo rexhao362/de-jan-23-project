@@ -12,7 +12,7 @@ def make_curr_df():
 def main():
     curr_df = make_curr_df()
     dim_currency = build_dim_currency(curr_df)
-    res = write_to_bucket('processed-test-bucket-64', dim_currency, 'dim_currency', '2023-03-22/11-33-01')
+    res = write_to_bucket('processed-test-bucket-65', dim_currency, 'dim_currency', '2023-03-22/11-33-01')
     print(res)
     
-main()
+# main()

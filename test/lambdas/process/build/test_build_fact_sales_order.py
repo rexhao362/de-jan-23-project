@@ -4,7 +4,7 @@ from pandas import DataFrame
 from numpy import equal, append
 import re
 
-sales_order_path = 'test/json_files/sales_order_test_1.json'
+sales_order_path = 'test/lambdas/process/json_files/sales_order_test_1.json'
 sales_order_data = load_file_from_local(sales_order_path)
 sales_order_dataframe = process(sales_order_data)
 
