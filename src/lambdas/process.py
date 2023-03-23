@@ -204,18 +204,48 @@ def build_dim_location(dataframe):
     return dim_location.set_index('location_id')
 
 
-def build_dim_date():
+def build_dim_date(start_date, end_date):
     """
     BUILD DIM_DATE
+    arg1 (string): first date (inclusive) in the range to be generated, format yyyy/mm/dd
+    arg2 (string): last date (inclusive) in the range to be generated, format yyyy/mm/dd
+    Returns: Pandas dataframe with date_id index, and columns for year, month, day, day_of_week, day_name, month_name, and quarter.
+    
+    - Generates and populates a dataframe with a range of dates from start_date to end_date
     """
+    #generate a date time index
+    dti = pd.date_range(start=start_date, end=end_date).to_series()
+    # df = dti.to_frame(index=False)
+    years = dti.dt.year
+    months = dti.dt.month
+    days = dti.dt.day
+    day_of_week = dti.dt.day_of_week
+    day_name = dti.dt.day_name()
+    month_name=dti.dt.month_name()
+    quarter = dti.dt.quarter
+    d={
+        'year': years,
+        'month': months,
+        'day': days,
+        'day_of_week': day_of_week,
+        'day_name': day_name,
+        'month_name': month_name,
+        'quarter': quarter
+    }
+    df = pd.DataFrame(data=d, index=dti)
+    df.index.name = 'date_id'
+    return df
+    
 
 def build_dim_counterparty(original_dataframe, address_dataframe):
     """
     BUILD DIM_COUNTERPARTY
+    arg1: original counterparty dataframe
+    arg2: original address dataframe
     
     input columns = [counterparty_id, counterparty_legal_name, legal_address_id, commercial_contact, delivery_contact, created_at, last_updated]
      1
-    output columns = [counterparty_id, counterparty_legal_name, counterparty_legal_address_line_1, counterparty_legal_address_line_2, counterparty_legal_district, counterparty_legal_city, counterparty_legal_postal_code, counterparty_legal_county, counterparty_legal_phone_number]
+    output columns = [counterparty_id, counterparty_legal_name, counterparty_legal_address_line_1, counterparty_legal_address_line_2, counterparty_legal_district, counterparty_legal_city, counterparty_legal_postal_code, counterparty_legal_country, counterparty_legal_phone_number]
     """
     df = original_dataframe.copy()
     ids = original_dataframe['legal_address_id']
@@ -227,35 +257,44 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     l_add_1 = np.empty(length, dtype='U10')
     l_add_2 = np.empty(length, dtype='U10')
     l_district = np.empty(length, dtype='U10')
-    l_county = np.empty(length, dtype='U10')
+    l_country = np.empty(length, dtype='U10')
     l_city = np.empty(length, dtype='U10')
-    l_postcode = np.empty(length, dtype='U10')
+    l_postal_code = np.empty(length, dtype='U10')
     l_phone = np.empty(length, dtype='U10')
     #for each record in dataframe and corresponding address_id
     for i, id in enumerate(ids):
+    
         #query the address table for the right id
-        address = address_dataframe.query(f"address_id == '{id}'")
-        # print(address['city'])
+        address = address_dataframe.query(f"address_id == {id}")
+
         #initialize the columns
         # print(address['address_line_1'].item())
         l_add_1[i] = address['address_line_1'].item()
         l_add_2[i] = address['address_line_2'].item()
         l_district[i] = address['district'].item()
         l_city[i] = address['city'].item()
-        l_county[i] = address['county'].item()
-        l_postcode[i] = address['postal_code'].item()
+        l_country[i] = address['country'].item()
+        l_postal_code[i] = address['postal_code'].item()
         l_phone[i] = address['phone'].item()
-    
         
     df['counterparty_legal_address_line_1'] = l_add_1
     df['counterparty_legal_address_line_2'] = l_add_2
     df['counterparty_legal_district'] = l_district
     df['counterparty_legal_city'] = l_city
-    df['counterparty_legal_postal_code'] = l_postcode
-    df['counterparty_legal_country'] = l_county
+    df['counterparty_legal_postal_code'] = l_postal_code
+    df['counterparty_legal_country'] = l_country
     df['counterparty_legal_phone_number'] = l_phone
-
-    return df.set_index('counterparty_id')
+        
+    return df
+    
+    
+    # use ids to fetch from address:
+    # counterparty_legal_address_line_1
+    # counterparty_legal_address_line_2
+    # counterparty_legal_district
+    # counterparty_legal_city
+    # counterparty_legal_postcode
+    # counterparty_legal_county
 
 def generate_local_parquet(table):
     """
@@ -306,8 +345,7 @@ def main():
 
 
 
-
 if __name__ == "__main__":
     main()
 
-    
+  

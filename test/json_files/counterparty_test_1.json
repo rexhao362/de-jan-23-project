@@ -1,40 +1,16 @@
 {
-    "headers":[
-       "counterparty_id",
-       "counterparty_legal_name",
-       "legal_address_id",
-       "commercial_contact",
-       "delivery_contact",
-       "created_at",
-       "last_updated"
-    ],
-    "data":[
-       [
-          "foo1",
-          "bar1",
-          "0",
-          "barfoo1",
-          "foofoobar1",
-          "foobarfoo1",
-          "booboofar1"
-       ],
-       [
-          "foo2",
-          "bar2",
-          "1",
-          "barfoo2",
-          "foofoobar2",
-          "foobarfoo2",
-          "booboofar2"
-       ],
-       [
-        "foo3",
-        "bar3",
-        "2",
-        "barfoo3",
-        "foofoobar3",
-        "foobarfoo3",
-        "booboofar3"
-     ]
-    ]
- }
+  "headers": [
+    "counterparty_id",
+    "counterparty_legal_name",
+    "legal_address_id",
+    "commercial_contact",
+    "delivery_contact",
+    "created_at",
+    "last_updated"
+  ],
+  "data": [
+    [1, "bar1", 1, "barfoo1", "foofoobar1", "foobarfoo1", "booboofar1"],
+    [2, "bar2", 1, "barfoo2", "foofoobar2", "foobarfoo2", "booboofar2"],
+    [3, "bar3", 2, "barfoo3", "foofoobar3", "foobarfoo3", "booboofar3"]
+  ]
+}
