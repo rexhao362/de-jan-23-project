@@ -1,14 +1,25 @@
-import os
-import json
-from decimal import Decimal
-from ingestion_function.connection import con
+
 from datetime import datetime
 import boto3
+import pg8000.native
+import os
+import json
 
-# Create data directory
-if not os.path.exists('./ingestion_function/data'):
-    os.makedirs('./ingestion_function/data')
+host = 'nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com'
+port = 5432
+user = 'project_user_1'
+password = 'UmaC43m32Zi6RW'
+database = 'totesys'
+schema = 'public'
 
+# DB connection
+con = pg8000.native.Connection(
+    user,
+    host=host,
+    database=database,
+    port=port,
+    password=password
+)
 
 def get_table_names():
     """
@@ -75,41 +86,6 @@ def get_table_data(table_name, timestamp):
         return table_data
 
 
-def data_ingestion(timestamp):
-    """
-    Uses the get_table_names() and the get_table_data() functions to retrieve data for each table. Formats datetime objects into string and Decimal objects into float. Turns each table into a dictionary and saves them to json files.
-
-    Args:
-        param1: the last update timestamp retrieved using the retrieve_last_updated() function to pass to the get_table_data()
-
-    Returns:
-        no return
-
-    Raises:
-        Error: Raises an exception.
-    """
-    for table_name in get_table_names():
-        table_data = get_table_data(table_name, timestamp)
-        for row in table_data:
-            for i in range(len(row)):
-                if isinstance(row[i], datetime):
-                    row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
-                elif isinstance(row[i], Decimal):
-                    row[i] = float(row[i])
-        data = []
-        if len(table_data) > 1:
-            data = table_data[1:]
-
-        dict = {
-            'table_name': table_name,
-            'headers': table_data[0],
-            'data': data
-        }
-
-        with open(f'./ingestion_function/data/{table_name}.json', 'w') as f:
-            f.write(json.dumps(dict))
-
-
 def get_ingested_bucket_name():
     """
     Retrieves ingested bucket name 
@@ -147,14 +123,14 @@ def upload_to_s3():
         Error: Raises an exception.
     """
     s3 = boto3.client('s3')
+    dt_now = datetime.now()
+    current_day = dt_now.strftime('%d-%m-%Y')
+    current_time = dt_now.strftime('%H:%M:%S')
     for file_name in os.listdir('./ingestion_function/data'):
         with open(f'./ingestion_function/data/{file_name}', 'rb') as f:
-            dt_now = datetime.now()
-            current_day = dt_now.strftime('%d-%m-%Y')
-            current_time = dt_now.strftime('%H:%M:%S')
             s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                           Key=f'{current_day}/{current_time}/{file_name}')
-
+            
 
 def retrieve_last_updated():
     """
@@ -179,7 +155,7 @@ def retrieve_last_updated():
         json_res = json.loads(response['Body'].read())
         last_updated = json_res['last_updated']
         return datetime.strptime(last_updated, '%Y-%m-%dT%H:%M:%S.%f')
-
+    
 
 def store_last_updated(timestamp):
     """
@@ -211,10 +187,3 @@ def store_last_updated(timestamp):
         s3 = boto3.client('s3')
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                       Key='date/last_updated.json')
-
-
-def lambda_handler():
-    timestamp = retrieve_last_updated()
-    data_ingestion(timestamp)
-    upload_to_s3()
-    store_last_updated(timestamp)

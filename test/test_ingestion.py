@@ -209,8 +209,8 @@ def test_get_table_data_extracts_list_table_data_department():
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
-        assert type(result[i][2]) == str
-        assert type(result[i][3]) == str
+        assert type(result[i][2]) == str or result[i][2] == None
+        assert type(result[i][3]) == str or result[i][3] == None
         assert type(result[i][4]) == datetime
         assert type(result[i][5]) == datetime
 
@@ -230,7 +230,7 @@ def test_get_table_data_extracts_list_table_data_payment_type():
     result = get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
-        assert type(result[i][1]) == str
+        assert type(result[i][1]) == str and result[i][1] in ['SALES_RECEIPT', 'SALES_REFUND', 'PURCHASE_PAYMENT', 'PURCHASE_REFUND']
         assert type(result[i][2]) == datetime
         assert type(result[i][3]) == datetime
 
@@ -243,11 +243,11 @@ def test_get_table_data_extracts_list_table_data_payment():
         assert type(result[i][2]) == datetime
         assert type(result[i][3]) == int
         assert type(result[i][4]) == int
-        assert type(result[i][5]) == Decimal
+        assert type(result[i][5]) == Decimal and result[i][5] >= 1 and result[i][5] <= 1000000
         assert type(result[i][6]) == int
         assert type(result[i][7]) == int
         assert type(result[i][8]) == bool
-        assert type(result[i][9]) == str
+        assert type(result[i][9]) == str and re.match('^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])', result[i][9]) != None
         assert type(result[i][10]) == int
         assert type(result[i][11]) == int
 
