@@ -19,7 +19,6 @@ coverage.xml
 .pytest_cache/
 
 # sensitive
-credentials.txt
 setup_production_chedentials.sh
 setup_test_credentials.sh
 
