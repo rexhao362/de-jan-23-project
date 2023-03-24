@@ -1,1 +1,0 @@
-{"table_name": "address", "headers": ["address_id", "address_line_1", "address_line_2", "district", "city", "postal_code", "country", "phone", "created_at", "last_updated"], "data": []}

@@ -126,8 +126,8 @@ def upload_to_s3():
     dt_now = datetime.now()
     current_day = dt_now.strftime('%d-%m-%Y')
     current_time = dt_now.strftime('%H:%M:%S')
-    for file_name in os.listdir('./ingestion_function/data'):
-        with open(f'./ingestion_function/data/{file_name}', 'rb') as f:
+    for file_name in os.listdir('./src/lambdas/ingestion/data/table_data'):
+        with open(f'./src/lambdas/ingestion/data/table_data/{file_name}', 'rb') as f:
             s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                           Key=f'{current_day}/{current_time}/{file_name}')
             
@@ -190,13 +190,13 @@ def store_last_updated(timestamp):
                 date_to_store = most_recent
 
     # writes files to local folder
-    with open('./ingestion_function/date/last_updated.json', 'w') as f:
+    with open('./src/lambdas/ingestion/data/date/last_updated.json', 'w') as f:
         date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
         date_object = {'last_updated': date_string}
         f.write(json.dumps(date_object))
 
     #  uploads files to S3 bucket
-    with open('./ingestion_function/date/last_updated.json', 'rb') as f:
+    with open('./src/lambdas/ingestion/data/date/last_updated.json', 'rb') as f:
         s3 = boto3.client('s3')
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                       Key='date/last_updated.json')

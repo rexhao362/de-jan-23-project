@@ -1,10 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
-from src.utils.utils_inge import get_table_data
-from src.utils.utils_inge import get_table_names
-from src.utils.utils_inge import retrieve_last_updated
-from src.utils.utils_inge import store_last_updated
-from src.utils.utils_inge import upload_to_s3
+from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils.utils import get_table_names
+from src.lambdas.ingestion.utils.utils import retrieve_last_updated
+from src.lambdas.ingestion.utils.utils import store_last_updated
+from src.lambdas.ingestion.utils.utils import upload_to_s3
 import json
 
 
@@ -43,7 +43,7 @@ def data_ingestion():
             'data': data
         }
 
-        with open(f'./ingestion_function/data/{table_name}.json', 'w') as f:
+        with open(f'./src/lambdas/ingestion/data/table_data/{table_name}.json', 'w') as f:
             f.write(json.dumps(table_data))
 
     upload_to_s3()
