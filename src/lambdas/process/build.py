@@ -20,9 +20,8 @@ def build_dim_design(dataframe):
     Output columns: 
         [design_id, design_name, file_location, file_name]
     """
-    df = dataframe.copy()
-    dim_design = df.drop(columns=['created_at', 'last_updated'])
-    dim_design = dim_design
+    # df = dataframe.copy()
+    dim_design = dataframe.copy().drop(columns=['created_at', 'last_updated'])
     return dim_design[['design_id', 'design_name', 'file_location', 'file_name']]
 
 def build_dim_currency(dataframe):
@@ -41,8 +40,8 @@ def build_dim_currency(dataframe):
         [currency_id, currency_code, currency_name]
 
     """
-    df = dataframe.copy()
-    dim_currency = df.drop(columns=['created_at', 'last_updated'])
+    # df = dataframe.copy()
+    dim_currency = dataframe.copy().drop(columns=['created_at', 'last_updated'])
 
     currency_names = []
     for item in dim_currency['currency_code']:
@@ -53,7 +52,7 @@ def build_dim_currency(dataframe):
         elif item == "EUR":
             currency_names.append('Euros')
         else:
-            currency_names.append(None)
+            currency_names.append('None')
 
     dim_currency['currency_name'] = currency_names
     dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
@@ -95,8 +94,7 @@ def build_fact_sales_order(sales_order_dataframe):
 
     order_list = ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id']
 
-    sales_order = sales_order[order_list]
-    return sales_order
+    return sales_order[order_list]
 
 def build_dim_staff(staff_dataframe, department_dataframe):
     """
@@ -126,8 +124,7 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     
     dim_staff['department_name'] = department_name_col
     dim_staff['location'] = location_col
-    dim_staff = dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']]
-    return dim_staff 
+    return dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']] 
 
 def build_dim_location(dataframe):
     """
@@ -148,8 +145,7 @@ def build_dim_location(dataframe):
     """
     df = dataframe.copy()
     dim_location = df.drop(columns=['created_at', 'last_updated'])
-    dim_location = dim_location.rename(columns={'address_id':'location_id'})
-    return dim_location
+    return dim_location.rename(columns={'address_id':'location_id'})
 
 def build_dim_date(start_date, end_date):
     """
@@ -183,8 +179,8 @@ def build_dim_date(start_date, end_date):
         'month_name': month_name,
         'quarter': quarter
     }
-    df = pd.DataFrame(data=d)
-    return df
+    # df = pd.DataFrame(data=d)
+    return pd.DataFrame(data=d)
     
 def build_dim_counterparty(original_dataframe, address_dataframe):
     """

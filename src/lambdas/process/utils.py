@@ -46,8 +46,8 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        print(e)
-        print(key)
+        # print(e)
+        # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
         
@@ -116,7 +116,7 @@ def write_to_bucket(bucket_name, table, key):
     parquet_binary = table.to_parquet()
 
     try:
-        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'test/{key}.parquet') 
+        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'{key}.parquet') 
         status = response["ResponseMetadata"]["HTTPStatusCode"]
         if status == 200:
             response_object["status"] = status
