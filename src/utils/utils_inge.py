@@ -5,20 +5,20 @@ import pg8000.native
 import os
 import json
 
-host = 'nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com'
-port = 5432
-user = 'project_user_1'
-password = 'UmaC43m32Zi6RW'
-database = 'totesys'
-schema = 'public'
+TOTESYS_DB_HOST = 'nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com'
+TOTESYS_DB_PORT = 5432
+TOTESYS_DB_USER = 'project_user_1'
+TOTESYS_DB_PASSWORD = 'UmaC43m32Zi6RW'
+TOTESYS_DB_DATABASE = 'totesys'
+TOTESYS_DB_DATABASE_SCHEMA = 'public'
 
 # DB connection
 con = pg8000.native.Connection(
-    user,
-    host=host,
-    database=database,
-    port=port,
-    password=password
+    user=TOTESYS_DB_USER,
+    host=TOTESYS_DB_HOST,
+    database=TOTESYS_DB_DATABASE,
+    port=TOTESYS_DB_PORT,
+    password=TOTESYS_DB_PASSWORD
 )
 
 def get_table_names():
@@ -35,7 +35,7 @@ def get_table_names():
         KeyError: Raises an exception.
     """
     table_names = con.run(
-        'SELECT table_name FROM information_schema.tables WHERE table_schema = :schema', schema='public')
+        'SELECT table_name FROM information_schema.tables WHERE table_schema = :schema', schema=TOTESYS_DB_DATABASE_SCHEMA)
     return [item[0] for item in table_names]
 
 
@@ -94,7 +94,7 @@ def get_ingested_bucket_name():
         no args
 
     Returns:
-        The name of the igested bucket name
+        The name of the ingested bucket name
 
     Raises:
         Error: Raises an exception.
@@ -153,8 +153,8 @@ def retrieve_last_updated():
         response = s3.get_object(
             Bucket=get_ingested_bucket_name(), Key='date/last_updated.json')
         json_res = json.loads(response['Body'].read())
-        last_updated = json_res['last_updated']
-        return datetime.strptime(last_updated, '%Y-%m-%dT%H:%M:%S.%f')
+        timestamp = json_res['last_updated']
+        return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
     
 
 def store_last_updated(timestamp):
@@ -189,13 +189,14 @@ def store_last_updated(timestamp):
             if most_recent >= date_to_store:
                 date_to_store = most_recent
 
-    with open('./ingestion_function/data/last_updated.json', 'w') as f:
+    # writes files to local folder
+    with open('./ingestion_function/date/last_updated.json', 'w') as f:
         date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
         date_object = {'last_updated': date_string}
         f.write(json.dumps(date_object))
 
     #  uploads files to S3 bucket
-    with open('./ingestion_function/data/last_updated.json', 'rb') as f:
+    with open('./ingestion_function/date/last_updated.json', 'rb') as f:
         s3 = boto3.client('s3')
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                       Key='date/last_updated.json')

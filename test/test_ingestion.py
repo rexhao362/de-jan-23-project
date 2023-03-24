@@ -21,149 +21,79 @@ from freezegun import freeze_time
 
 def test_get_table_names_queries_database_for_table_names():
     result = get_table_names()
-    assert 'address' in result
-    assert 'counterparty' in result
-    assert 'currency' in result
-    assert 'department' in result
-    assert 'design' in result
-    assert 'payment_type' in result
-    assert 'payment' in result
-    assert 'purchase_order' in result
-    assert 'sales_order' in result
-    assert 'staff' in result
-    assert 'transaction' in result
+    print(result)
+    table_names = ['address',
+                      'counterparty',
+                      'currency',
+                      'department',
+                      'design',
+                      'payment_type',
+                      'payment',
+                      'purchase_order',
+                      'sales_order',
+                      'staff',
+                      'transaction']
+    for table_name in table_names:
+        assert table_name in result
     assert len(result) == 11
 
 
 # test get_headers
-def test_get_headers_extracts_column_names_for_address():
+@pytest.mark.parametrize('address_column_names', ['address_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone', 'created_at', 'last_updated'])
+def test_get_headers_extracts_column_names_for_address(address_column_names):
     result = get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'address_id' in result[0]
-    assert 'address_line_1' in result[0]
-    assert 'address_line_2' in result[0]
-    assert 'district' in result[0]
-    assert 'city' in result[0]
-    assert 'postal_code' in result[0]
-    assert 'country' in result[0]
-    assert 'phone' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert address_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_counterparty():
+@pytest.mark.parametrize('counterparty_column_names', ["counterparty_id", "counterparty_legal_name", "legal_address_id", "commercial_contact", "delivery_contact", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_counterparty(counterparty_column_names):
     result = get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'counterparty_id' in result[0]
-    assert 'counterparty_legal_name' in result[0]
-    assert 'legal_address_id' in result[0]
-    assert 'commercial_contact' in result[0]
-    assert 'delivery_contact' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert counterparty_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_currency():
+@pytest.mark.parametrize('currency_column_names', ["currency_id", "currency_code", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_currency(currency_column_names):
     result = get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'currency_id' in result[0]
-    assert 'currency_code' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert currency_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_department():
+@pytest.mark.parametrize('department_column_names', ["department_id", "department_name", "location", "manager", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_department(department_column_names):
     result = get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'department_id' in result[0]
-    assert 'department_name' in result[0]
-    assert 'location' in result[0]
-    assert 'manager' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert department_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_design():
+@pytest.mark.parametrize('design_column_names', ["design_id", "created_at", "design_name", "file_location", "file_name", "last_updated"])
+def test_get_headers_extracts_column_names_for_design(design_column_names):
     result = get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'design_id' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
-    assert 'design_name' in result[0]
-    assert 'file_location' in result[0]
-    assert 'file_name' in result[0]
+    assert design_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_payment_type():
+@pytest.mark.parametrize('payment_type_column_names', ["payment_type_id", "payment_type_name", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_payment_type(payment_type_column_names):
     result = get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'payment_type_id' in result[0]
-    assert 'payment_type_name' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert payment_type_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_payment():
+@pytest.mark.parametrize('payment_column_names', ["payment_id", "created_at", "last_updated", "transaction_id", "counterparty_id", "payment_amount", "currency_id", "payment_type_id", "paid", "payment_date", "company_ac_number", "counterparty_ac_number"])
+def test_get_headers_extracts_column_names_for_payment(payment_column_names):
     result = get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'payment_id' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
-    assert "transaction_id" in result[0]
-    assert "counterparty_id" in result[0]
-    assert "payment_amount" in result[0]
-    assert "currency_id" in result[0]
-    assert "payment_type_id" in result[0]
-    assert "paid" in result[0]
-    assert "payment_date" in result[0]
-    assert "company_ac_number" in result[0]
-    assert "counterparty_ac_number" in result[0]
+    assert payment_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_purchase_order():
+@pytest.mark.parametrize('purchase_order_column_names', ["purchase_order_id", "created_at", "last_updated", "staff_id", "counterparty_id", "item_code", "item_quantity", "item_unit_price", "currency_id", "agreed_delivery_date", "agreed_payment_date", "agreed_delivery_location_id"])
+def test_get_headers_extracts_column_names_for_purchase_order(purchase_order_column_names):
     result = get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'purchase_order_id' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
-    assert 'staff_id' in result[0]
-    assert 'counterparty_id' in result[0]
-    assert 'item_code' in result[0]
-    assert 'item_quantity' in result[0]
-    assert 'item_unit_price' in result[0]
-    assert 'currency_id' in result[0]
-    assert 'agreed_delivery_date' in result[0]
-    assert 'agreed_payment_date' in result[0]
-    assert 'agreed_delivery_location_id' in result[0]
+    assert purchase_order_column_names in result[0]
 
 
-def test_get_headers_extracts_column_names_for_sales_order():
+@pytest.mark.parametrize('sales_order_column_names', ["sales_order_id", "created_at", "last_updated", "design_id", "staff_id", "counterparty_id", "units_sold", "unit_price", "currency_id", "agreed_delivery_date", "agreed_payment_date", "agreed_delivery_location_id"])
+def test_get_headers_extracts_column_names_for_sales_order(sales_order_column_names):
     result = get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'sales_order_id' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
-    assert 'design_id' in result[0]
-    assert 'staff_id' in result[0]
-    assert 'counterparty_id' in result[0]
-    assert 'units_sold' in result[0]
-    assert 'unit_price' in result[0]
-    assert 'currency_id' in result[0]
-    assert 'agreed_delivery_date' in result[0]
-    assert 'agreed_payment_date' in result[0]
-    assert 'agreed_delivery_location_id' in result[0]
+    assert sales_order_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_staff():
+@pytest.mark.parametrize('staff_column_names', ["staff_id", "first_name", "last_name", "department_id", "email_address", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_staff(staff_column_names):
     result = get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'staff_id' in result[0]
-    assert 'first_name' in result[0]
-    assert 'last_name' in result[0]
-    assert 'department_id' in result[0]
-    assert 'email_address' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert staff_column_names in result[0]
 
-
-def test_get_headers_extracts_column_names_for_transaction():
+@pytest.mark.parametrize('transaction_column_names', ["transaction_id", "transaction_type", "sales_order_id", "purchase_order_id", "created_at", "last_updated"])
+def test_get_headers_extracts_column_names_for_transaction(transaction_column_names):
     result = get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))
-    assert 'transaction_id' in result[0]
-    assert 'transaction_type' in result[0]
-    assert 'sales_order_id' in result[0]
-    assert 'purchase_order_id' in result[0]
-    assert 'created_at' in result[0]
-    assert 'last_updated' in result[0]
+    assert transaction_column_names in result[0]
 
 
 # test get_table_data
@@ -333,9 +263,10 @@ def bucket(s3):
     )
 
 
-# test data ingestion TODO
+# test data ingestion
+# need to make this test work for data key
 @freeze_time("2012-01-14 12:00:01")
-def test_data_ingestion_address(bucket, s3):
+def test_data_ingestion(bucket, s3):
     data_ingestion()
     list_files = s3.list_objects_v2(Bucket=get_ingested_bucket_name())
     for table in get_table_names():
@@ -345,112 +276,21 @@ def test_data_ingestion_address(bucket, s3):
             json_data = json.loads(f.read())
             assert json_data['table_name'] == table
             assert json_data['headers'] == get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
+            # for row in json_data['data']:
+            #     for i in range(len(row)):
+            #         if re.match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{6}', row[i]) != None:
+            #             row[i] = row[i].strptime('%Y-%m-%dT%H:%M:%S.%f')
+            #         elif isinstance(row[i], float):
+            #             row[i] = Decimal(row[i])
+            # assert json_data['data'] == get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[1:]
         response = s3.get_object(Bucket=get_ingested_bucket_name(), Key=f'14-01-2012/12:00:01/{table}.json')
-        print(json.loads(response['Body'].read()))
-        
+        json_response = json.loads(response['Body'].read())
+        assert json_data == json_response
 
-def test_data_ingestion_counterparty():
-    data_ingestion()
-    filepath = './ingestion_function/data/counterparty.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'counterparty'
-        assert json_data['headers'] == get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_currency():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/currency.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'currency'
-        assert json_data['headers'] == get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_department():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/department.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'department'
-        assert json_data['headers'] == get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_design():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/design.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'design'
-        assert json_data['headers'] == get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_payment_type():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/payment_type.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'payment_type'
-        assert json_data['headers'] == get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_payment():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/payment.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'payment'
-        assert json_data['headers'] == get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_purchase_order():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/purchase_order.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'purchase_order'
-        assert json_data['headers'] == get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_sales_order():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/sales_order.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'sales_order'
-        assert json_data['headers'] == get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_staff():
-    filepath = './ingestion_function/data/staff.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'staff'
-        assert json_data['headers'] == get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
-
-def test_data_ingestion_transaction():
-    datetime(2022, 10, 5, 16, 30, 42, 962000)
-    filepath = './ingestion_function/data/transaction.json'
-    assert os.path.isfile(filepath)
-    with open(filepath, 'r') as f:
-        json_data = json.loads(f.read())
-        assert json_data['table_name'] == 'transaction'
-        assert json_data['headers'] == get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-
+# need to change this test later for mocking
 def test_get_table_data_function_returns_rows_newer_than_last_updated_date():
     table_data = get_table_data('address', datetime(2022, 12, 5, 10, 30, 41, 962000))
     assert len(table_data) == 1
-
 
 
 def test_get_ingested_bucket_name_function_gets_correct_bucket_name(bucket, s3):
@@ -476,7 +316,10 @@ def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
 
 
 def test_retrieve_last_updated_function_retrieves_last_updated(bucket, s3):
-    with open('./last_updated.json', 'rb') as f:
+    with open('./test/last_updated.json', 'w') as f:
+        test_date = {"last_updated": "2000-11-03T14:20:49.962000"}
+        f.write(json.dumps(test_date))
+    with open('./test/last_updated.json', 'rb') as f:
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                       Key='date/last_updated.json')
     assert retrieve_last_updated() == datetime(2000, 11, 3, 14, 20, 49, 962000)
@@ -498,42 +341,5 @@ def test_store_last_updated_stores_last_updated(bucket, s3):
     assert 'date/last_updated.json' in list_of_files
     result = retrieve_last_updated()
     assert result == datetime(2022, 11, 3, 14, 20, 52, 186000)
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-#test upload files to s3 bucket
-# def test_upload_to_s3_function_uploads_files_to_correct_bucket():
-#     s3 = boto3.client('s3')
-#     upload_to_s3()
-#     list_objects = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-4781192')
-#     pass
-#     # TODO MOTO
-
-
-#test store_last_updated
-# @mock_s3
-# def test_retrieve_last_updated_function_returns_correct_value():
-#     s3 = boto3.client('s3')
-#     bucket = 's3-de-ingestion-query-queens'
-#     s3.create_bucket(Bucket=bucket)
-#     # upload mock file to mock bucket?
-#     result = retrieve_last_updated()
-#     print(result)
-#     assert False
-
-
 
 

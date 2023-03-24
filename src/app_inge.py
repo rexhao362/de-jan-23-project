@@ -25,28 +25,27 @@ def data_ingestion():
     timestamp = retrieve_last_updated()
 
     for table_name in get_table_names():
-        table_data = get_table_data(table_name, timestamp)
-        for row in table_data:
+        table_entries = get_table_data(table_name, timestamp)
+        for row in table_entries:
             for i in range(len(row)):
                 if isinstance(row[i], datetime):
                     row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
                 elif isinstance(row[i], Decimal):
                     row[i] = float(row[i])
         data = []
-        if len(table_data) > 1:
-            data = table_data[1:]
+        # if there's no new data entries then provide empty list in table_data dict
+        if len(table_entries) > 1:
+            data = table_entries[1:]
 
-        dict = {
+        table_data = {
             'table_name': table_name,
-            'headers': table_data[0],
+            'headers': table_entries[0],
             'data': data
         }
 
         with open(f'./ingestion_function/data/{table_name}.json', 'w') as f:
-            f.write(json.dumps(dict))
+            f.write(json.dumps(table_data))
 
     upload_to_s3()
 
     store_last_updated(timestamp)
-
-data_ingestion()
