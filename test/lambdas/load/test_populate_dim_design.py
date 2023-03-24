@@ -1,4 +1,4 @@
-from src.lambdas.load.utils.test_populate_tables import _test_populate_independent_table
+from src.lambdas.load.testutils.test_populate_tables import _test_populate_independent_table
 
 table_name = "dim_design"
 
