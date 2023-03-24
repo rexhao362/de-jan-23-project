@@ -1,5 +1,5 @@
-from src.lambdas.process.utils import (load_file_from_local, process, load_file_from_s3)
-def main():
+from src.lambdas.process.utils import *
+def main_local():
     # LOAD CURRENCY DATAFRAME
     curr_path = 'test/json_files/currency_test_2.json'
     curr_data = load_file_from_local(curr_path)
@@ -35,8 +35,15 @@ def main():
     sales_data = load_file_from_local(sales_path)
     sales_dataframe = process(sales_data)
    
+def main_s3():
+    # TODO - Might have issues with async stuff within a comprehension but would be nice!
+    bucket_name='FOOBAR'
+    date, time = get_last_updated(bucket_name)
+    jsons = get_all_jsons(bucket_name, date, time)
+    df_dict = {k:process(v) for (k, v) in jsons.items()}
+    print(df_dict.keys())
 
 if __name__ == "__main__":
-    main()
+    # main_s3()
 
   

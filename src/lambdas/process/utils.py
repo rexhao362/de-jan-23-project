@@ -147,3 +147,15 @@ def get_last_updated(bucket_name):
         logging.error('Could not retrieve last updated json')
         return (None, None)
 
+#TODO enter default json structure if file not found, so dataframe compehension can proceed
+def get_all_jsons(bucket_name, date, time):
+    files = ['address', 'counterparty', 'currency', 'department', 'design', 'payment', 'payment_type', 'purchase_order', 'sales_order', 'staff', 'transaction']
+    date, time = get_last_updated(bucket_name)
+    json_files = {}
+    for file in files:
+        try:
+            json_files[file] = load_file_from_s3(bucket_name, f'{date}/{time}/{file}.json')['table']
+        except:
+            json_files[file] = {'table_name' : file, 'headers' : None, 'data' : None}
+    
+    return json_files

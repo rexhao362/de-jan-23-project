@@ -1,3 +1,5 @@
+
+#TODO - Could do with more tests, or move this into test_utils.py and keep it short?
 import boto3
 from moto import mock_s3
 from pandas import read_parquet
@@ -32,29 +34,6 @@ def test_create_bucket_with_last_updated(s3):
     res = s3.upload_file('./test/lambdas/process/json_files/last_updated.json', bucket_name, 'date/last_updated.json')
     objects = s3.list_objects_v2(Bucket=bucket_name)
     assert 'Contents' in objects
-
-"""
-def retrieve_last_updated():
-
-    Retrieves the last updated date from the s3 bucket. If the file does not exist then uses a default date.
-    Args:
-        No args
-    Returns:
-        Returns the last updated date
-    Raises:
-        Error: Raises an exception.
-
-    s3 = boto3.client('s3')
-    list = s3.list_objects_v2(Bucket=get_ingested_bucket_name())
-    if 'Contents' not in list:
-        return datetime(2022, 10, 5, 16, 30, 42, 962000)
-    else:
-        response = s3.get_object(
-            Bucket=get_ingested_bucket_name(), Key='date/last_updated.json')
-        json_res = json.loads(response['Body'].read())
-        timestamp = json_res['last_updated']
-        return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
-"""
 
 def test_returns_date_and_time_with_successful_get(s3):
     from src.lambdas.process.utils import get_last_updated
