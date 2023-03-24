@@ -54,6 +54,7 @@ def load_new_data_to_warehouse_db():
 try:
     load_new_data_to_warehouse_db()
 except Exception as e:
+    #print(f'{e.}')
     exit( str(e) )  # replace with log() to CloudWatch
 
 # clean up the bucket!
