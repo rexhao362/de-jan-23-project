@@ -26,3 +26,5 @@ setup_test_credentials.sh
 # Environments
 venv/
 
+# temp test files
+temp_test*

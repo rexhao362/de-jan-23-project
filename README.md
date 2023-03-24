@@ -11,6 +11,7 @@ The is the final project of Data Engineering Bootcamp with Northcoders, cohort J
 - project's [Kanban board](https://trello.com/invite/b/dSISINtB/ATTI1d71e99e2e21210a7dffb1be363771dbF14A7D6E/team-project)
 - dev documentation
   - Tne minimal viable product [diagram](doc/dev/The%20MVP%20diagram.jpg)
+  - [development phases](doc/dev/development%20phases.md)
 
 Please do:
 
