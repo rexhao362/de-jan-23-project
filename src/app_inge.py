@@ -8,7 +8,7 @@ from src.utils.utils_inge import upload_to_s3
 import json
 
 
-def data_ingestion(timestamp):
+def data_ingestion():
     """
     Uses the get_table_names() and the get_table_data() functions to retrieve data for each table. Formats datetime objects into string and Decimal objects into float. Turns each table into a dictionary and saves them to json files.
 
@@ -48,3 +48,5 @@ def data_ingestion(timestamp):
     upload_to_s3()
 
     store_last_updated(timestamp)
+
+data_ingestion()

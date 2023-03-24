@@ -1,1 +1,1 @@
-{"table_name": "currency", "headers": ["currency_id", "currency_code", "created_at", "last_updated"], "data": [[1, "GBP", "2022-11-03T14:20:49.962000", "2022-11-03T14:20:49.962000"], [2, "USD", "2022-11-03T14:20:49.962000", "2022-11-03T14:20:49.962000"], [3, "EUR", "2022-11-03T14:20:49.962000", "2022-11-03T14:20:49.962000"]]}
+{"table_name": "currency", "headers": ["currency_id", "currency_code", "created_at", "last_updated"], "data": []}

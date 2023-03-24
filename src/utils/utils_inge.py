@@ -170,12 +170,24 @@ def store_last_updated(timestamp):
     Raises:
         Error: Raises an exception.
     """
+
     date_to_store = timestamp
     for table in get_table_names():
-        most_recent = con.run(
-            'SELECT last_updated FROM :table_name GROUP BY last_updated ORDER BY last_updated LIMIT 1', table_name=table)[0][0]
-        if most_recent >= date_to_store:
-            date_to_store = most_recent
+        if table in ['address',
+                      'counterparty',
+                      'currency',
+                      'department',
+                      'design',
+                      'payment_type',
+                      'payment',
+                      'purchase_order',
+                      'sales_order',
+                      'staff',
+                      'transaction']:
+            most_recent = con.run(
+                f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
+            if most_recent >= date_to_store:
+                date_to_store = most_recent
 
     with open('./ingestion_function/data/last_updated.json', 'w') as f:
         date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
