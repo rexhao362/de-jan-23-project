@@ -83,5 +83,3 @@ def test_file_is_still_valid_once_written_to_bucket(s3):
     assert equal(df['currency_code'], dataframe1['currency_code']).all()
     assert equal(df['currency_name'], dataframe1['currency_name']).all()
 
-
-

@@ -4,6 +4,7 @@ import json
 import logging
 import re
 
+
 # import pyarrow
 
 def load_file_from_local(filepath):
@@ -126,3 +127,23 @@ def write_to_bucket(bucket_name, table, key):
         logging.error("Could not load table into bucket")
     
     return response_object
+
+def get_last_updated(bucket_name):
+    """
+    Gets and processes the datetime held within s3://date/last_updated.json
+    
+    Args:
+        param1: bucket_name, string
+
+    Returns:
+        date, string, [0]
+        time, string, [1]
+    """
+    try:
+        res = load_file_from_s3(bucket_name, 'date/last_updated.json')
+        timestamp = res['table']['last_updated']
+        return (timestamp[:10], timestamp[12:19])
+    except:
+        logging.error('Could not retrieve last updated json')
+        return (None, None)
+
