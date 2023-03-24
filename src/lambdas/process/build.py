@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from src.lambdas.process.utils import (timestamp_to_date)
+import logging
 """
 Functions used to build dimension & fact table dataframes from given table dataframes.
 """
@@ -52,7 +53,7 @@ def build_dim_currency(dataframe):
         elif item == "EUR":
             currency_names.append('Euros')
         else:
-            currency_names.append('None')
+            logging.error(f'Unknown Currency - Currency Code : {item}')
 
     dim_currency['currency_name'] = currency_names
     dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
