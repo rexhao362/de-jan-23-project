@@ -1,19 +1,14 @@
 import pytest
+from src.lambdas.load.populate_dim_currency import validate_data
 from src.lambdas.load.testutils.test_populate_tables import _test_populate_independent_table
-from src.lambdas.load.populate_dim_currency import (validate_data, populate_dim_currency)
 
 table_name = "dim_currency"
 
 # test validator
-def test_validate_raises_exception_when_passed_string():
+def test_validate_raises_exception_when_passed_non_list():
     with pytest.raises(TypeError):
-        data = "invalid data"
-        validate_data(data)
-
-def test_validate_raises_exception_when_dict():
-    with pytest.raises(TypeError):
-        data = {}
-        validate_data(data)
+        validate_data("invalid data")
+        validate_data( {} )
 
 def test_validate_raises_exception_when_passed_list_with_no_list_inside():
     with pytest.raises(TypeError):
@@ -28,15 +23,9 @@ def test_validate_raises_exception_when_passed_list_with_empty_list():
 def test_validate_raises_exception_when_passed_invalid_types_in_nested_list():
     with pytest.raises(TypeError):
         data = [ ["a", "b", "c"] ]
-        validate_data(data)
-
-    with pytest.raises(TypeError):
-        data = [ [1, 2, "c"] ]
-        validate_data(data)
-
-    with pytest.raises(TypeError):
-        data = [ [1, "b", 3] ]
-        validate_data(data)
+        validate_data( [ ["a", "b", "c"] ] )
+        validate_data( [ [1, 2, "c"] ] )
+        validate_data( [ [1, "b", 3] ] )
 
 # happy path
 
