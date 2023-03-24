@@ -1,32 +1,71 @@
-def validate_data(data, function_name="populate_dim_currency"):
-    if not type(data) is list:
-        error_message = f'{function_name}: data should be a list (got {type(data)})'
+from num2words import num2words
+
+currency_row_elements_description = [
+    { "type": "int" },
+    { "type": "str" },
+    { "type": "str" }
+]
+
+# for position, element_description in enumerate(currency_row_elements_description, 1):
+#     element_description["position"] = num2words(position, to = 'ordinal_num')
+
+
+class ElementDescription:
+    def __init__(self, element_type, position_ordinal):
+        self.type = element_type
+        self.position = position_ordinal
+
+class RowElementsDescription:
+    def __init__(self, row_elements_description):
+        self.index = 0
+        self.row_elements = []
+        for position, element_description in enumerate(row_elements_description, 1):
+            row_element = ElementDescription(element_description["type"], num2words(position, to = 'ordinal_num') )
+            self.row_elements.append(row_element)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index == len(self.row_elements):
+            raise StopIteration
+        res = self.row_elements[self.index]
+        self.index += 1
+        return res
+
+    def __len__(self):
+        return len(self.row_elements)
+
+def validate_data(data, row_elements_description = RowElementsDescription(currency_row_elements_description), function_name=__name__):
+    top_level_type = type(data).__name__
+    if top_level_type != "list":
+        error_message = f'{function_name}: data should be of type "list" (got "{top_level_type}")'
+        print('Error:', error_message)
         raise TypeError(error_message)
 
-    for record in data:
-        if not type(record) is list:
-            error_message = f'{function_name}: each data element should be a list (got {type(record)})'
+    ref_num_elements = len(row_elements_description)
+
+    for row in data:
+        row_container_type = type(row).__name__
+        if row_container_type != "list":
+            error_message = f'{function_name}: each data element should be of type "list" (got "{row_container_type}")'
+            print('Error:', error_message)
             raise TypeError(error_message)
         
-        num_elements = len(record)
-        if num_elements != 3:
-            error_message = f'{function_name}: each data element should be a list of 3 elements (got {num_elements})'
-            raise ValueError()
+        num_elements = len(row)
+        if num_elements != ref_num_elements:
+            error_message = f'{function_name}: each data element should be a list of {ref_num_elements} elements (got {num_elements})'
+            print('Error:', error_message)
+            raise ValueError(error_message)
 
-        element = record[0]
-        if type(element) != int:
-            error_message = f'{function_name}: first element of each nested list should be an integer (got {type(element)})'
-            raise TypeError(error_message)
-
-        element = record[1]
-        if type(element) != str:
-            error_message = f'{function_name}: second element of each nested list should be a string (got {type(element)})'
-            raise TypeError(error_message)
-
-        element = record[2]
-        if type(element) != str:
-            error_message = f'{function_name}: third element of each nested list should be a string (got {type(element)})'
-            raise TypeError(error_message)
+        for element, element_description in zip(row, row_elements_description):
+            element_type = type(element).__name__
+            ref_element_type = element_description.type
+            if element_type != ref_element_type:
+                element_position = element_description.position
+                error_message = f'{function_name}: {element_position} element of each nested list should be of type "{ref_element_type}" (got "{element_type}")'
+                print('Error:', error_message)
+                raise TypeError(error_message)
         
 
 def populate_dim_currency(connection, data, schema, table_name="dim_currency"):
@@ -52,8 +91,8 @@ def populate_dim_currency(connection, data, schema, table_name="dim_currency"):
         TypeError: if elements of data have invalid type
         ValueError: if data is not in required format 
     """
-    function_name = populate_dim_currency.__name__      
-    validate_data(data, function_name)
+       
+    validate_data(data)
 
     values = ",".join( [ f"('{record[0]}', '{record[1]}', '{record[2]}')" for record in data] )
 
