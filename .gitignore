@@ -20,3 +20,6 @@ coverage.xml
 
 # Environments
 venv/
+
+# temp test files
+temp_test*

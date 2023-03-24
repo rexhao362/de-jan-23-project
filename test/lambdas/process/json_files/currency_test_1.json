@@ -1,0 +1,29 @@
+{
+    "headers":[
+       "currency_id",
+       "currency_code",
+       "created_at",
+       "last_updated"
+    ],
+    "data":[
+       [
+          1,
+          "GBP",
+          "created_1",
+          "updated_1"
+       ],
+       [
+        2,
+        "USD",
+        "created_2",
+        "updated_2"
+     ],
+     [
+        3,
+        "EUR",
+        "created_3",
+        "updated_3"
+     ]
+       
+    ]
+ }
