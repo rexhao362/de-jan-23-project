@@ -264,7 +264,6 @@ def bucket(s3):
 
 
 # test data ingestion
-# need to make this test work for data key
 @freeze_time("2012-01-14 12:00:01")
 def test_data_ingestion(bucket, s3):
     data_ingestion()
@@ -276,13 +275,14 @@ def test_data_ingestion(bucket, s3):
             json_data = json.loads(f.read())
             assert json_data['table_name'] == table
             assert json_data['headers'] == get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
-            # for row in json_data['data']:
-            #     for i in range(len(row)):
-            #         if re.match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{6}', row[i]) != None:
-            #             row[i] = row[i].strptime('%Y-%m-%dT%H:%M:%S.%f')
-            #         elif isinstance(row[i], float):
-            #             row[i] = Decimal(row[i])
-            # assert json_data['data'] == get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[1:]
+            test_data = get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[1:]
+            for row in test_data:
+                for i in range(len(row)):
+                    if isinstance(row[i], datetime):
+                            row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
+                    elif isinstance(row[i], Decimal):
+                        row[i] = float(row[i])
+            assert json_data['data'] == test_data
         response = s3.get_object(Bucket=get_ingested_bucket_name(), Key=f'14-01-2012/12:00:01/{table}.json')
         json_response = json.loads(response['Body'].read())
         assert json_data == json_response
