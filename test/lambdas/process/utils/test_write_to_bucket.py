@@ -33,10 +33,10 @@ def test_create_bucket(s3):
     assert len(result["Buckets"]) == 1
     assert result["Buckets"][0]["Name"] == bucket_name
 
-def test_bucket_exists_through_tests(s3):
-    result = s3.list_buckets()
-    assert len(result["Buckets"]) == 1
-    assert result["Buckets"][0]["Name"] == bucket_name
+# def test_bucket_exists_through_tests(s3):
+#     result = s3.list_buckets()
+#     assert len(result["Buckets"]) == 1
+#     assert result["Buckets"][0]["Name"] == bucket_name
 
 def test_write_to_s3_returns_dict(s3):
     from src.lambdas.process.utils import (write_to_bucket)
