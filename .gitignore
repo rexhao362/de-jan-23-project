@@ -23,3 +23,6 @@ venv/
 
 # temp test files
 temp_test*
+
+# workspace files
+de-jan-23-project.code-workspace
