@@ -5,8 +5,8 @@ from src.utils.db.make_schema_table_name import make_schema_table_name
 
 def _test_populate_independent_table(table_name, input_data):
     with Connection(env["user"], password=env["password"], host=env["host"], port=env["port"], database=env["database"]) as connection:
-        num_columns = len(input_data[0])
         num_rows = len(input_data)
+        num_columns = len(input_data[0]) if num_rows else 0
         full_table_name = make_schema_table_name( env["schema"], table_name)
         
         # act
