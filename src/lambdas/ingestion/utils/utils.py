@@ -5,12 +5,7 @@ import pg8000.native
 import os
 import json
 
-TOTESYS_DB_HOST = 'nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com'
-TOTESYS_DB_PORT = 5432
-TOTESYS_DB_USER = 'project_user_1'
-TOTESYS_DB_PASSWORD = 'UmaC43m32Zi6RW'
-TOTESYS_DB_DATABASE = 'totesys'
-TOTESYS_DB_DATABASE_SCHEMA = 'public'
+
 
 # DB connection
 con = pg8000.native.Connection(

@@ -20,3 +20,4 @@ coverage.xml
 
 # Environments
 venv/
+setup_production_credentials.sh
