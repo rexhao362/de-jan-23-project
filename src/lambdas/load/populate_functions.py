@@ -1,0 +1,3 @@
+from src.lambdas.load.populate_dim_currency import populate_dim_currency
+from src.lambdas.load.populate_dim_staff import populate_dim_staff
+from src.lambdas.load.populate_dim_design import populate_dim_design
