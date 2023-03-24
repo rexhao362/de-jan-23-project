@@ -1,3 +1,4 @@
+import traceback
 import pyarrow.parquet as pq
 from pg8000.native import Connection
 from src.environ.warehouse_db import env_warehouse_db as env
@@ -5,19 +6,19 @@ import src.lambdas.load.format_functions as format_namespace
 from src.lambdas.load.populate_dim_currency import populate_dim_currency
 
 
-def load_new_data_to_warehouse_db():
+def load_new_data_to_warehouse_db(data_path):
     print("load_new_data_to_warehouse_db():")
 
     input_data_descriptions = [
         {
             "table_name": "dim_currency",
-            "file_path": "test/lambdas/load/input_files/dim_currency.parquet"
+            "file_name": "dim_currency.parquet"
         }
     ]
 
     # read tables from files and format data if not empty
     for input_data in input_data_descriptions:
-        file_path = input_data["file_path"]
+        file_path = f'{data_path}/{ input_data["file_name"] }'
         table_name = input_data["table_name"]
 
         print(f'read_table("{file_path}")..')
@@ -52,9 +53,11 @@ def load_new_data_to_warehouse_db():
 
 # main script
 try:
-    load_new_data_to_warehouse_db()
-except Exception as e:
-    #print(f'{e.}')
-    exit( str(e) )  # replace with log() to CloudWatch
+    load_new_data_to_warehouse_db("test/lambdas/load/input_files")
+except Exception as err:
+    # msg = "".join(traceback.format_exception(type(err), err, err.__traceback__)) # full traceback, go with shorter one for now
+    # msg = "".join( traceback.format_tb(err.__traceback__) ) # a shorter one, stil too much
+    msg = f"\nError: {err}"
+    exit(msg)  # replace with log() to CloudWatch
 
 # clean up the bucket!
