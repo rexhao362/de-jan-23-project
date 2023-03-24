@@ -343,8 +343,8 @@ def test_data_ingestion_address(bucket, s3):
         assert os.path.isfile(filepath)
         with open(filepath, 'r') as f:
             json_data = json.loads(f.read())
-            assert json_data['table_name'] == 'address'
-            assert json_data['headers'] == get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
+            assert json_data['table_name'] == table
+            assert json_data['headers'] == get_table_data(table, datetime(2022, 10, 5, 16, 30, 42, 962000))[0]
         response = s3.get_object(Bucket=get_ingested_bucket_name(), Key=f'14-01-2012/12:00:01/{table}.json')
         print(json.loads(response['Body'].read()))
         
