@@ -1,11 +1,30 @@
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-default_column_names = [
-    "currency_id",
-    "currency_code",
-    "currency_name"
-]
+class SQLType:
+    # class variables
+    supported_types = {
+        "INT": pa.types.is_integer,
+        "VARCHAR": pa.types.is_string
+    }
+
+    def __init__(self, type_name):
+        uc_type_name = type_name.upper()
+        if not uc_type_name in SQLType.supported_types:
+            raise ValueError(f"unsupported SQL type: {type_name}")
+        self.type_name = uc_type_name
+
+    def __str__(self):
+        return self.type_name
+
+    def matches_arrow_type(self, arrow_type):
+        return SQLType.supported_types[self.type_name](arrow_type)
+
+sql_table_format = {
+    "currency_id": "INT",
+    "currency_code": "VARCHAR",
+    "currency_name": "VARCHAR"
+}
 
 #table = pq.read_table("test/lambdas/load/input_files/dim_currency.parquet")
 table = pa.table({
@@ -17,12 +36,19 @@ table = pa.table({
 
 print("original table:\n", table, "\n")
 
-# for table_name in table.column_names:
-#     if not table_name in default_column_names:
-#         table.drop(table_name)
+filtered_table = table.select( [column_name for column_name in sql_table_format] )
 
+# validate
+for column_name, sql_value_type in sql_table_format.items():
+    #print(f"{column_name}: {value_type}")
+    column_type = filtered_table[column_name].type
+    if not SQLType(sql_value_type).matches_arrow_type( column_type ):
+        exit(f'column_type={column_type} is different from {sql_value_type}')
+    #print(column_type, "\n")
+    #type_match = sql_to_pyarrow_type_map[value_type](column_type)
+    #print(f'type_match={type_match}')
 
-rows = table.select( [column_name for column_name in default_column_names] ).to_pylist()
+rows = filtered_table.to_pylist()
 
 print("filtered table\n")
 columns = ' '.join(table.column_names)
