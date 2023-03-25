@@ -6,8 +6,10 @@ currency_row_elements_description = [
     { "type": "str" }
 ]
 
-# for position, element_description in enumerate(currency_row_elements_description, 1):
-#     element_description["position"] = num2words(position, to = 'ordinal_num')
+currency_data_structure_description = {
+    "type": "list",
+    "elements": currency_row_elements_description
+}
 
 
 class ElementDescription:
@@ -18,9 +20,13 @@ class ElementDescription:
 class RowElementsDescription:
     def __init__(self, row_elements_description):
         self.index = 0
+        # self.type = 
         self.row_elements = []
         for position, element_description in enumerate(row_elements_description, 1):
-            row_element = ElementDescription(element_description["type"], num2words(position, to = 'ordinal_num') )
+            row_element = ElementDescription( \
+                element_description["type"], \
+                num2words(position, to = 'ordinal_num') \
+            )
             self.row_elements.append(row_element)
 
     def __iter__(self):
@@ -36,14 +42,23 @@ class RowElementsDescription:
     def __len__(self):
         return len(self.row_elements)
 
-def validate_data(data, row_elements_description = RowElementsDescription(currency_row_elements_description), function_name=__name__):
+class DatatStructureDescription:
+    def __init__(self, data_structure_description):
+        self.type = data_structure_description["type"]
+        self.row_elements_description = RowElementsDescription( data_structure_description["elements"] )
+
+
+
+
+
+def validate_data(data, data_structure_description = DatatStructureDescription(currency_data_structure_description), function_name=__name__):
     top_level_type = type(data).__name__
-    if top_level_type != "list":
-        error_message = f'{function_name}: data should be of type "list" (got "{top_level_type}")'
+    if top_level_type != data_structure_description.type:
+        error_message = f'{function_name}: data should be of type "{data_structure_description.type}" (got "{top_level_type}")'
         print('Error:', error_message)
         raise TypeError(error_message)
 
-    ref_num_elements = len(row_elements_description)
+    ref_num_elements = len(data_structure_description.row_elements_description)
 
     for row in data:
         row_container_type = type(row).__name__
@@ -58,7 +73,7 @@ def validate_data(data, row_elements_description = RowElementsDescription(curren
             print('Error:', error_message)
             raise ValueError(error_message)
 
-        for element, element_description in zip(row, row_elements_description):
+        for element, element_description in zip(row, data_structure_description.row_elements_description):
             element_type = type(element).__name__
             ref_element_type = element_description.type
             if element_type != ref_element_type:

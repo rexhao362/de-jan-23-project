@@ -8,23 +8,26 @@ table_name = "dim_currency"
 def test_validate_raises_exception_when_passed_non_list():
     with pytest.raises(TypeError):
         validate_data("invalid data")
+
+    with pytest.raises(TypeError):
         validate_data( {} )
 
 def test_validate_raises_exception_when_passed_list_with_no_list_inside():
     with pytest.raises(TypeError):
-        data = [ "a" ]
-        validate_data(data)
+        validate_data( [ "a" ] )
 
 def test_validate_raises_exception_when_passed_list_with_empty_list():
     with pytest.raises(ValueError):
-        data = [ [] ]
-        validate_data(data)
+        validate_data( [ [] ] )
 
 def test_validate_raises_exception_when_passed_invalid_types_in_nested_list():
     with pytest.raises(TypeError):
-        data = [ ["a", "b", "c"] ]
         validate_data( [ ["a", "b", "c"] ] )
+
+    with pytest.raises(TypeError):
         validate_data( [ [1, 2, "c"] ] )
+
+    with pytest.raises(TypeError):
         validate_data( [ [1, "b", 3] ] )
 
 # happy path
