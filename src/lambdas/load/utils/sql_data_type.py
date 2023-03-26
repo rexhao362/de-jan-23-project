@@ -1,13 +1,15 @@
-import pyarrow as pa
+import pyarrow.types as pytypes
 
 class SQLDataType:
     # class variables
     INT = "INT"
     VARCHAR = "VARCHAR"
+    TIME = "TIME"
 
     supported_data_types = {
-        INT: pa.types.is_integer,
-        VARCHAR: pa.types.is_string
+        INT: pytypes.is_integer,
+        VARCHAR: pytypes.is_string,
+        TIME: pytypes.is_string
     }
 
     def __init__(self, data_type_name):

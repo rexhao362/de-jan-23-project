@@ -10,16 +10,21 @@ test_table = pa.table({
 
 # happy path
 
-def test_constructs_sql_int_when_passed_int_string():
+def test_constructs_int_type():
     assert SQLDataType("int").data_type_name == "INT"
     assert SQLDataType("INT").data_type_name == "INT"
 
-def test_constructs_sql_varchar_when_passed_varchar_string():
+def test_constructs_varchar_type():
     assert SQLDataType("varchar").data_type_name == "VARCHAR"
     assert SQLDataType("VARCHAR").data_type_name == "VARCHAR"
 
-def test_type_match_works_correctly():
+def test_constructs_time_type():
+    assert SQLDataType("time").data_type_name == "TIME"
+    assert SQLDataType("TIME").data_type_name == "TIME"
+
+def test_matches_pyarrow_type():
     assert SQLDataType("int").matches_pyarrow_type( test_table["currency_id"].type )
+    assert SQLDataType("varchar").matches_pyarrow_type( test_table["currency_name"].type )
 
 # sad path
 
