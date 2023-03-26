@@ -1,8 +1,8 @@
 import pytest
 import pyarrow as pa
-from src.lambdas.load.data_table import DataTable
-from src.lambdas.load.data_table_source import \
+from src.lambdas.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
+from src.lambdas.load.utils.data_table import DataTable
 
 dim_currency_table_name = "dim_currency"
 dim_currency_format = {

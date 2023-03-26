@@ -1,6 +1,6 @@
 import pytest
 import pyarrow as pa
-from src.lambdas.load.sql_data_type import SQLDataType
+from src.lambdas.load.utils.sql_data_type import SQLDataType
 
 test_table = pa.table({
     "currency_name": ["Pounds", "Dollars", "Euros"],
