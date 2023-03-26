@@ -8,19 +8,20 @@ class BaseSQLDataType:
     def matches_pyarrow_type(self, pyarrow_type):
         return self.type_match_function(pyarrow_type)
 
-# int, integer, int4
+# int | integer | int4
 class SQLDataTypeINT(BaseSQLDataType):
     def __init__(self):
         super().__init__(pytypes.is_integer)
 
-# character varying[(n)], varchar[(n)]
+# character varying [ n) ] | varchar [ (n) ]
 class SQLDataTypeVARCHAR(BaseSQLDataType):
     def __init__(self, max_length=None):
         super().__init__(pytypes.is_string)
         self.max_length = max_length
 
-# time [ (p) ] [ without time zone ], time [ (p) ] with time zone
-# p: 0 to 6
+# time [ (p) ] [ without time zone ] | time [ (p) ] with time zone
+#
+# where p: 0 to 6
 class SQLDataTypeTIME(BaseSQLDataType):
     def __init__(self, precision=None, without_time_zone=True):
         super().__init__(pytypes.is_string)
@@ -32,7 +33,7 @@ class SQLDataTypeDATE(BaseSQLDataType):
     def __init__(self):
         super().__init__(pytypes.is_string)
 
-# NUMERIC [(precision[, scale])], DECIMAL [(precision[, scale])]
+# NUMERIC [ (precision [, scale ] ) ] | DECIMAL [ (precision [, scale ] ) ]
 class SQLDataTypeNUMERIC(BaseSQLDataType):
     def __init__(self, precision=None, scale=None):
         super().__init__(pytypes.is_decimal)
