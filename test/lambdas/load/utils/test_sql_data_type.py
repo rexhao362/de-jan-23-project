@@ -26,6 +26,10 @@ def test_constructs_date_type():
     assert SQLDataType("date").data_type_name == "DATE"
     assert SQLDataType("DATE").data_type_name == "DATE"
 
+def test_constructs_decimal_type():
+    assert SQLDataType("numeric").data_type_name == "NUMERIC"
+    assert SQLDataType("NUMERIC").data_type_name == "NUMERIC"
+
 def test_matches_pyarrow_type():
     assert SQLDataType("int").matches_pyarrow_type( test_table["currency_id"].type )
     assert SQLDataType("varchar").matches_pyarrow_type( test_table["currency_name"].type )

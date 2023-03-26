@@ -6,12 +6,14 @@ class SQLDataType:
     VARCHAR = "VARCHAR"
     TIME = "TIME"
     DATE = "DATE"
+    NUMERIC = "NUMERIC"
 
     supported_data_types = {
         INT: pytypes.is_integer,
         VARCHAR: pytypes.is_string,
         TIME: pytypes.is_string,
-        DATE: pytypes.is_string
+        DATE: pytypes.is_string,
+        NUMERIC: pytypes.is_decimal,
     }
 
     def __init__(self, data_type_name):
