@@ -2,7 +2,7 @@ import os
 import pyarrow.parquet as pq
 from src.lambdas.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from src.lambdas.load.utils.sql_data_type import SQLDataType
+from src.lambdas.load.utils.sql_data_type import get_sql_data_type
 
 default_parquet_extension = ".parquet"
 
@@ -61,10 +61,11 @@ class DataTable:
         """
         Tests that actual table's columns types match the table format
         """
-        for column_name, sql_data_type in self.format.items():
+        for column_name, sql_data_type_name in self.format.items():
             column_type = self.table[column_name].type
-            if not SQLDataType(sql_data_type).matches_pyarrow_type(column_type):
-                msg = f'table "{self.name}": column "{column_name}" should be of type "{sql_data_type}", got "{column_type}"'
+
+            if not get_sql_data_type(sql_data_type_name).matches_pyarrow_type(column_type):
+                msg = f'table "{self.name}": column "{column_name}" should be of type "{sql_data_type_name}", got "{column_type}"'
                 self.__invalidate()
                 raise TypeError(msg)
 
