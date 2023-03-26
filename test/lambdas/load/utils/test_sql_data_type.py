@@ -22,6 +22,10 @@ def test_constructs_time_type():
     assert SQLDataType("time").data_type_name == "TIME"
     assert SQLDataType("TIME").data_type_name == "TIME"
 
+def test_constructs_date_type():
+    assert SQLDataType("date").data_type_name == "DATE"
+    assert SQLDataType("DATE").data_type_name == "DATE"
+
 def test_matches_pyarrow_type():
     assert SQLDataType("int").matches_pyarrow_type( test_table["currency_id"].type )
     assert SQLDataType("varchar").matches_pyarrow_type( test_table["currency_name"].type )
@@ -41,7 +45,7 @@ def test_raises_type_error_if_constructed_with_non_string_argument():
     print(f'Exception raised: {exc_info.value.args[0]}')
 
 def test_raises_value_error_if_constructed_with_unsupported_type_name():
-    re = r'unsupported SQL data type'
+    re = r'unsupported/invalid SQL data type'
 
     with pytest.raises(ValueError, match=re) as exc_info:
         SQLDataType("invalid_type_name")

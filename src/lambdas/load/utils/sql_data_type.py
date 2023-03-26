@@ -5,11 +5,13 @@ class SQLDataType:
     INT = "INT"
     VARCHAR = "VARCHAR"
     TIME = "TIME"
+    DATE = "DATE"
 
     supported_data_types = {
         INT: pytypes.is_integer,
         VARCHAR: pytypes.is_string,
-        TIME: pytypes.is_string
+        TIME: pytypes.is_string,
+        DATE: pytypes.is_string
     }
 
     def __init__(self, data_type_name):
@@ -21,7 +23,7 @@ class SQLDataType:
 
         uc_data_type_name = data_type_name.upper()
         if not uc_data_type_name in self.supported_data_types:
-            raise ValueError(f'{class_name}("{data_type_name}"): unsupported SQL data type')
+            raise ValueError(f'{class_name}("{uc_data_type_name}"): unsupported/invalid SQL data type')
 
         self.data_type_name = uc_data_type_name
 
