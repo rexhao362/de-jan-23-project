@@ -71,7 +71,7 @@ run-flake:
 
 ## Run the unit tests
 unit-test:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vrP test/lambdas/process/*)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vrP test/lambdas/ingestion/*)
 
 ## Run the coverage check
 check-coverage:
