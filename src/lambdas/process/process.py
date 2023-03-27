@@ -1,4 +1,8 @@
+import logging
 from src.lambdas.process.utils import *
+from src.lambdas.process.build import *
+
+
 def main_local():
     # LOAD CURRENCY DATAFRAME
     curr_path = 'test/json_files/currency_test_2.json'
@@ -34,43 +38,76 @@ def main_local():
     sales_path = 'test/json_files/sales_order_test_1.json'
     sales_data = load_file_from_local(sales_path)
     sales_dataframe = process(sales_data)
-   
+
+
 def main_s3():
-    # TODO - Might have issues with async stuff within a comprehension but would be nice!
-    # bucket_name='FOOBAR'
-    # date, time = get_last_updated(bucket_name)
-    # jsons = get_all_jsons(bucket_name, date, time)
-    # df_dict = {k:process(v) for (k, v) in jsons.items()}
-    # print(df_dict.keys())
+    INGESTION_BUCKET_NAME = "query_queens_ingestion_bucket"
+    PROCESSING_BUCKET_NAME = "query_queens_processing_bucket"
 
-  #current_timestamp = get_timestamp_from_event_data(event[<filename_key>])
+    date, time = get_last_updated(INGESTION_BUCKET_NAME)
+    jsons = get_all_jsons(INGESTION_BUCKET_NAME, date, time)
 
-  if (all_tables_present(timestamp):
-    #create a lookup object
-    table_names = {
-      'dim_currency': timestamp + '/currency.json'
-      'dim_design': timestamp + '/design.json'
-      ...
-    }
-    # Try processing all the data
-    success = false
-    try:
-      dim_currency = build_dim_currency(table_names['dim_currency'])
-      dim_design = build_dim_design(table_names['dim-design'])
-      ...
-      success = true
-    catch Exception as e:
-      # Do something with the exception, log it to Cloudwatch
-      pass
-    # If all is well, try putting all the new tables into the bucket
-    if (success):
-      try:
-        write_to_bucket(<bucket_name>, dim_currency, timestamp + f"/{currency.json}")
-        write_to_bucket(<bucket_name>, dim_design, timestamp + f"/{design.json}")
-        ...
-      catch Exception as e:
-        # Do something with the exception, tell Cloudwatch, and clean up the bucket
-        pass
-    
+  # TO-DO:
+    current_timestamp = f"{date}/{time}"
+
+    if (len(jsons) == 11):
+        # create a lookup object
+        table_names = {
+            'currency': current_timestamp + '/currency.json',
+            'design': current_timestamp + '/design.json',
+            'staff': current_timestamp + '/staff.json',
+            'department': current_timestamp + '/department.json',
+           # 'purchase_order': current_timestamp + '/purchase_order.json',
+            'counterparty': current_timestamp + '/counterparty.json',
+            'address': current_timestamp + '/address.json',
+            'sales_order': current_timestamp + '/sales_order.json',
+            #'payment_type': current_timestamp + '/payment_type.json',
+            #'payment': current_timestamp + '/payment.json',
+            #'transaction': current_timestamp + '/transaction.json'
+        }
+        # Try processing all the data
+        success = False
+        try:
+            dim_currency = build_dim_currency(table_names['currency'])
+            dim_design = build_dim_design(table_names['design'])
+            dim_staff = build_dim_staff(table_names['staff'], table_names['department'])
+            dim_location = build_dim_location(table_names['address'])
+            dim_date = build_dim_date("2020/01/01", "2050/01/01")
+            dim_counterparty = build_dim_counterparty(table_names['counterparty'], table_names['address'])
+            fact_sales_order = build_fact_sales_order(table_names['sales_order']) 
+
+
+
+            success = True
+        except Exception as e:
+            # Do something with the exception, log it to Cloudwatch
+            logging.error("Couldn't build tables.")
+        # If all is well, try putting all the new tables into the bucket
+        if (success):
+            try:
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_currency,
+                                current_timestamp + "/currency.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_design,
+                                current_timestamp + "/design.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_staff,
+                                current_timestamp + "/staff.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_location,
+                                current_timestamp + "/location.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_date,
+                                current_timestamp + "/date.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, dim_counterparty,
+                                current_timestamp + "/counter_party.json")
+                write_to_bucket(PROCESSING_BUCKET_NAME, fact_sales_order,
+                                current_timestamp + "/sales_order.json")
+
+                logging.info("All processed tables are written to the bucket.")
+                
+            except Exception as e:
+                # Do something with the exception, tell Cloudwatch, and clean up the bucket
+                logging.error("Couldn't write tables to bucket.")
+                
+                # TO-DO clean up bucket ticket 85
+
+
 if __name__ == "__main__":
-    main_s3(event)
+    main_s3()
