@@ -3,9 +3,15 @@ import boto3
 import json
 import logging
 import re
+from os.path import join
 
 
 # import pyarrow
+
+def write_file_to_local(filepath, table, filename):
+    json_data = json.dumps(table, indent=4)
+    with open(join(filepath, filename), "w") as outfile:
+        outfile.write(json_data)
 
 def load_file_from_local(filepath):
     """
