@@ -47,7 +47,7 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        # print(e)
+        print(e)
         # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
@@ -142,7 +142,7 @@ def get_last_updated(bucket_name):
     try:
         res = load_file_from_s3(bucket_name, 'date/last_updated.json')
         timestamp = res['table']['last_updated']
-        return (timestamp[:10], timestamp[12:19])
+        return (timestamp[:10], timestamp[11:19])
     except:
         logging.error('Could not retrieve last updated json')
         return (None, None)
