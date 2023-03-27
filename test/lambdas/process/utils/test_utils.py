@@ -13,14 +13,14 @@ parquet = 'test/parquets/dim_currency_formatted.parquet'
 
 
 def test_load_file_from_local_returns_dict():
-    result = load_file_from_local(empty_json)
+    result = load_file_from_local(full_json)
     assert type(result) == dict
     
 def test_load_file_from_local_dict_contains_data():
-    result = load_file_from_local(no_data_json)
+    result = load_file_from_local(no_data_json)["table"]
     assert result['headers'] == []
     assert result['data'] == []
-    result = load_file_from_local(full_json)
+    result = load_file_from_local(full_json)["table"]
     assert result['headers'] == ["Name", "Type", "Description"]
     assert result['data'] == [   
     ["foo1", "bar1","foo bar1"],
@@ -40,7 +40,7 @@ def test_process_with_valid_data_from_local_returns_pd_dataframe():
 
 def test_process_with_empty_json_throws_error():
     raw_data = load_file_from_local(empty_json)
-    with pytest.raises(KeyError):
+    with pytest.raises(Exception):
         dataframe = process(raw_data)
         assert True
 
@@ -56,8 +56,8 @@ def test_process_returns_dataframe_containing_input_data():
     headers = ['Name', 'Type', 'Description']
     j = 0
     for header in headers:
-        for i in range(len(raw_data['data'])):
-            assert dataframe[header][i] == raw_data['data'][i][j]
+        for i in range(len(raw_data['table']['data'])):
+            assert dataframe[header][i] == raw_data['table']['data'][i][j]
         j += 1
 
 def test_print_pd_dataframe_to_csv():

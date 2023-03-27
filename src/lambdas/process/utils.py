@@ -16,10 +16,21 @@ def load_file_from_local(filepath):
 
     Returns: data, dict
     """
+    file_wrapper = {
+        "status": 404,
+        "table": {
+                "headers": [],
+                "data": []
+            }
+    }
     json_data = open(filepath)
     data = json.load(json_data)
     json_data.close()
-    return data
+    if(data):
+        file_wrapper["table"] = data
+    if(len(data) == 0):
+        file_wrapper['table'] = []
+    return file_wrapper
 
 def load_file_from_s3(bucket, key):
     """
@@ -47,7 +58,7 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        print(e)
+        #print(e)
         # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
@@ -65,9 +76,7 @@ def process(table):
         KeyError: Raises an exception.
     """
     try:
-
-        df = pd.DataFrame(table["data"], columns=table["headers"])
-
+        df = pd.DataFrame(table["table"]["data"], columns=table["table"]["headers"])
     except KeyError as e:
         raise(e)
     return df
