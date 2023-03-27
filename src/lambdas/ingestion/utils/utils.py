@@ -4,16 +4,25 @@ import boto3
 import pg8000.native
 import os
 import json
+from os import environ
 
+env_totesys_db = {
+    "user": environ.get('TOTESYS_DB_USER'),
+    "password": environ.get('TOTESYS_DB_PASSWORD'),
+    "host": environ.get('TOTESYS_DB_HOST', 'localhost'),
+    "port": environ.get('TOTESYS_DB_PORT', 5432),
+    "database": environ.get('TOTESYS_DB_DATABASE'),
+    "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
+}
 
 
 # DB connection
 con = pg8000.native.Connection(
-    user=TOTESYS_DB_USER,
-    host=TOTESYS_DB_HOST,
-    database=TOTESYS_DB_DATABASE,
-    port=TOTESYS_DB_PORT,
-    password=TOTESYS_DB_PASSWORD
+    user=env_totesys_db['user'],
+    host=env_totesys_db['host'],
+    database=env_totesys_db['database'],
+    port=env_totesys_db['port'],
+    password=env_totesys_db['password']
 )
 
 def get_table_names():
@@ -30,7 +39,7 @@ def get_table_names():
         KeyError: Raises an exception.
     """
     table_names = con.run(
-        'SELECT table_name FROM information_schema.tables WHERE table_schema = :schema', schema=TOTESYS_DB_DATABASE_SCHEMA)
+        'SELECT table_name FROM information_schema.tables WHERE table_schema = :schema', schema=env_totesys_db['schema'])
     return [item[0] for item in table_names]
 
 
@@ -83,7 +92,7 @@ def get_table_data(table_name, timestamp):
 
 def get_ingested_bucket_name():
     """
-    Retrieves ingested bucket name 
+    Returns name of ingested S3 bucket 
 
     Args:
         no args

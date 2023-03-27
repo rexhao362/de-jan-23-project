@@ -63,7 +63,7 @@ CREATE TABLE sales_order (
     staff_id INT,
     counterparty_id INT,
     units_sold INT,
-    unit_price NUMERIC,
+    unit_price NUMERIC(10, 2),
     currency_id INT,
     agreed_delivery_date VARCHAR,
     agreed_payment_date VARCHAR,
