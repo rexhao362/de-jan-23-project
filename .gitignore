@@ -28,6 +28,8 @@ setup_test_credentials.sh
 # Environments
 venv/
 
+setup_production_credentials.sh
+
 # temp test files
 temp_test*
 
