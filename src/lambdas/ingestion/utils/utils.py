@@ -18,12 +18,13 @@ env_totesys_db = {
 
 # DB connection
 con = pg8000.native.Connection(
-    user=env_totesys_db['user'],
-    host=env_totesys_db['host'],
-    database=env_totesys_db['database'],
-    port=env_totesys_db['port'],
-    password=env_totesys_db['password']
+    user = env_totesys_db['user'],
+    host = env_totesys_db['host'],
+    database = env_totesys_db['database'],
+    port = env_totesys_db['port'],
+    password = env_totesys_db['password']
 )
+
 
 def get_table_names():
     """
@@ -134,7 +135,7 @@ def upload_to_s3():
         with open(f'./src/lambdas/ingestion/data/table_data/{file_name}', 'rb') as f:
             s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                           Key=f'{current_day}/{current_time}/{file_name}')
-            
+
 
 def retrieve_last_updated():
     """
@@ -159,7 +160,7 @@ def retrieve_last_updated():
         json_res = json.loads(response['Body'].read())
         timestamp = json_res['last_updated']
         return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
-    
+
 
 def store_last_updated(timestamp):
     """
@@ -178,16 +179,16 @@ def store_last_updated(timestamp):
     date_to_store = timestamp
     for table in get_table_names():
         if table in ['address',
-                      'counterparty',
-                      'currency',
-                      'department',
-                      'design',
-                      'payment_type',
-                      'payment',
-                      'purchase_order',
-                      'sales_order',
-                      'staff',
-                      'transaction']:
+                     'counterparty',
+                     'currency',
+                     'department',
+                     'design',
+                     'payment_type',
+                     'payment',
+                     'purchase_order',
+                     'sales_order',
+                     'staff',
+                     'transaction']:
             most_recent = con.run(
                 f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
             if most_recent >= date_to_store:
