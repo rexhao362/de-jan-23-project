@@ -80,6 +80,7 @@ def test_to_sql_values_method_returns_correct_string():
     print(res)
     assert res == test_table_sql_values
 
+@pytest.mark.xfail
 def test_to_sql_request_method_returns_correct_value():
     assert False, "TODO"
     
