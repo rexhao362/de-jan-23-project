@@ -31,3 +31,5 @@ venv/
 # temp test files
 temp_test*
 
+# data in s3 simulation
+local/aws/

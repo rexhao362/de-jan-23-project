@@ -54,7 +54,7 @@ def load_new_data_to_warehouse_db(data_path):
 # if run directly
 if __name__ == "__main__":
     try:
-        load_new_data_to_warehouse_db("local/aws/s3/process")
+        load_new_data_to_warehouse_db("local/aws/s3/processed")
 
     except Exception as err:
         # msg = "".join(traceback.format_exception(type(err), err, err.__traceback__)) # full traceback, go with shorter one for now
@@ -63,5 +63,6 @@ if __name__ == "__main__":
         exit(msg)  # replace with log() to CloudWatch
 
     finally:
+        pass
         # clean up the process files
         #cleanup()
