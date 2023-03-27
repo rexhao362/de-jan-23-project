@@ -12,10 +12,6 @@ variable "remodel_lambda_name" {
     type = string
     default = "remodel_lambda"
 }
-variable "backend_bucket_name" {
-    type = string
-    default = "queery-queens-backend-bucket"
-}
 variable "region_name" {
     type = string
     default = "us-east-1"
