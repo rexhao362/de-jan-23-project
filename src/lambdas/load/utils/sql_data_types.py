@@ -1,7 +1,7 @@
 import re
 import pyarrow.types as pytypes
 
-class BaseSQLDataType:
+class _SQLDataType:
     def __init__(self, type_match_function):
         self.type_match_function = type_match_function
 
@@ -9,12 +9,12 @@ class BaseSQLDataType:
         return self.type_match_function(pyarrow_type)
 
 # int | integer | int4
-class SQLDataTypeINT(BaseSQLDataType):
+class SQLDataTypeINT(_SQLDataType):
     def __init__(self):
         super().__init__(pytypes.is_integer)
 
 # character varying [ n) ] | varchar [ (n) ]
-class SQLDataTypeVARCHAR(BaseSQLDataType):
+class SQLDataTypeVARCHAR(_SQLDataType):
     def __init__(self, max_length=None):
         super().__init__(pytypes.is_string)
         self.max_length = max_length
@@ -22,23 +22,24 @@ class SQLDataTypeVARCHAR(BaseSQLDataType):
 # time [ (p) ] [ without time zone ] | time [ (p) ] with time zone
 #
 # where p: 0 to 6
-class SQLDataTypeTIME(BaseSQLDataType):
+class SQLDataTypeTIME(_SQLDataType):
     def __init__(self, precision=None, without_time_zone=True):
         super().__init__(pytypes.is_string)
         self.precision = precision
         self.without_time_zone = without_time_zone
 
 # date
-class SQLDataTypeDATE(BaseSQLDataType):
+class SQLDataTypeDATE(_SQLDataType):
     def __init__(self):
         super().__init__(pytypes.is_string)
 
 # NUMERIC [ (precision [, scale ] ) ] | DECIMAL [ (precision [, scale ] ) ]
-class SQLDataTypeNUMERIC(BaseSQLDataType):
+class SQLDataTypeNUMERIC(_SQLDataType):
     def __init__(self, precision=None, scale=None):
         super().__init__(pytypes.is_decimal)
         self.precision = precision
         self.scale = scale
+
 
 def get_sql_data_type(data_type_name):
     arg_type = type(data_type_name)

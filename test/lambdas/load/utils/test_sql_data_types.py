@@ -13,12 +13,12 @@ test_table = pa.table({
     "currency_name": ["Pounds", "Dollars", "Euros"],
     "currency_id": [1, 2, 3],
     "currency_code": ["GBP", "USD", "EUR"],
-    "creation_time": ["10:00:00", "11:10:00", "08:00:03"],
+    "creation_time": ["10:00:00", "11:10:00", "08:00:03"],                                                                                                                                                                                                                      
     "updated_on": ["01.12.1973", "20.08.2002", "05.01.2023"],
     "unit_price": [2.78, 5.12, 3.56]
 })
 
-def test_get_sql_data_type_returns_int_object():
+def test_get_sql_data_type_returns_int_object():                                                                                                                                                                                                                                                                                                        
     dt = get_sql_data_type("INT")
     assert isinstance(dt, SQLDataTypeINT)
     assert isinstance( get_sql_data_type("integer"), SQLDataTypeINT)

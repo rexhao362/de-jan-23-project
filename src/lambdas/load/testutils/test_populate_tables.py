@@ -1,18 +1,25 @@
 from pg8000.native import Connection
-from src.environ.warehouse_db import env_warehouse_db as env
+
+from src.environ.warehouse_db import warehouse_db_user as user
+from src.environ.warehouse_db import warehouse_db_password as passwd
+from src.environ.warehouse_db import warehouse_db_host as host
+from src.environ.warehouse_db import warehouse_db_port as port
+from src.environ.warehouse_db import warehouse_db_database as db
+from src.environ.warehouse_db import warehouse_db_schema as db_schema
+
 import src.lambdas.load.populate_functions as populate_functions
 from src.utils.db.make_schema_table_name import make_schema_table_name
 
 def _test_populate_independent_table(table_name, input_data):
-    with Connection(env["user"], password=env["password"], host=env["host"], port=env["port"], database=env["database"]) as connection:
+    with Connection(user, password=passwd, host=host, port=port, database=db) as connection:
         num_rows = len(input_data)
         num_columns = len(input_data[0]) if num_rows else 0
-        full_table_name = make_schema_table_name( env["schema"], table_name)
+        full_table_name = make_schema_table_name(db_schema, table_name)
         
         # act
         connection.run(f'DELETE FROM {full_table_name}')
         populate_function = getattr(populate_functions, f'populate_{table_name}' )
-        populate_function(connection, input_data, env["schema"], table_name)
+        populate_function(connection, input_data, db_schema, table_name)
         rows = connection.run(f'SELECT * FROM {full_table_name}')
 
         # assert

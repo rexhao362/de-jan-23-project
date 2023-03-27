@@ -1,45 +1,42 @@
 from pg8000.native import Connection
-from src.environ.warehouse_db import env_warehouse_db as db_env
-from src.lambdas.load.data_table import DataTable
 
-data_tables = [
-    DataTable(
-        "dim_currency", {
-            "currency_id": "INT",
-            "currency_code": "VARCHAR",
-            "currency_name": "VARCHAR"
-        }
-    )
-]
+from src.environ.warehouse_db import warehouse_db_user as user
+from src.environ.warehouse_db import warehouse_db_password as passwd
+from src.environ.warehouse_db import warehouse_db_host as host
+from src.environ.warehouse_db import warehouse_db_port as port
+from src.environ.warehouse_db import warehouse_db_database as db
+from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
 
-def load_new_data_into_warehouse_db(data_path):
-    new_tables_count = 0
+from src.lambdas.load.db_schema import db_schema
 
-    for data_table in data_tables:
-        #print(f'Reading data for "{data_table.name}" table from {data_path}..')
-        data_table.from_parquet(data_path)
-        if data_table.has_data():
-            new_tables_count += 1
+def load_new_data_into_warehouse_db(path):
+    tables_ready_to_load = []
+
+    for table in db_schema:
+        if table.dont_import:
+            print( f'Don\'t import data to "{table.name}"' )
+            continue
+        print( f'Reading data for "{table.name}" table from {path}..' )
+        table.from_parquet(path)
+        if table.has_data():
+            print( f'\tdata for "{table.name}" is ready to be loaded' )
+            tables_ready_to_load.append(table)
 
     msg = "no new data to load"
 
-    if new_tables_count:
-        user = db_env["user"]
-        passwd = db_env["password"]
-        host = db_env["host"]
-        port = db_env["port"]
-        database = db_env["database"]
-        schema = db_env["schema"]
+    num_tables_to_load = len(tables_ready_to_load)
+    if num_tables_to_load:
+        with Connection(user, password=passwd, host=host, port=port, database=db) as connection:
+            for table in tables_ready_to_load:
+                assert table.has_data()
+                request = table.to_sql_request(db_schema_name)
+                print("\nSQL request:")
+                print(request)
+                connection.run(request)
 
-        with Connection(user, password=passwd, host=host, port=port, database=database) as connection:
-            for data_table in data_tables:
-                if data_table.has_data():
-                    request = data_table.prepare_sql_request(schema)
-                    res = connection.run(request)
+        msg = f'{num_tables_to_load} table{"s" if num_tables_to_load > 1 else ""} loaded into "{db}" database (schema "{db_schema_name}")'
 
-        msg = f'{new_tables_count} table(s) loaded into the warehouse db'
-
-    #print(msg)
+    print(msg)
 
 if __name__ == "__main__":
     test_path = "local/aws/s3/processed"
