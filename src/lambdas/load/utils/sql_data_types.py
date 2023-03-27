@@ -36,7 +36,7 @@ class SQLDataTypeDATE(_SQLDataType):
 # NUMERIC [ (precision [, scale ] ) ] | DECIMAL [ (precision [, scale ] ) ]
 class SQLDataTypeNUMERIC(_SQLDataType):
     def __init__(self, precision=None, scale=None):
-        super().__init__(pytypes.is_decimal)
+        super().__init__(pytypes.is_floating)
         self.precision = precision
         self.scale = scale
 
