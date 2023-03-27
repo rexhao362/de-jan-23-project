@@ -1,3 +1,6 @@
+# hello mac users
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
@@ -15,9 +18,20 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# sensitive
+setup_production_chedentials.sh
+setup_test_credentials.sh
+
 # pyenv
 .python-version
 
 # Environments
 venv/
+
 setup_production_credentials.sh
+
+# temp test files
+temp_test*
+
+# data in s3 simulation
+local/aws/
