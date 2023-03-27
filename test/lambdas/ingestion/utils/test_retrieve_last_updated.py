@@ -1,4 +1,4 @@
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
+from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name, store_last_updated
 from src.lambdas.ingestion.utils.utils import retrieve_last_updated
 import pytest
 from moto import mock_s3
@@ -39,7 +39,7 @@ def test_retrieve_last_updated_function_retrieves_last_updated(bucket, s3):
         f.write(json.dumps(test_date))
     with open('./src/lambdas/ingestion/data/date/last_updated.json', 'rb') as f:
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
-                      Key='date/last_updated.json')
+                      Key='date/date-1.json')
     assert retrieve_last_updated() == datetime(2000, 11, 3, 14, 20, 49, 962000)
 
 

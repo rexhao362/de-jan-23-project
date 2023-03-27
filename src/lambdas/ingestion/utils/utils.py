@@ -7,13 +7,21 @@ from os import environ
 
 
 env_totesys_db = {
-    "user": environ.get('TOTESYS_DB_USER'),
-    "password": environ.get('TOTESYS_DB_PASSWORD'),
-    "host": environ.get('TOTESYS_DB_HOST', 'localhost'),
+    "host": "nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com",
+    "user": "project_user_1",
+    "password": "UmaC43m32Zi6RW",
     "port": environ.get('TOTESYS_DB_PORT', 5432),
-    "database": environ.get('TOTESYS_DB_DATABASE'),
-    "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
+    "database": "totesys",
+    "schema": "public"
 }
+# env_totesys_db = {
+#     "user": environ.get('TOTESYS_DB_USER'),
+#     "password": environ.get('TOTESYS_DB_PASSWORD'),
+#     "host": environ.get('TOTESYS_DB_HOST', 'localhost'),
+#     "port": environ.get('TOTESYS_DB_PORT', 5432),
+#     "database": environ.get('TOTESYS_DB_DATABASE'),
+#     "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
+# }
 
 
 # DB connection
@@ -151,13 +159,15 @@ def retrieve_last_updated():
         Error: Raises an exception.
     """
     s3 = boto3.client('s3')
-    list = s3.list_objects_v2(Bucket=get_ingested_bucket_name())
-    if 'Contents' not in list:
+    response = s3.list_objects_v2(Bucket=get_ingested_bucket_name(), Prefix='date/')
+    if 'Contents' not in response:
         return datetime(2022, 10, 5, 16, 30, 42, 962000)
     else:
-        response = s3.get_object(
-            Bucket=get_ingested_bucket_name(), Key='date/last_updated.json')
-        json_res = json.loads(response['Body'].read())
+        list_objects = response['Contents']
+        key = len(list_objects)
+        res = s3.get_object(
+            Bucket=get_ingested_bucket_name(), Key=f'date/date-{key}.json')
+        json_res = json.loads(res['Body'].read())
         timestamp = json_res['last_updated']
         return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
 
@@ -177,8 +187,8 @@ def store_last_updated(timestamp):
     """
 
     date_to_store = timestamp
-    for table in get_table_names():
-        if table in ['address',
+    for table_name in get_table_names():
+        if table_name in ['address',
                      'counterparty',
                      'currency',
                      'department',
@@ -190,7 +200,7 @@ def store_last_updated(timestamp):
                      'staff',
                      'transaction']:
             most_recent = con.run(
-                f'SELECT last_updated FROM {table} GROUP BY last_updated ORDER BY last_updated LIMIT 1')[0][0]
+                f'SELECT last_updated FROM {table_name} GROUP BY last_updated ORDER BY last_updated DESC LIMIT 1')[0][0]
             if most_recent >= date_to_store:
                 date_to_store = most_recent
 
@@ -203,5 +213,8 @@ def store_last_updated(timestamp):
     #  uploads files to S3 bucket
     with open('./src/lambdas/ingestion/data/date/last_updated.json', 'rb') as f:
         s3 = boto3.client('s3')
+        response = s3.list_objects_v2(Bucket=get_ingested_bucket_name(), Prefix='date/')
+        list_objects = [item['Key'] for item in response['Contents']] if 'Contents' in response else []
+        key = len(list_objects) + 1
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
-                      Key='date/last_updated.json')
+                      Key=f'date/date-{key}.json')
