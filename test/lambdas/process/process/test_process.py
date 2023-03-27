@@ -23,9 +23,9 @@ def aws_credentials():
 def s3(aws_credentials):
     with mock_s3():
         yield boto3.client("s3", region_name="us-east-1")
-@pytest.mark.skip
-def test_create_bucket_with_last_updated(s3):
-    prefix = "2020-11-03/14-29-50/"
+
+def test_process_main_s3(s3):
+    prefix = "2020-11-03/14:20:49/"
     s3.create_bucket(Bucket=processing_bucket_name)
     s3.create_bucket(Bucket=ingestion_bucket_name)
     s3.upload_file('./test/lambdas/process/json_files/last_updated.json', ingestion_bucket_name, 'date/last_updated.json')
@@ -43,4 +43,4 @@ def test_create_bucket_with_last_updated(s3):
     objects = s3.list_objects_v2(Bucket=ingestion_bucket_name)
     assert 'Contents' in objects
     main_s3()
-    print(s3.list_objects_v2(Bucket=processing_bucket_name))
+    #print(s3.list_objects_v2(Bucket=processing_bucket_name))
