@@ -5,7 +5,6 @@ import os
 import json
 from os import environ
 
-
 env_totesys_db = {
     "user": environ.get('TOTESYS_DB_USER'),
     "password": environ.get('TOTESYS_DB_PASSWORD'),
@@ -14,6 +13,10 @@ env_totesys_db = {
     "database": environ.get('TOTESYS_DB_DATABASE'),
     "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
 }
+
+
+user = env_totesys_db['user']
+print(user, 'USER')
 
 
 # DB connection

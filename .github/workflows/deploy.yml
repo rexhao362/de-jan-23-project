@@ -7,6 +7,13 @@ on:
 jobs:
     run-tests:
         name: run-tests
+        env:
+          TOTESYS_DB_USER: ${{ secrets.TOTESYS_DB_USER }}
+          TOTESYS_DB_HOST: ${{ secrets.TOTESYS_DB_HOST }}
+          TOTESYS_DB_PASSWORD: ${{ secrets.TOTESYS_DB_PASSWORD }}
+          TOTESYS_DB_PORT: ${{ secrets.TOTESYS_DB_PORT }}
+          TOTESYS_DB_DATABASE: ${{ secrets.TOTESYS_DB_DATABASE }}
+          TOTESYS_DB_DATABASE_SCHEMA: ${{ secrets.TOTESYS_DB_DATABASE_SCHEMA }}
         runs-on: ubuntu-latest
         steps:
           - name: Checkout Repo
