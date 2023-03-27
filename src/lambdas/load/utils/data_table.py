@@ -27,7 +27,7 @@ class DataTable:
             self.table.num_rows
 
     def from_pyarrow(self, table):
-        self.__from_source(table, DataFromPyArrowTable() )
+        return self.__from_source(table, DataFromPyArrowTable() )
 
     def from_parquet(self, path, override_file_name=None):                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
         file_name = override_file_name if override_file_name \
@@ -35,12 +35,13 @@ class DataTable:
 
         full_path = os.path.join(path, file_name)
         table = pq.read_table(full_path)
-        self.__from_source(table, DataFromParquetFile(full_path) )
+        return self.__from_source(table, DataFromParquetFile(full_path) )
 
     def __from_source(self, table, source):                                                                                                                                                                                                                                                                                                                                                                                                     
         self.table = table.select(self.column_names)
         self.__check_column_types()
         self.source = source
+        return self
 
     @staticmethod
     def __escape(element):
@@ -57,10 +58,10 @@ class DataTable:
 
         return ',\n'.join(rows_strs)
 
-    def to_sql_request(self, schema=None):
+    def to_sql_request(self, db_schema=None):
         assert self.has_data()
 
-        table_name = f'{schema}.{self.name}' if schema else self.name
+        table_name = f'{db_schema}.{self.name}' if db_schema else self.name
         sql_request = "INSERT INTO " + table_name + "\n" + \
             "(" + ", ".join(self.column_names) + ")" + "\n" + \
             "VALUES\n" + \
@@ -70,7 +71,7 @@ class DataTable:
 
     def __check_column_types(self):
         """
-        Tests that actual table's columns types match the table format
+        Tests that actual table's columns types match the table schema
         """
         for column_name, sql_data_type_name in self.schema.items():
             column_type = self.table[column_name].type
