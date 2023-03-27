@@ -37,13 +37,40 @@ def main_local():
    
 def main_s3():
     # TODO - Might have issues with async stuff within a comprehension but would be nice!
-    bucket_name='FOOBAR'
-    date, time = get_last_updated(bucket_name)
-    jsons = get_all_jsons(bucket_name, date, time)
-    df_dict = {k:process(v) for (k, v) in jsons.items()}
-    print(df_dict.keys())
+    # bucket_name='FOOBAR'
+    # date, time = get_last_updated(bucket_name)
+    # jsons = get_all_jsons(bucket_name, date, time)
+    # df_dict = {k:process(v) for (k, v) in jsons.items()}
+    # print(df_dict.keys())
 
+  #current_timestamp = get_timestamp_from_event_data(event[<filename_key>])
+
+  if (all_tables_present(timestamp):
+    #create a lookup object
+    table_names = {
+      'dim_currency': timestamp + '/currency.json'
+      'dim_design': timestamp + '/design.json'
+      ...
+    }
+    # Try processing all the data
+    success = false
+    try:
+      dim_currency = build_dim_currency(table_names['dim_currency'])
+      dim_design = build_dim_design(table_names['dim-design'])
+      ...
+      success = true
+    catch Exception as e:
+      # Do something with the exception, log it to Cloudwatch
+      pass
+    # If all is well, try putting all the new tables into the bucket
+    if (success):
+      try:
+        write_to_bucket(<bucket_name>, dim_currency, timestamp + f"/{currency.json}")
+        write_to_bucket(<bucket_name>, dim_design, timestamp + f"/{design.json}")
+        ...
+      catch Exception as e:
+        # Do something with the exception, tell Cloudwatch, and clean up the bucket
+        pass
+    
 if __name__ == "__main__":
-    # main_s3()
-
-  
+    main_s3(event)
