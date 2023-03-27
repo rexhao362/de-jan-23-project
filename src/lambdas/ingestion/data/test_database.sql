@@ -9,8 +9,11 @@ CREATE DATABASE totes_test_database;
 \c totes_test_database; 
 
 -- Create all tables
+DROP SCHEMA IF EXISTS puclic CASCADE;
+CREATE SCHEMA puclic;
 
-CREATE TABLE counterparty (
+
+CREATE TABLE public.counterparty (
     counterparty_id SERIAL PRIMARY KEY,
     counterparty_legal_name VARCHAR,
     legal_address_id INT,
@@ -20,14 +23,14 @@ CREATE TABLE counterparty (
     last_updated TIMESTAMP
     )
 
-CREATE TABLE currency (
+CREATE TABLE public.currency (
     currency_id SERIAL PRIMARY KEY,
     currency_code VARCHAR,
     created_at TIMESTAMP,
     last_updated TIMESTAMP
 )
 
-CREATE TABLE department (
+CREATE TABLE public.department (
     department_id SERIAL PRIMARY KEY,
     department_name VARCHAR,
     location VARCHAR,
@@ -36,7 +39,7 @@ CREATE TABLE department (
     last_updated TIMESTAMP    
 )
 
-CREATE TABLE design (
+CREATE TABLE public.design (
     design_id SERIAL PRIMARY KEY,
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
@@ -45,7 +48,7 @@ CREATE TABLE design (
     file_name VARCHAR
 )
 
-CREATE TABLE staff (
+CREATE TABLE public.staff (
     staff_id SERIAL PRIMARY KEY,
     first_name VARCHAR,
     last_name VARCHAR,
@@ -55,13 +58,13 @@ CREATE TABLE staff (
     last_updated TIMESTAMP
 )
 
-CREATE TABLE sales_order (
+CREATE TABLE public.sales_order (
     sales_order_id SERIAL PRIMARY KEY,
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
-    design_id INT,
-    staff_id INT,
-    counterparty_id INT,
+    design_id INT FOREIGN KEY REFERENCES design(design_id),
+    staff_id INT FOREIGN KEY REFERENCES staff(staff_id),
+    counterparty_id INT FOREIGN KEY REFERENCES counterparty(counterparty_id),
     units_sold INT,
     unit_price NUMERIC(10, 2),
     currency_id INT,
@@ -70,7 +73,7 @@ CREATE TABLE sales_order (
     agreed_delivery_location_id INT
 )
 
-CREATE TABLE address (
+CREATE TABLE public.address (
     address_id SERIAL PRIMARY KEY,
     address_line_1 VARCHAR,
     address_line_2 VARCHAR,
@@ -83,48 +86,48 @@ CREATE TABLE address (
     last_updated TIMESTAMP
 )
 
-CREATE TABLE payment (
+CREATE TABLE public.payment (
     payment_id SERIAL PRIMARY KEY,
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
-    transaction_id INT,
-    counterparty_id INT,
+    transaction_id INT FOREIGN KEY REFERENCES transaction(transaction_id),
+    counterparty_id INT FOREIGN KEY REFERENCES counterparty(counterparty_id),
     payment_amount NUMERIC,
-    currency_id INT,
-    payment_type_id INT,
+    currency_id INT FOREIGN KEY REFERENCES currency(currency_id),
+    payment_type_id INT FOREIGN KEY REFERENCES payment_type(payment_type_id),
     paid BOOLEAN,
     payment_date VARCHAR,
     company_ac_number INT,
     counterparty_ac_number INT    
 )
 
-CREATE TABLE purchase_order (
+CREATE TABLE public.purchase_order (
     purchase_order_id INT,
     created_at TIMESTAMP,
     last_updated TIMESTAMP,
-    staff_id INT,
-    counterparty_id INT,
+    staff_id INT FOREIGN KEY REFERENCES staff(staff_id),
+    counterparty_id INT FOREIGN KEY REFERENCES counterparty(counterparty_id),
     item_code VARCHAR,
     item_quantity INT,
     item_unit_price NUMERIC,
-    currency_id INT,
+    currency_id INT FOREIGN KEY REFERENCES currency(currency_id),
     agreed_delivery_date VARCHAR,
     agreed_delivery_date VARCHAR,
     agreed_delivery_location_id INT   
 )
 
-CREATE TABLE payment_type (
+CREATE TABLE public.payment_type (
     payment_type_id INT,
     payment_type_name VARCHAR,
     created_at TIMESTAMP,
     last_updated TIMESTAMP
 )
 
-CREATE TABLE transaction (
+CREATE TABLE public.transaction (
     transaction_id INT,
     transaction_type VARCHAR,
-    sales_order_id INT,
-    purchase_order_id INT,
+    sales_order_id INT FOREIGN KEY REFERENCES sales_order(sales_order_id),
+    purchase_order_id INT FOREIGN KEY REFERENCES purchase_order(purchase_order_id),
     created_at TIMESTAMP,
     last_updated TIMESTAMP
 )
