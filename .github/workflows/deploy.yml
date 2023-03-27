@@ -1,0 +1,66 @@
+---
+on:
+  push:
+    branches:
+      - 9
+
+jobs:
+    run-tests:
+        name: run-tests
+        env:
+          TOTESYS_DB_USER: ${{ secrets.TOTESYS_DB_USER }}
+          TOTESYS_DB_HOST: ${{ secrets.TOTESYS_DB_HOST }}
+          TOTESYS_DB_PASSWORD: ${{ secrets.TOTESYS_DB_PASSWORD }}
+          TOTESYS_DB_PORT: ${{ secrets.TOTESYS_DB_PORT }}
+          TOTESYS_DB_DATABASE: ${{ secrets.TOTESYS_DB_DATABASE }}
+          TOTESYS_DB_DATABASE_SCHEMA: ${{ secrets.TOTESYS_DB_DATABASE_SCHEMA }}
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repo
+            uses: actions/checkout@v3
+          - name: Use Python
+            uses: actions/setup-python@v4
+            with:
+                python-version: "3.9"
+          - name: Use Make
+            run: sudo apt install make -y
+          - name: Use Requirements
+            run: make requirements
+          - name: Install Dev Dependencies
+            run: make dev-setup
+          - name: Run Checks
+            run: make run-checks
+
+    deployment:
+        name: deploy-dev
+        needs: run-tests
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repo
+            uses: actions/checkout@v3
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v2
+            with:
+                aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+                aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+                aws-region: ${{secrets.AWS_REGION}}
+          - name: Install Terraform
+            uses: harshicorp/setup-terraform@v2
+          - name: Terraform Init
+            run: terraform init
+            working-directory: ./terraform
+          - name: Terraform Plan
+            id: plan
+            run: terraform plan
+            working-directory: ./terraform
+          - name: Terraform Plan Status
+            if: steps.plan.outcome == 'failure'
+            run: exit 1
+            working-directory: ./terraform
+          - name: Terraform Apply
+            run: terraform apply -auto-approve
+            working-directory: ./terraform
+            
+
+
+
