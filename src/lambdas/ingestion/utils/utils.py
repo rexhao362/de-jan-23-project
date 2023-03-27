@@ -1,10 +1,10 @@
-
 from datetime import datetime
 import boto3
 import pg8000.native
 import os
 import json
 from os import environ
+
 
 env_totesys_db = {
     "user": environ.get('TOTESYS_DB_USER'),
