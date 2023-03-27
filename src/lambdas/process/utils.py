@@ -143,7 +143,7 @@ def write_to_bucket(bucket_name, table, key):
     
     return response_object
 
-def get_last_updated(bucket_name):
+def get_last_updated(bucket_name, local=False):
     """
     Gets and processes the datetime held within s3://date/last_updated.json
     
@@ -154,8 +154,9 @@ def get_last_updated(bucket_name):
         date, string, [0]
         time, string, [1]
     """
+
     try:
-        res = load_file_from_s3(bucket_name, 'date/last_updated.json')
+        res = load_file_from_s3(bucket_name, 'date/last_updated.json') if local else load_file_from_local(join(bucket_name, 'date/last_updated.json'))
         timestamp = res['table']['last_updated']
         return (timestamp[:10], timestamp[11:19])
     except:
@@ -163,13 +164,16 @@ def get_last_updated(bucket_name):
         return (None, None)
 
 #TODO enter default json structure if file not found, so dataframe compehension can proceed
-def get_all_jsons(bucket_name, date, time):
+def get_all_jsons(bucket_name, date, time, local=False):
     files = ['address', 'counterparty', 'currency', 'department', 'design', 'payment', 'payment_type', 'purchase_order', 'sales_order', 'staff', 'transaction']
     date, time = get_last_updated(bucket_name)
     json_files = {}
     for file in files:
         try:
-            json_files[file] = load_file_from_s3(bucket_name, f'{date}/{time}/{file}.json')['table']
+            if local:
+                json_files[file] = load_file_from_s3(bucket_name, f'{date}/{time}/{file}.json')['table']
+            else: json_files[file] = load_file_from_local(bucket_name, f'{date}/{time}/{file}.json')['table']
+                
         except:
             json_files[file] = {'table_name' : file, 'headers' : None, 'data' : None}
     
