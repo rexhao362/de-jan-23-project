@@ -101,7 +101,7 @@ def main_local(path):
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_date,
                                 "dim_date.parquet")
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_counterparty,
-                                "dim_counter_party.parquet")
+                                "dim_counterparty.parquet")
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, fact_sales_order,
                                 "dim_sales_order.parquet")
 
@@ -215,7 +215,7 @@ def main_s3():
                 write_to_bucket(PROCESSING_BUCKET_NAME, dim_date,
                                 current_timestamp + "/date")
                 write_to_bucket(PROCESSING_BUCKET_NAME, dim_counterparty,
-                                current_timestamp + "/counter_party")
+                                current_timestamp + "/counterparty")
                 write_to_bucket(PROCESSING_BUCKET_NAME, fact_sales_order,
                                 current_timestamp + "/sales_order")
 
