@@ -12,10 +12,10 @@ from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
 from src.lambdas.load.db_schema import db_schema
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 
 def load_new_data_into_warehouse_db(path):
-    path = join(path, "process")  # TODO: use global/config variable
+    path = join(path, "processed")  # TODO: use global/config variable
     tables_ready_to_load = []
 
     for table in db_schema:
@@ -43,15 +43,16 @@ def load_new_data_into_warehouse_db(path):
     logger.info(msg)
 
 if __name__ == "__main__":
-    test_path = "local/aws/s3/processed"
+    test_path = "local/aws/s3"
 
-    try:
-        load_new_data_into_warehouse_db(test_path)
+    load_new_data_into_warehouse_db(test_path)
+    # try:
+    #     load_new_data_into_warehouse_db(test_path)
 
-    except Exception as exc:
-        logger.critical(exc)
-        exit(1)
+    # except Exception as exc:
+    #     logger.critical(exc)
+    #     exit(1)
 
-    finally:
-        pass
-        # cleanup(test_path)
+    # finally:
+    #     pass
+    #     # cleanup(test_path)

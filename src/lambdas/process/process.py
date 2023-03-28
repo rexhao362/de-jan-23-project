@@ -91,11 +91,11 @@ def main_local(path):
     # If all is well, try writing remodeled dataframes to bucket
     if (success):
         try:
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_currency, "currency.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_currency, "dim_currency.parquet")
             write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_design,
                                 "design.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_staff,
-                                "staff.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_staff,
+                                "dim_staff.parquet")
             write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_location,
                                 "location.parquet")
             write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_date,
