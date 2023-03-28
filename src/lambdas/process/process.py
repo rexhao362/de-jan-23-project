@@ -50,7 +50,6 @@ def main_local():
         success = True
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
-        print(e)
         logging.error("Couldn't load tables.")
 
     # If all is well, try processing dictionaries
