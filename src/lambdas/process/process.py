@@ -92,18 +92,18 @@ def main_local(path):
     if (success):
         try:
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_currency, "dim_currency.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_design,
-                                "design.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_design,
+                                "dim_design.parquet")
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_staff,
                                 "dim_staff.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_location,
-                                "location.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_date,
-                                "date.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_counterparty,
-                                "counter_party.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), fact_sales_order,
-                                "sales_order.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_location,
+                                "dim_location.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_date,
+                                "dim_date.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_counterparty,
+                                "dim_counter_party.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, fact_sales_order,
+                                "dim_sales_order.parquet")
 
             logging.info("All processed tables are written to the bucket.")
 
