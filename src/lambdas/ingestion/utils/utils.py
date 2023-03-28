@@ -3,6 +3,18 @@ import boto3
 import pg8000.native
 import os
 import json
+from os import environ
+
+
+env_totesys_db = {
+    "user": "project_user_1",
+    "password": "UmaC43m32Zi6RW",
+    "host": "nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com",
+    "port": environ.get('TOTESYS_DB_PORT', 5432),
+    "database": "totesys",
+    "schema": "public"
+}
+
 
 # DB connection
 con = pg8000.native.Connection(
@@ -212,9 +224,8 @@ def store_last_updated(timestamp, path):
 
     s3 = boto3.client('s3')
     bucket_name = get_ingested_bucket_name()
-
     response = s3.list_objects_v2(
-        Bucket=bucket_name, Prefix='date/')
+        Bucket=bucket_name, Prefix='date/date_')
     if 'Contents' in response:
         s3.copy_object(
             Bucket=bucket_name,

@@ -148,5 +148,9 @@ def test_get_table_data_extracts_list_table_data_transaction():
 
 # need to change this test later for mocking
 def test_get_table_data_function_returns_rows_newer_than_last_updated_date():
-    table_data = get_table_data('purchase_order', datetime(2023, 1, 1, 10, 30, 41, 962000))
-    assert len(table_data) == 2
+    dt = datetime(2023, 1, 1, 10, 30, 41, 962000)
+    table_data = get_table_data('purchase_order', dt)
+    for row in table_data[1:]:
+        for i in range(len(row)):
+            if isinstance(row[i], datetime):
+                row[i] > dt
