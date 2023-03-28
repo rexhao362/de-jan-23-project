@@ -3,15 +3,18 @@ import boto3
 import json
 import logging
 import re
-from os.path import join
+from os.path import (join, exists)
+from os import makedirs
 
 
 # import pyarrow
 
 def write_file_to_local(filepath, table, filename):
-    json_data = json.dumps(table, indent=4)
-    with open(join(filepath, filename), "w") as outfile:
-        outfile.write(json_data)
+    parquet_binary = table.to_parquet()
+    if not exists(filepath):
+        makedirs(filepath)
+    with open(join(filepath, filename), "wb") as outfile:
+        outfile.write(parquet_binary)
 
 def load_file_from_local(filepath):
     """
