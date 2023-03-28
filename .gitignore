@@ -19,7 +19,7 @@ coverage.xml
 .pytest_cache/
 
 # sensitive
-*_chedentials.sh
+*_credentials.sh
 
 # pyenv
 .python-version
@@ -36,10 +36,7 @@ query_queens_processing_bucket/
 # data in s3 simulation
 local/aws/
 
-# local scripts
-bin/
-
 # all terraform files created on init
-
 terraform/.terraform/
 terraform/.terraform.lock.hcl
+

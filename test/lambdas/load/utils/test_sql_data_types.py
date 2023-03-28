@@ -97,8 +97,7 @@ def test_get_sql_data_type_returns_numeric_object():
     assert isinstance(dt, SQLDataTypeNUMERIC)
     assert dt.precision == None
     assert dt.scale == None
-    # TODO
-    #assert dt.matches_pyarrow_type( test_table["unit_price"].type ), f'class {dt.__class__.__name__} does not pass matches_pyarrow_type() test'
+    assert dt.matches_pyarrow_type( test_table["unit_price"].type ), f'class {dt.__class__.__name__} does not pass matches_pyarrow_type() test'
 
     # NUMERIC (p)
     precision = 10
