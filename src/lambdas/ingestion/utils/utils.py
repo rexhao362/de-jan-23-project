@@ -3,15 +3,16 @@ import boto3
 import pg8000.native
 import os
 import json
+from src.utils.secrets_manager import secrets_manager
 
 
 # DB connection
 con = pg8000.native.Connection(
-    user=env_totesys_db['user'],
-    host=env_totesys_db['host'],
-    database=env_totesys_db['database'],
-    port=env_totesys_db['port'],
-    password=env_totesys_db['password']
+    user=secrets_manager.get_secret_value("TOTESYS_DB_USER"),
+    password=secrets_manager.get_secret_value("TOTESYS_DB_PASSWORD"),
+    host=secrets_manager.get_secret_value("TOTESYS_DB_HOST"),
+    port=secrets_manager.get_secret_value("TOTESYS_DB_PORT"),
+    database=secrets_manager.get_secret_value("TOTESYS_DB_DATABASE")
 )
 
 
