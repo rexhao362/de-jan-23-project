@@ -67,43 +67,50 @@ output_tables = [
         'table_name': 'currency',
         'dataframe': None,
         'dependencies': ['currency'],
-        'build_function': build_dim_currency
+        'build_function': build_dim_currency,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'design',
         'dataframe': None,
         'dependencies': ['design'],
-        'build_function': build_dim_design
+        'build_function': build_dim_design,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'staff',
         'dataframe': None,
         'dependencies': ['staff', 'department'],
-        'build_function': build_dim_staff
+        'build_function': build_dim_staff,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'location',
         'dataframe': None,
         'dependencies': ['address'],
-        'build_function': build_dim_location
+        'build_function': build_dim_location,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'date',
         'dataframe': None,
         'dependencies': [],
-        'build_function': build_dim_date
+        'build_function': build_dim_date,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'counterparty',
         'dataframe': None,
         'dependencies': ['counterparty', 'address'],
-        'build_function': build_dim_counterparty
+        'build_function': build_dim_counterparty,
+        'prefix': 'dim_'
     },
     {
         'table_name': 'sales_order',
         'dataframe': None,
         'dependencies': ['sales_order'],
-        'build_function': build_fact_sales_order
+        'build_function': build_fact_sales_order,
+        'prefix': 'fact_'
     },
 ]
 
@@ -171,7 +178,7 @@ def main_local():
 
             for table in output_tables:
                 write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp),
-                                    table['dataframe'], table['table_name']+'.parquet')
+                                    table['dataframe'], table['prefix']+table['table_name']+'.parquet')
             logging.info("All processed tables are written to the bucket.")
 
         except Exception as e:
@@ -245,7 +252,7 @@ def main_s3():
         try:
             for table in output_tables:
                 write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], join(
-                    current_timestamp, table['table_name']+'.parquet'))
+                    current_timestamp, table['prefix'] + table['table_name']+'.parquet'))
 
             logging.info("All processed tables are written to the bucket.")
 
