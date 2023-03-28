@@ -19,7 +19,7 @@ coverage.xml
 .pytest_cache/
 
 # sensitive
-*_chedentials.sh
+*_credentials.sh
 
 # pyenv
 .python-version
@@ -32,6 +32,3 @@ temp_test*
 
 # data in s3 simulation
 local/aws/
-
-# dev scripts
-bin/
