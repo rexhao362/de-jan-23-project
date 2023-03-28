@@ -6,24 +6,24 @@ resource "aws_s3_bucket" "code_bucket" {
 resource "aws_s3_bucket" "ingestion_bucket" {
     bucket_prefix = "s3-de-ingestion-query-queens-"
 }
-resource "aws_s3_bucket" "processed_bucket" {
-    bucket_prefix = "s3-de-processed-query-queens-"
+resource "aws_s3_bucket" "process_bucket" {
+    bucket_prefix = "s3-de-process-query-queens-"
 }
 
 # create lambda-objects
-resource "aws_s3_object" "ingestion_code" {
+resource "aws_s3_object" "ingestion_lambda" {
     bucket = aws_s3_bucket.code_bucket.bucket
-    key = functions/ingestion/ingestion.zip
+    key = "functions/ingestion.zip"
     source = "${path.module}/../function_zips/ingestion.zip"
 }
-resource "aws_s3_object" "process_code" {
+resource "aws_s3_object" "process_lambda" {
     bucket = aws_s3_bucket.code_bucket.bucket
-    key = functions/process/process.zip
+    key = "functions/process.zip"
     source = "${path.module}/../function_zips/process.zip"
 }
-resource "aws_s3_object" "load_code" {
+resource "aws_s3_object" "load_lambda" {
     bucket = aws_s3_bucket.code_bucket.bucket
-    key = functions/remodel/load.zip
+    key = "functions/load.zip"
     source = "${path.module}/../function_zips/load.zip"
 }
 
