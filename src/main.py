@@ -9,25 +9,23 @@ logger.setLevel(logging.INFO)
 
 # debug only, remove in production
 import sys
-logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 local_bucket_path = "local/aws/s3"
 
-data_ingestion(local_bucket_path)
-main_local(local_bucket_path)
-load_new_data_into_warehouse_db(local_bucket_path)
+try:
+    data_ingestion(local_bucket_path)
+    main_local(local_bucket_path)
+    load_new_data_into_warehouse_db(local_bucket_path)
 
-# try:
-#     data_ingestion(local_bucket_path)
-#     main_local(local_bucket_path)
-#     load_new_data_into_warehouse_db(local_bucket_path)
+except BaseException as exc:
+    import traceback
+    logger.critical( f'{exc.__class__.__name__} exception raised' )
+    msg = ''.join( traceback.format_tb(exc.__traceback__, 1) ) + str(exc)
+    logger.critical(msg)
+    exit(1)
 
-# except Exception as exc:
-#     print("Exception:", exc)
-#     logger.error(exc)
-#     exit(1)
-
-# finally:
-#     pass
-#     # clean up the process files
-#     #cleanup()
+finally:
+    pass
+    # clean up the process files
+    #cleanup()

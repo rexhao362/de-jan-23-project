@@ -12,11 +12,6 @@ from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
 from src.lambdas.load.db_schema import db_schema
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# debug only, remove in production
-import sys
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 def load_new_data_into_warehouse_db(path):
     path = join(path, "processed")  # TODO: use global/config variable
@@ -45,18 +40,3 @@ def load_new_data_into_warehouse_db(path):
         msg = f'{num_tables_to_load} table{"s" if num_tables_to_load > 1 else ""} loaded into "{db}" database (schema "{db_schema_name}")'
 
     logger.info(msg)
-
-if __name__ == "__main__":
-    test_path = "local/aws/s3"
-
-    load_new_data_into_warehouse_db(test_path)
-    # try:
-    #     load_new_data_into_warehouse_db(test_path)
-
-    # except Exception as exc:
-    #     logger.critical(exc)
-    #     exit(1)
-
-    # finally:
-    #     pass
-    #     # cleanup(test_path)
