@@ -31,6 +31,7 @@ setup_production_credentials.sh
 
 # temp test files
 temp_test*
+query_queens_processing_bucket/
 
 # data in s3 simulation
 local/aws/
