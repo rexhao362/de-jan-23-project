@@ -3,6 +3,7 @@ import boto3
 import pg8000.native
 import os
 import json
+from src.utils.secrets_manager import secrets_manager
 
 from src.environ.totesys_db import totesys_db_user as user
 from src.environ.totesys_db import totesys_db_password as passwd

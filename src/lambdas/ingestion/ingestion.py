@@ -1,3 +1,4 @@
+from os.path import join
 from datetime import datetime
 from decimal import Decimal
 from src.lambdas.ingestion.utils.utils import get_table_data
@@ -26,7 +27,7 @@ def data_ingestion(path):
     Raises:
         Error: Raises an exception.
     """
-
+    path = join(path, "ingestion")  # TODO: use global/config variable
     timestamp = retrieve_last_updated()
 
     for table_name in get_table_names():
@@ -52,7 +53,7 @@ def data_ingestion(path):
         with open(filepath, 'w') as f:
             f.write(json.dumps(table_data))
 
-    upload_to_s3(path)
+    #upload_to_s3(path)
 
     store_last_updated(timestamp, path)
 

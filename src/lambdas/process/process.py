@@ -1,12 +1,12 @@
+from os.path import join
 import logging
 from src.lambdas.process.utils import *
 from src.lambdas.process.build import *
-from os.path import join
 
 
-def main_local():
-    LOCAL_INGESTION_DIRECTORY = "query_queens_ingestion_bucket"
-    LOCAL_PROCESSING_DIRECTORY = "query_queens_processing_bucket"
+def main_local(path):
+    LOCAL_INGESTION_DIRECTORY = join(path, "ingested")
+    LOCAL_PROCESSING_DIRECTORY = join(path, "processed")
 
     date, time = get_last_updated(LOCAL_INGESTION_DIRECTORY, local=True)
     jsons = get_all_jsons(LOCAL_INGESTION_DIRECTORY, date, time, local=True)
