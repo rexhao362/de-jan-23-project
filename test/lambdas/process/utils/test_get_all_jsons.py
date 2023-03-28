@@ -33,13 +33,13 @@ def test_create_bucket_with_last_updated(s3):
 def test_upload_all_last_updated_jsons(s3):
     from src.lambdas.process.utils import get_last_updated
     date, time = get_last_updated(bucket_name)
-    s3.upload_file('test/lambdas/process/json_files/address_test_2.json', bucket_name, f'{date}/{time}/address.json')
-    s3.upload_file('test/lambdas/process/json_files/counterparty_test_2.json', bucket_name, f'{date}/{time}/counterparty.json')
-    s3.upload_file('test/lambdas/process/json_files/currency_test_2.json', bucket_name, f'{date}/{time}/currency.json')
-    s3.upload_file('test/lambdas/process/json_files/department_test_1.json', bucket_name, f'{date}/{time}/department.json')
-    s3.upload_file('test/lambdas/process/json_files/design_test_2.json', bucket_name, f'{date}/{time}/design.json')
-    s3.upload_file('test/lambdas/process/json_files/sales_order_test_1.json', bucket_name, f'{date}/{time}/sales_order.json')
-    s3.upload_file('test/lambdas/process/json_files/staff_test_1.json', bucket_name, f'{date}/{time}/staff.json')
+    s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, f'{date}/{time}/address.json')
+    s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, f'{date}/{time}/counterparty.json')
+    s3.upload_file('test/lambdas/process/json_files/currency.json', bucket_name, f'{date}/{time}/currency.json')
+    s3.upload_file('test/lambdas/process/json_files/department.json', bucket_name, f'{date}/{time}/department.json')
+    s3.upload_file('test/lambdas/process/json_files/design.json', bucket_name, f'{date}/{time}/design.json')
+    s3.upload_file('test/lambdas/process/json_files/sales_order.json', bucket_name, f'{date}/{time}/sales_order.json')
+    s3.upload_file('test/lambdas/process/json_files/staff.json', bucket_name, f'{date}/{time}/staff.json')
     objects = s3.list_objects_v2(Bucket=bucket_name)
     assert len(objects['Contents']) == 8
 
