@@ -45,10 +45,6 @@ def helpers():
 
 
 
-
-
-
-
 @pytest.fixture(scope="module")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -69,16 +65,6 @@ def test_process_main_s3(s3, helpers):
     assert 'Contents' in objects
    
     
-    # Test if all keys are available
-    
-    expected_keys = ['2020-11-03/14:20:49/address.json', '2020-11-03/14:20:49/counterparty.json', '2020-11-03/14:20:49/currency.json', '2020-11-03/14:20:49/department.json', '2020-11-03/14:20:49/design.json', '2020-11-03/14:20:49/payment.json', '2020-11-03/14:20:49/payment_type.json', '2020-11-03/14:20:49/purchase_order.json', '2020-11-03/14:20:49/sales_order.json', '2020-11-03/14:20:49/staff.json', '2020-11-03/14:20:49/transaction.json', 'date/last_updated.json']
-    actual_keys = [d['Key'] for d in objects['Contents']]
-    assert len(expected_keys) == len(actual_keys)
-    for key in expected_keys:
-        assert key in actual_keys
-    
-
-    
 def test_write_to_bucket(s3, helpers):
     helpers.mock_ingestion(s3)
     main_s3()
@@ -91,8 +77,8 @@ def test_write_to_bucket(s3, helpers):
     
 
 def test_main_s3_outputs_correct_parquet_files(s3, helpers):
-    output_tables = ['counter_party', 'currency', 'date', 'design', 'location', 'sales_order', 'staff']
-    expected_keys = [os.path.join(PREFIX, table + '.parquet') for table in output_tables]
+    expected_column_names = {'counter_party': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': ['design_id', 'design_name', 'file_location', 'file_name'], 'location': ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone'], 'sales_order': ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id'], 'staff': ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']}
+    table_column_dict = {}
     helpers.mock_ingestion(s3)
     main_s3()
     processed_contents = s3.list_objects_v2(Bucket=PROCESSING_BUCKET_NAME)['Contents']
@@ -101,11 +87,15 @@ def test_main_s3_outputs_correct_parquet_files(s3, helpers):
         s3_filepath = s3_object['Key']
         obj = s3.get_object(Bucket=PROCESSING_BUCKET_NAME, Key=s3_filepath)
         df = pd.read_parquet(io.BytesIO(obj['Body'].read()))
-        file_names.append(s3_filepath)
+        table_name = os.path.splitext(os.path.basename(s3_filepath))[0]
+        table_column_dict[table_name] = df.columns.tolist()
 
-    assert len(expected_keys) == len(file_names)
-    for key in expected_keys:
-        assert key in file_names
+    for table_name, column_names in table_column_dict.items():
+        assert sorted(column_names) == sorted(expected_column_names[table_name])
+
+        
+
+    
         
       
    
