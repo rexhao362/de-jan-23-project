@@ -2,12 +2,12 @@
 The document describes output data structure of each module in the workflow
 
 ## Ingest
-Whenever triggered by cloudwatch, ingest lambda checks for new data. When done handling, gets a timestamp in the format yy-mm-dd/hh-mm-ss. Then puts in ingestion bucket a new "directory" named \<timestamp\> "containing" one json for each of the eleven input tables. (In actuality, this means putting eleven objects with keys such as '2023-03-22/11-33-01/design.json'.)
+Whenever triggered by cloudwatch, ingest lambda checks for new data. When done handling, gets a timestamp in the format yy-mm-dd/hh:mm:ss. Then puts in ingestion bucket a new "directory" named \<timestamp\> "containing" one json for each of the eleven input tables. (In actuality, this means putting eleven objects with keys such as '2023-03-22/11:33:01/design.json'.)
   
 Output example in mock directory structure:
 ```
   2023-03-22
-  └───11-33-01
+  └───11:33:01
      |    design.json
      |    transaction.json
      |    payment.json
