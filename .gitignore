@@ -36,8 +36,9 @@ temp_test*
 # data in s3 simulation
 local/aws/
 
+# all terraform files created on init
 
-
-
+terraform/.terraform/
+terraform/.terraform.lock.hcl
 
 

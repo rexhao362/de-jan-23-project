@@ -216,15 +216,15 @@ resource "aws_iam_role_policy_attachment" "load_s3_policy_attachment" {
 
 # attach cw policy documents to each role
 
-resource "aws_iam_role_policy_attachment" "ingestion_s3_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "ingestion_cw_policy_attachment" {
     role = aws_iam_role.ingestion_lambda_role.name
     policy_arn = aws_iam_policy.ingestion_cw_policy.arn
 }
-resource "aws_iam_role_policy_attachment" "process_s3_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "process_cw_policy_attachment" {
     role = aws_iam_role.process_lambda_role.name
     policy_arn = aws_iam_policy.process_cw_policy.arn
 }
-resource "aws_iam_role_policy_attachment" "load_s3_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "load_cw_policy_attachment" {
     role = aws_iam_role.load_lambda_role.name
     policy_arn = aws_iam_policy.load_cw_policy.arn
 }
