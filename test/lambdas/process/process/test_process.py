@@ -7,8 +7,8 @@ import io
 from pandas import read_parquet
 from src.lambdas.process.process import (main_local, main_s3)
 
-PROCESSING_BUCKET_NAME = "query_queens_processing_bucket"
-INGESTION_BUCKET_NAME = "query_queens_ingestion_bucket"
+PROCESSING_BUCKET_NAME = "query-queens-processing-bucket"
+INGESTION_BUCKET_NAME = "query-queens-ingestion-bucket"
 PREFIX = "2020-11-03/14:20:49/"
 
 
@@ -75,7 +75,7 @@ def test_main_s3_write_to_bucket(s3, helpers):
     helpers.mock_ingestion(s3)
     main_s3()
     processing_objects = s3.list_objects_v2(Bucket=PROCESSING_BUCKET_NAME)
-    expected_keys = ['2020-11-03/14:20:49/counter_party.parquet', '2020-11-03/14:20:49/currency.parquet', '2020-11-03/14:20:49/date.parquet',
+    expected_keys = ['2020-11-03/14:20:49/counterparty.parquet', '2020-11-03/14:20:49/currency.parquet', '2020-11-03/14:20:49/date.parquet',
                      '2020-11-03/14:20:49/design.parquet', '2020-11-03/14:20:49/location.parquet', '2020-11-03/14:20:49/sales_order.parquet', '2020-11-03/14:20:49/staff.parquet']
     actual_keys = [d['Key'] for d in processing_objects['Contents']]
     assert len(expected_keys) == len(actual_keys)
@@ -84,7 +84,7 @@ def test_main_s3_write_to_bucket(s3, helpers):
 
 
 def test_main_s3_outputs_correct_parquet_files(s3, helpers):
-    expected_column_names = {'counter_party': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': [
+    expected_column_names = {'counterparty': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': [
         'design_id', 'design_name', 'file_location', 'file_name'], 'location': ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone'], 'sales_order': ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id'], 'staff': ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']}
     table_column_dict = {}
     helpers.mock_ingestion(s3)
@@ -108,7 +108,7 @@ def test_local_write_to_bucket(s3, helpers):
     main_local()
     # list objects in the processing bucket
     actual_keys = os.listdir(os.path.join(PROCESSING_BUCKET_NAME, PREFIX))
-    expected_keys = ['counter_party.parquet', 'currency.parquet', 'date.parquet',
+    expected_keys = ['counterparty.parquet', 'currency.parquet', 'date.parquet',
                      'design.parquet', 'location.parquet', 'sales_order.parquet', 'staff.parquet']
     assert len(expected_keys) == len(actual_keys)
     for key in expected_keys:
@@ -116,12 +116,12 @@ def test_local_write_to_bucket(s3, helpers):
 
 
 def test_local_outputs_correct_parquet_files(s3, helpers):
-    expected_column_names = {'counter_party': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': [
+    expected_column_names = {'counterparty': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': [
         'design_id', 'design_name', 'file_location', 'file_name'], 'location': ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone'], 'sales_order': ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id'], 'staff': ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']}
     table_column_dict = {}
     helpers.mock_ingestion(s3)
     main_local()
-    filepaths = os.listdir(os.path.join(PROCESSING_BUCKET_NAME, PREFIX))
+    filepaths = os.listdir(os.path.join('./',PROCESSING_BUCKET_NAME, PREFIX))
 
     for filepath in filepaths:
         filepath = os.path.join(PROCESSING_BUCKET_NAME, PREFIX, filepath)
