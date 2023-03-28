@@ -19,9 +19,7 @@ coverage.xml
 .pytest_cache/
 
 # sensitive
-credentials.txt
-setup_production_chedentials.sh
-setup_test_credentials.sh
+*_chedentials.sh
 
 # pyenv
 .python-version
@@ -29,6 +27,18 @@ setup_test_credentials.sh
 # Environments
 venv/
 
+setup_production_credentials.sh
+
 # temp test files
 temp_test*
 
+# data in s3 simulation
+local/aws/
+
+# local scripts
+bin/
+
+# all terraform files created on init
+
+terraform/.terraform/
+terraform/.terraform.lock.hcl

@@ -51,13 +51,18 @@ def load_new_data_to_warehouse_db(data_path):
 
     print("load_new_data_to_warehouse_db(): done")    
 
-# main script
-try:
-    load_new_data_to_warehouse_db("test/lambdas/load/input_files")
-except Exception as err:
-    # msg = "".join(traceback.format_exception(type(err), err, err.__traceback__)) # full traceback, go with shorter one for now
-    # msg = "".join( traceback.format_tb(err.__traceback__) ) # a shorter one, stil too much
-    msg = f"\nError: {err}"
-    exit(msg)  # replace with log() to CloudWatch
+# if run directly
+if __name__ == "__main__":
+    try:
+        load_new_data_to_warehouse_db("local/aws/s3/processed")
 
-# clean up the bucket!
+    except Exception as err:
+        # msg = "".join(traceback.format_exception(type(err), err, err.__traceback__)) # full traceback, go with shorter one for now
+        # msg = "".join( traceback.format_tb(err.__traceback__) ) # a shorter one, stil too much
+        msg = f"\nError: {err}"
+        exit(msg)  # replace with log() to CloudWatch
+
+    finally:
+        pass
+        # clean up the process files
+        #cleanup()
