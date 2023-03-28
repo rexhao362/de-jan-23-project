@@ -3,17 +3,6 @@ import boto3
 import pg8000.native
 import os
 import json
-from os import environ
-
-
-env_totesys_db = {
-    "user": "project_user_1",
-    "password": "UmaC43m32Zi6RW",
-    "host": "nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com",
-    "port": environ.get('TOTESYS_DB_PORT', 5432),
-    "database": "totesys",
-    "schema": "public"
-}
 
 
 # DB connection
