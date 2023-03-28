@@ -2,6 +2,110 @@ import logging
 from src.lambdas.process.utils import *
 from src.lambdas.process.build import *
 from os.path import join
+import traceback
+
+input_tables = {
+    'currency': {
+        'table_name': 'currency',
+        'dataframe': None,
+        'required': True,
+    },
+    'design': {
+        'table_name': 'design',
+        'dataframe': None,
+        'required': True
+    },
+    'staff': {
+        'table_name': 'staff',
+        'dataframe': None,
+        'required': True
+    },
+    'department': {
+        'table_name': 'department',
+        'dataframe': None,
+        'required': True
+    },
+    'counterparty': {
+        'table_name': 'counterparty',
+        'dataframe': None,
+        'required': True
+    },
+    'address': {
+        'table_name': 'address',
+        'dataframe': None,
+        'required': True
+    },
+    'sales_order': {
+        'table_name': 'sales_order',
+        'dataframe': None,
+        'required': True
+    },
+    'purchase_order': {
+        'table_name': 'purchase_order',
+        'dataframe': None,
+        'required': False
+    },
+    'payment_type': {
+        'table_name': 'payment_type',
+        'dataframe': None,
+        'required': False
+    },
+    'payment': {
+        'table_name': 'payment',
+        'dataframe': None,
+        'required': False
+    },
+    'transaction': {
+        'table_name': 'transaction',
+        'dataframe': None,
+        'required': False
+    },
+}
+
+output_tables = [
+    {
+        'table_name': 'currency',
+        'dataframe': None,
+        'dependencies': ['currency'],
+        'build_function': build_dim_currency
+    },
+    {
+        'table_name': 'design',
+        'dataframe': None,
+        'dependencies': ['design'],
+        'build_function': build_dim_design
+    },
+    {
+        'table_name': 'staff',
+        'dataframe': None,
+        'dependencies': ['staff', 'department'],
+        'build_function': build_dim_staff
+    },
+    {
+        'table_name': 'location',
+        'dataframe': None,
+        'dependencies': ['address'],
+        'build_function': build_dim_location
+    },
+    {
+        'table_name': 'date',
+        'dataframe': None,
+        'dependencies': [],
+        'build_function': build_dim_date
+    },
+    {
+        'table_name': 'counterparty',
+        'dataframe': None,
+        'dependencies': ['counterparty', 'address'],
+        'build_function': build_dim_counterparty
+    },
+    {
+        'table_name': 'sales_order',
+        'dataframe': None,
+        'dependencies': ['sales_order'],
+        'build_function': build_fact_sales_order
+    },
+]
 
 
 def main_local():
@@ -13,40 +117,21 @@ def main_local():
 
     current_timestamp = f"{date}/{time}"
 
-    if (len(jsons) == 11):
-        # create a lookup object
-        table_names = {
-            'currency': current_timestamp + '/currency.json',
-            'design': current_timestamp + '/design.json',
-            'staff': current_timestamp + '/staff.json',
-            'department': current_timestamp + '/department.json',
-            # 'purchase_order': current_timestamp + '/purchase_order.json',
-            'counterparty': current_timestamp + '/counterparty.json',
-            'address': current_timestamp + '/address.json',
-            'sales_order': current_timestamp + '/sales_order.json',
-            # 'payment_type': current_timestamp + '/payment_type.json',
-            # 'payment': current_timestamp + '/payment.json',
-            # 'transaction': current_timestamp + '/transaction.json'
-        }
+    for key, table in input_tables.items():
+        table['filename'] = join(
+            current_timestamp, table['table_name'] + '.json')
 
 # Try loading all the data
     success = False
 
     try:
-        dim_currency = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['currency']))
-        dim_design = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['design']))
-        dim_staff = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['staff']))
-        dim_counterparty = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['counterparty']))
-        fact_sales_order = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['sales_order']))
-        dim_department = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['department']))
-        dim_address = load_file_from_local(
-            join(LOCAL_INGESTION_DIRECTORY, table_names['address']))
+        # for table in input_tables where required = true, table[dataframe] = load_file
+
+        for key, table in input_tables.items():
+            if table['required']:
+                table['dataframe'] = load_file_from_local(
+                    join(LOCAL_INGESTION_DIRECTORY, current_timestamp, table['table_name'] + '.json'))
+
         success = True
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
@@ -57,14 +142,9 @@ def main_local():
     if (success):
         success = False
         try:
-            dim_currency = process(dim_currency)
-            dim_design = process(dim_design)
-            dim_staff = process(dim_staff)
-            dim_location = process(dim_address)
-            dim_counterparty = process(dim_counterparty)
-            fact_sales_order = process(fact_sales_order)
-            dim_department = process(dim_department)
-            dim_address = process(dim_address)
+            for key, table in input_tables.items():
+                if table['required']:
+                    table['dataframe'] = process(table['dataframe'])
             success = True
         except Exception as e:
             # Do something with the exception, log it to Cloudwatch
@@ -75,36 +155,25 @@ def main_local():
     if (success):
         success = False
         try:
-            dim_currency = build_dim_currency(dim_currency)
-            dim_design = build_dim_design(dim_design)
-            dim_staff = build_dim_staff(dim_staff, dim_department)
-            dim_location = build_dim_location(dim_address)
-            dim_date = build_dim_date("2020/01/01", "2050/01/01")
-            dim_counterparty = build_dim_counterparty(
-                dim_counterparty, dim_address)
-            fact_sales_order = build_fact_sales_order(fact_sales_order)
+            for table in output_tables:
+                deps = [input_tables[dep]['dataframe'] for dep in table['dependencies'] ]
+                if (table['table_name'] == 'date'):
+                    #start and end dates generated for the dates table
+                    deps = ['2020/01/01', '2050/01/01']
+                table['dataframe'] = table['build_function'](*deps)
             success = True
         except Exception as e:
             # Do something with the exception, log it to Cloudwatch
             logging.error("Couldn't remodel dataframes.")
+            print(e)
+            print(traceback.format_exc())
 
     # If all is well, try writing remodeled dataframes to bucket
     if (success):
         try:
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_currency, "currency.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_design,
-                                "design.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_staff,
-                                "staff.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_location,
-                                "location.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_date,
-                                "date.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_counterparty,
-                                "counter_party.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), fact_sales_order,
-                                "sales_order.parquet")
-
+            
+            for table in output_tables:
+                write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), table['dataframe'], table['table_name']+'.parquet')
             logging.info("All processed tables are written to the bucket.")
 
         except Exception as e:
@@ -215,7 +284,7 @@ def main_s3():
                 write_to_bucket(PROCESSING_BUCKET_NAME, dim_date,
                                 current_timestamp + "/date")
                 write_to_bucket(PROCESSING_BUCKET_NAME, dim_counterparty,
-                                current_timestamp + "/counter_party")
+                                current_timestamp + "/counterparty")
                 write_to_bucket(PROCESSING_BUCKET_NAME, fact_sales_order,
                                 current_timestamp + "/sales_order")
 
