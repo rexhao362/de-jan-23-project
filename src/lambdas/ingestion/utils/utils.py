@@ -222,24 +222,25 @@ def store_last_updated(timestamp, path):
             if most_recent > date_to_store:
                 date_to_store = most_recent
 
-    s3 = boto3.client('s3')
-    bucket_name = get_ingested_bucket_name()
-    response = s3.list_objects_v2(
-        Bucket=bucket_name, Prefix='date/date_')
-    if 'Contents' in response:
-        s3.copy_object(
-            Bucket=bucket_name,
-            CopySource=f'{bucket_name}/date/date_1.json',
-            Key='date/date_2.json'
-        )
+    # s3 = boto3.client('s3')
+    # bucket_name = get_ingested_bucket_name()
+    # response = s3.list_objects_v2(
+    #     Bucket=bucket_name, Prefix='date/date_')
+    # if 'Contents' in response:
+    #     s3.copy_object(
+    #         Bucket=bucket_name,
+    #         CopySource=f'{bucket_name}/date/date_1.json',
+    #         Key='date/date_2.json'
+    #     )
 
     # writes files to local folder
     date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
     date_object = {'last_updated': date_string}
-
+    with open(f'{path}/date/last_updated.json', 'w') as f:
+        f.write(json.dumps(date_object))
     #  uploads files to S3 bucket
-    s3.put_object(
-        Body=json.dumps(date_object),
-        Bucket=bucket_name,
-        Key='date/date_1.json'
-    )
+    # s3.put_object(
+    #     Body=json.dumps(date_object),
+    #     Bucket=bucket_name,
+    #     Key='date/date_1.json'
+    # )

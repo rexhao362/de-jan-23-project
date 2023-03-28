@@ -27,7 +27,7 @@ def data_ingestion(path):
     Raises:
         Error: Raises an exception.
     """
-    path = join(path, "ingestion")  # TODO: use global/config variable
+    path = join(path, "ingested")  # TODO: use global/config variable
     timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
 
     for table_name in get_table_names():
@@ -55,6 +55,6 @@ def data_ingestion(path):
 
     #upload_to_s3(path)
 
-    # store_last_updated(timestamp, path)
+    store_last_updated(timestamp, path)
 
 
