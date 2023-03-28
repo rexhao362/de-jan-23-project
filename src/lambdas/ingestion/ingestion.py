@@ -28,7 +28,7 @@ def data_ingestion(path):
         Error: Raises an exception.
     """
     path = join(path, "ingestion")  # TODO: use global/config variable
-    timestamp = retrieve_last_updated()
+    timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
 
     for table_name in get_table_names():
         table_entries = get_table_data(table_name, timestamp)
@@ -55,18 +55,6 @@ def data_ingestion(path):
 
     #upload_to_s3(path)
 
-    store_last_updated(timestamp, path)
+    # store_last_updated(timestamp, path)
 
 
-if __name__ == "__main__":
-    test_path = "./local/aws/s3/ingestion"
-
-    try:
-        data_ingestion(test_path)
-
-    except Exception as exc:
-        msg = f"\nError: {exc}"
-        exit(msg)  # replace with log() to CloudWatch
-
-    finally:
-        pass
