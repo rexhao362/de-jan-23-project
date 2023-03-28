@@ -1,3 +1,4 @@
+import logging
 from pg8000.native import Connection
 
 from src.environ.warehouse_db import warehouse_db_user as user
@@ -9,24 +10,24 @@ from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
 
 from src.lambdas.load.db_schema import db_schema
 
-def debug_print(msg):
-    """
-    Prints msg only if the module is run directly
-    """
-    if __name__ == "__main__":
-        print(msg)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# debug only, remove in production
+import sys
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 def load_new_data_into_warehouse_db(path):
     tables_ready_to_load = []
 
     for table in db_schema:
         if table.dont_import:
-            debug_print( f'Don\'t import data to "{table.name}"' )
+            logger.info( f'Don\'t import data to "{table.name}"' )
             continue
-        debug_print( f'Reading data for "{table.name}" table from {path}..' )
+        logger.info( f'Reading data for "{table.name}" table from {path}..' )
         table.from_parquet(path)
         if table.has_data():
-            debug_print( f'\tdata for "{table.name}" is ready to be loaded' )
+            logger.info( f'\tdata for "{table.name}" is ready' )
             tables_ready_to_load.append(table)
 
     msg = "no new data to load"
@@ -37,13 +38,11 @@ def load_new_data_into_warehouse_db(path):
             for table in tables_ready_to_load:
                 assert table.has_data()
                 request = table.to_sql_request(db_schema_name)
-                debug_print("\nSQL request:")
-                debug_print(request)
                 connection.run(request)
 
         msg = f'{num_tables_to_load} table{"s" if num_tables_to_load > 1 else ""} loaded into "{db}" database (schema "{db_schema_name}")'
 
-    debug_print(msg)
+    logger.info(msg)
 
 if __name__ == "__main__":
     test_path = "local/aws/s3/processed"
@@ -52,10 +51,9 @@ if __name__ == "__main__":
         load_new_data_into_warehouse_db(test_path)
 
     except Exception as exc:
-        msg = f"\nError: {exc}"
-        exit(msg)  # replace with log() to CloudWatch
+        logger.critical(exc)
+        exit(1)
 
     finally:
         pass
-        # clean up the process files
-        #cleanup()
+        # cleanup(test_path)
