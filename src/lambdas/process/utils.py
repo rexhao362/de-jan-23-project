@@ -4,6 +4,7 @@ import json
 import logging
 import re
 
+
 # import pyarrow
 
 def load_file_from_local(filepath):
@@ -15,10 +16,21 @@ def load_file_from_local(filepath):
 
     Returns: data, dict
     """
+    file_wrapper = {
+        "status": 404,
+        "table": {
+                "headers": [],
+                "data": []
+            }
+    }
     json_data = open(filepath)
     data = json.load(json_data)
     json_data.close()
-    return data
+    if(data):
+        file_wrapper["table"] = data
+    if(len(data) == 0):
+        file_wrapper['table'] = []
+    return file_wrapper
 
 def load_file_from_s3(bucket, key):
     """
@@ -46,7 +58,7 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        # print(e)
+        #print(e)
         # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
@@ -64,9 +76,7 @@ def process(table):
         KeyError: Raises an exception.
     """
     try:
-
-        df = pd.DataFrame(table["data"], columns=table["headers"])
-
+        df = pd.DataFrame(table["table"]["data"], columns=table["table"]["headers"])
     except KeyError as e:
         raise(e)
     return df
@@ -126,3 +136,35 @@ def write_to_bucket(bucket_name, table, key):
         logging.error("Could not load table into bucket")
     
     return response_object
+
+def get_last_updated(bucket_name):
+    """
+    Gets and processes the datetime held within s3://date/last_updated.json
+    
+    Args:
+        param1: bucket_name, string
+
+    Returns:
+        date, string, [0]
+        time, string, [1]
+    """
+    try:
+        res = load_file_from_s3(bucket_name, 'date/last_updated.json')
+        timestamp = res['table']['last_updated']
+        return (timestamp[:10], timestamp[11:19])
+    except:
+        logging.error('Could not retrieve last updated json')
+        return (None, None)
+
+#TODO enter default json structure if file not found, so dataframe compehension can proceed
+def get_all_jsons(bucket_name, date, time):
+    files = ['address', 'counterparty', 'currency', 'department', 'design', 'payment', 'payment_type', 'purchase_order', 'sales_order', 'staff', 'transaction']
+    date, time = get_last_updated(bucket_name)
+    json_files = {}
+    for file in files:
+        try:
+            json_files[file] = load_file_from_s3(bucket_name, f'{date}/{time}/{file}.json')['table']
+        except:
+            json_files[file] = {'table_name' : file, 'headers' : None, 'data' : None}
+    
+    return json_files

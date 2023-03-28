@@ -3,10 +3,7 @@ from moto import mock_s3
 from pandas import read_parquet
 import pytest
 import os
-import io
 import boto3
-import pyarrow.parquet as pq
-from numpy import equal
 
 dataframe1 = read_parquet('test/lambdas/process/parquets/dim_currency.parquet')
 dataframe2 = read_parquet('test/lambdas/process/parquets/dim_currency_formatted.parquet')
