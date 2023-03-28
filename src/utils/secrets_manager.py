@@ -1,12 +1,20 @@
+"""
+usage:
+from src.utils.secrets_manager import secrets_manager
+
+user = secrets_manager.get_secret_value("WAREHOUSE_DB_USER")
+if user:
+    # do something
+else:
+    raise Exception("cannot retrieve secret 'user'")
+"""
+
 from os import environ
 import boto3
 from botocore.exceptions import ClientError
 from src.utils.environ import is_production_environ
 
 class _SecretsManager:
-    def __init__(self):
-        pass
-
     """
     Gets secret by name.
     Uses AWS Secrets Manager in Production environment and os.environ in Dev

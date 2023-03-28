@@ -27,7 +27,7 @@ def production_mock_environ():
         yield e
 
 # existing keys
-def test_get_existing_secret_value_from_environ_in_dev(dev_mock_environ):
+def test_get_existing_secret_value_in_dev(dev_mock_environ):
     # arrange
     secret_name = "WAREHOUSE_DB_USER"
     secret_value = "user"
@@ -39,7 +39,7 @@ def test_get_existing_secret_value_from_environ_in_dev(dev_mock_environ):
     assert value == secret_value
 
 @mock_secretsmanager
-def test_get_existing_secret_value_from_environ_in_production(production_mock_environ):
+def test_get_existing_secret_value_in_production(production_mock_environ):
     # arrange
     secret_name = "test_id"
     secret_value = "test_secret"
@@ -54,10 +54,10 @@ def test_get_existing_secret_value_from_environ_in_production(production_mock_en
 @pytest.fixture
 def non_existing_secret_name():
     return "complete_nonsense_101"
-    
-def test_returns_none_when_passed_unknown_name_dev_environ(dev_mock_environ, non_existing_secret_name):
+
+@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
+def test_returns_none_when_passed_unknown_secret_name(mock_environ, non_existing_secret_name):
     assert secrets_manager.get_secret_value(non_existing_secret_name) == None
 
-@mock_secretsmanager
-def test_returns_none_when_passed_unknown_name_production_environ(production_mock_environ, non_existing_secret_name):
-    assert secrets_manager.get_secret_value(non_existing_secret_name) == None
+# def test_returns_none_when_passed_unknown_name_production_environ(production_mock_environ, non_existing_secret_name):
+#     assert secrets_manager.get_secret_value(non_existing_secret_name) == None
