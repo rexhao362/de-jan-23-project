@@ -50,6 +50,17 @@ def test_process_main_s3(s3):
     actual_keys = [d['Key'] for d in objects['Contents']]
     assert len(expected_keys) == len(actual_keys)
     for key in expected_keys:
-     assert key in actual_keys
+        assert key in actual_keys
 
-    #print(s3.list_objects_v2(Bucket=processing_bucket_name))
+    
+
+
+    
+def test_write_to_bucket(s3):
+    main_s3()
+    processing_objects = s3.list_objects_v2(Bucket=processing_bucket_name)
+    expected_keys = ['2020-11-03/14:20:49/counter_party.parquet', '2020-11-03/14:20:49/currency.parquet', '2020-11-03/14:20:49/date.parquet', '2020-11-03/14:20:49/design.parquet', '2020-11-03/14:20:49/location.parquet', '2020-11-03/14:20:49/sales_order.parquet', '2020-11-03/14:20:49/staff.parquet']
+    actual_keys = [d['Key'] for d in processing_objects['Contents']]
+    assert len(expected_keys) == len(actual_keys)
+    for key in expected_keys:
+        assert key in actual_keys
