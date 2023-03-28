@@ -19,27 +19,27 @@ class Helpers:
         s3.create_bucket(Bucket=INGESTION_BUCKET_NAME)
         s3.upload_file('./test/lambdas/process/json_files/last_updated.json',
                        INGESTION_BUCKET_NAME, 'date/last_updated.json')
-        s3.upload_file('./test/lambdas/process/json_files/address_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/address.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}address.json')
-        s3.upload_file('./test/lambdas/process/json_files/counterparty_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/counterparty.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}counterparty.json')
-        s3.upload_file('./test/lambdas/process/json_files/currency_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/currency.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}currency.json')
-        s3.upload_file('./test/lambdas/process/json_files/department_test_1.json',
+        s3.upload_file('./test/lambdas/process/json_files/department.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}department.json')
-        s3.upload_file('./test/lambdas/process/json_files/design_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/design.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}design.json')
-        s3.upload_file('./test/lambdas/process/json_files/staff_test_1.json',
+        s3.upload_file('./test/lambdas/process/json_files/staff.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}staff.json')
-        s3.upload_file('./test/lambdas/process/json_files/sales_order_test_1.json',
+        s3.upload_file('./test/lambdas/process/json_files/sales_order.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}sales_order.json')
-        s3.upload_file('./test/lambdas/process/json_files/design_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/design.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}purchase_order.json')
-        s3.upload_file('./test/lambdas/process/json_files/design_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/design.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}payment.json')
-        s3.upload_file('./test/lambdas/process/json_files/design_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/design.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}payment_type.json')
-        s3.upload_file('./test/lambdas/process/json_files/design_test_2.json',
+        s3.upload_file('./test/lambdas/process/json_files/design.json',
                        INGESTION_BUCKET_NAME, f'{PREFIX}transaction.json')
         return
 
