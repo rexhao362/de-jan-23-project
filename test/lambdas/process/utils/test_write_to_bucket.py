@@ -49,7 +49,7 @@ def test_returns_status_code_200_with_successful_write(s3):
     obj_key_1 = 'test/test_1'
     upload = write_to_bucket(bucket_name, dataframe1, obj_key_1)
     objects = s3.list_objects_v2(Bucket=bucket_name)
-    assert obj_key_1 + ".parquet" in objects['Contents'][0]['Key']
+    assert obj_key_1 in objects['Contents'][0]['Key']
     assert upload['status'] == 200
     
 def test_returns_status_code_404_with_unsuccessful_write(s3):
@@ -67,14 +67,13 @@ def test_key_is_maintained_in_bucket(s3):
     write_to_bucket(bucket_name, dataframe1, obj_key_1)
     write_to_bucket(bucket_name, dataframe1, obj_key_2)
     objects = s3.list_objects_v2(Bucket=bucket_name)
-    assert obj_key_1 + ".parquet" in objects['Contents'][0]['Key']
-    assert obj_key_2 + ".parquet" in objects['Contents'][1]['Key']
+    assert obj_key_1 in objects['Contents'][0]['Key']
+    assert obj_key_2 in objects['Contents'][1]['Key']
 
 def test_file_is_still_valid_once_written_to_bucket(s3):
-    from src.lambdas.process.utils import (write_to_bucket)
     buffer = io.BytesIO()
     resource = boto3.resource('s3')
-    s3_object = resource.Object('test_bucket_1', 'test/test_1.parquet')
+    s3_object = resource.Object('test_bucket_1', 'test/test_1')
     s3_object.download_fileobj(buffer)
     table = pq.read_table(buffer)
     df = table.to_pandas()

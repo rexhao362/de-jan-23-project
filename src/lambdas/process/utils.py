@@ -134,7 +134,7 @@ def write_to_bucket(bucket_name, table, key):
     parquet_binary = table.to_parquet()
 
     try:
-        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'{key}.parquet') 
+        response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'{key}') 
         status = response["ResponseMetadata"]["HTTPStatusCode"]
         if status == 200:
             response_object["status"] = status
