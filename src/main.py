@@ -2,6 +2,7 @@ from os import path
 import logging
 from src.lambdas.ingestion.ingestion import data_ingestion
 from src.lambdas.process.process import main_local
+from src.lambdas.load.load_new_data_into_warehouse_db import load_new_data_into_warehouse_db
 
 logger = logging.getLogger('main')
 logger.setLevel(logging.INFO)

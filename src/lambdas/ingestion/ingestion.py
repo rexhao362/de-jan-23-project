@@ -28,7 +28,7 @@ def data_ingestion(path):
     Raises:
         Error: Raises an exception.
     """
-    path = join(path, "ingested")  # TODO: use global/config variable
+    path = join(path, "ingestion")  # TODO: use global/config variable
     timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
     ts = store_last_updated(timestamp, path)
     ts_str = ts.strftime('%Y-%m-%dT%H:%M:%S.%f')

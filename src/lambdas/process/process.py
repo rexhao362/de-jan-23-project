@@ -5,7 +5,7 @@ from src.lambdas.process.build import *
 
 
 def main_local(path):
-    LOCAL_INGESTION_DIRECTORY = join(path, "ingested")
+    LOCAL_INGESTION_DIRECTORY = join(path, "ingestion") # TODO: use global vars etc
     LOCAL_PROCESSING_DIRECTORY = join(path, "processed")
 
     date, time = get_last_updated(LOCAL_INGESTION_DIRECTORY, local=True)
