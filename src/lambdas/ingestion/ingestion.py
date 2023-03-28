@@ -1,4 +1,5 @@
 from os.path import join
+import os
 from datetime import datetime
 from decimal import Decimal
 from src.lambdas.ingestion.utils.utils import get_table_data
@@ -29,7 +30,11 @@ def data_ingestion(path):
     """
     path = join(path, "ingested")  # TODO: use global/config variable
     timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
-
+    ts = store_last_updated(timestamp, path)
+    ts_str = ts.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    string_time = (ts_str[:10], ts_str[11:19])
+    os.makedirs(f'{path}/{string_time[0]}/{string_time[1]}', exist_ok=True)
+    os.makedirs(f'{path}/date', exist_ok=True)
     for table_name in get_table_names():
         table_entries = get_table_data(table_name, timestamp)
         for row in table_entries:
@@ -49,12 +54,12 @@ def data_ingestion(path):
             'data': data
         }
 
-        filepath = f'{path}/table_data/{table_name}.json'
+        filepath = f'{path}/{string_time[0]}/{string_time[1]}/{table_name}.json'
         with open(filepath, 'w') as f:
             f.write(json.dumps(table_data))
 
     #upload_to_s3(path)
 
-    store_last_updated(timestamp, path)
+    
 
 

@@ -238,6 +238,7 @@ def store_last_updated(timestamp, path):
     date_object = {'last_updated': date_string}
     with open(f'{path}/date/last_updated.json', 'w') as f:
         f.write(json.dumps(date_object))
+    return date_to_store
     #  uploads files to S3 bucket
     # s3.put_object(
     #     Body=json.dumps(date_object),
