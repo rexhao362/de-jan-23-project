@@ -28,6 +28,7 @@ def load_file_from_local(filepath):
     json_data.close()
     if(data):
         file_wrapper["table"] = data
+        file_wrapper["status"] = 200
     if(len(data) == 0):
         file_wrapper['table'] = []
     return file_wrapper
@@ -58,8 +59,6 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        #print(e)
-        # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
         
