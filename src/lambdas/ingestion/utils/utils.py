@@ -4,14 +4,21 @@ import pg8000.native
 import os
 import json
 
+from src.environ.totesys_db import totesys_db_user as user
+from src.environ.totesys_db import totesys_db_password as passwd
+from src.environ.totesys_db import totesys_db_host as host
+from src.environ.totesys_db import totesys_db_port as port
+from src.environ.totesys_db import totesys_db_database as db
+from src.environ.totesys_db import totesys_db_schema as db_schema_name
+
 
 # DB connection
 con = pg8000.native.Connection(
-    user=env_totesys_db['user'],
-    host=env_totesys_db['host'],
-    database=env_totesys_db['database'],
-    port=env_totesys_db['port'],
-    password=env_totesys_db['password']
+    user=user,
+    host=host,
+    database=db,
+    port=port,
+    password=passwd
 )
 
 
@@ -31,8 +38,8 @@ def get_table_names():
     table_names = con.run(
         """SELECT table_name FROM information_schema.tables
         WHERE table_schema = :schema""",
-        schema=env_totesys_db['schema']
-        )
+        schema=db_schema_name
+    )
     return [item[0] for item in table_names]
 
 
@@ -226,15 +233,12 @@ def store_last_updated(timestamp, path):
         )
 
     # writes files to local folder
-    with open(f'{path}/date/last_updated.json', 'w') as f:
-        date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
-        date_object = {'last_updated': date_string}
-        f.write(json.dumps(date_object))
+    date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    date_object = {'last_updated': date_string}
 
     #  uploads files to S3 bucket
-    with open(f'{path}/date/last_updated.json', 'rb') as f:
-        s3.put_object(
-            Body=f,
-            Bucket=bucket_name,
-            Key='date/date_1.json'
-        )
+    s3.put_object(
+        Body=json.dumps(date_object),
+        Bucket=bucket_name,
+        Key='date/date_1.json'
+    )
