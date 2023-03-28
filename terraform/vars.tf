@@ -8,9 +8,9 @@ variable "process_lambda_name" {
     type = string
     default = "process_lambda"
 }
-variable "remodel_lambda_name" {
+variable "load_lambda_name" {
     type = string
-    default = "remodel_lambda"
+    default = "load_lambda"
 }
 variable "region_name" {
     type = string
