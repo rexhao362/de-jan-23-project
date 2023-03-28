@@ -37,6 +37,7 @@ def load_file_from_local(filepath):
     json_data.close()
     if(data):
         file_wrapper["table"] = data
+        file_wrapper["status"] = 200
     if(len(data) == 0):
         file_wrapper['table'] = []
     return file_wrapper
