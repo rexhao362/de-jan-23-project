@@ -8,16 +8,9 @@ import io
 import pandas as pd
 from src.lambdas.process.process import main_s3
 
-
-
 PROCESSING_BUCKET_NAME = "query_queens_processing_bucket"
 INGESTION_BUCKET_NAME = "query_queens_ingestion_bucket"
 PREFIX = "2020-11-03/14:20:49/"
-
-
-
-
-
 
 class Helpers:
     @staticmethod
@@ -42,9 +35,6 @@ class Helpers:
 def helpers():
     return Helpers
 
-
-
-
 @pytest.fixture(scope="module")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -64,7 +54,6 @@ def test_process_main_s3(s3, helpers):
     objects = s3.list_objects_v2(Bucket=INGESTION_BUCKET_NAME)
     assert 'Contents' in objects
    
-    
 def test_write_to_bucket(s3, helpers):
     helpers.mock_ingestion(s3)
     main_s3()
@@ -74,7 +63,6 @@ def test_write_to_bucket(s3, helpers):
     assert len(expected_keys) == len(actual_keys)
     for key in expected_keys:
         assert key in actual_keys
-    
 
 def test_main_s3_outputs_correct_parquet_files(s3, helpers):
     expected_column_names = {'counter_party': ['counterparty_id', 'counterparty_legal_name', 'counterparty_legal_address_line_1', 'counterparty_legal_address_line_2', 'counterparty_legal_district', 'counterparty_legal_city', 'counterparty_legal_postal_code', 'counterparty_legal_country', 'counterparty_legal_phone_number'], 'currency': ['currency_id', 'currency_code', 'currency_name'], 'date': ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter'], 'design': ['design_id', 'design_name', 'file_location', 'file_name'], 'location': ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone'], 'sales_order': ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id'], 'staff': ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']}
@@ -92,10 +80,3 @@ def test_main_s3_outputs_correct_parquet_files(s3, helpers):
 
     for table_name, column_names in table_column_dict.items():
         assert sorted(column_names) == sorted(expected_column_names[table_name])
-
-        
-
-    
-        
-      
-   
