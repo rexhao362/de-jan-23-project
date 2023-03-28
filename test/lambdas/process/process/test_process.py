@@ -45,10 +45,11 @@ def test_process_main_s3(s3):
    
     
     # Test if all keys are available
-    test_keys = ['2020-11-03/14:20:49/address.json', '2020-11-03/14:20:49/counterparty.json', '2020-11-03/14:20:49/currency.json', '2020-11-03/14:20:49/department.json', '2020-11-03/14:20:49/design.json', '2020-11-03/14:20:49/payment.json', '2020-11-03/14:20:49/payment_type.json', '2020-11-03/14:20:49/purchase_order.json', '2020-11-03/14:20:49/sales_order.json', '2020-11-03/14:20:49/staff.json', '2020-11-03/14:20:49/transaction.json', 'date/last_updated.json']
-
-    keys = [d['Key'] for d in objects['Contents']]
     
-    assert keys == test_keys
+    expected_keys = ['2020-11-03/14:20:49/address.json', '2020-11-03/14:20:49/counterparty.json', '2020-11-03/14:20:49/currency.json', '2020-11-03/14:20:49/department.json', '2020-11-03/14:20:49/design.json', '2020-11-03/14:20:49/payment.json', '2020-11-03/14:20:49/payment_type.json', '2020-11-03/14:20:49/purchase_order.json', '2020-11-03/14:20:49/sales_order.json', '2020-11-03/14:20:49/staff.json', '2020-11-03/14:20:49/transaction.json', 'date/last_updated.json']
+    actual_keys = [d['Key'] for d in objects['Contents']]
+    assert len(expected_keys) == len(actual_keys)
+    for key in expected_keys:
+     assert key in actual_keys
 
     #print(s3.list_objects_v2(Bucket=processing_bucket_name))
