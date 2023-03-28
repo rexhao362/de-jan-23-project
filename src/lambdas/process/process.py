@@ -177,7 +177,7 @@ def main_local():
         try:
 
             for table in output_tables:
-                write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp),
+                write_file_to_local(LOCAL_PROCESSING_DIRECTORY,
                                     table['dataframe'], table['prefix']+table['table_name']+'.parquet')
             logging.info("All processed tables are written to the bucket.")
 
@@ -251,8 +251,7 @@ def main_s3():
     if (success):
         try:
             for table in output_tables:
-                write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], join(
-                    current_timestamp, table['prefix'] + table['table_name']+'.parquet'))
+                write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table['prefix'] + table['table_name']+'.parquet')
 
             logging.info("All processed tables are written to the bucket.")
 
