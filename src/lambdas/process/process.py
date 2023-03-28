@@ -115,9 +115,9 @@ output_tables = [
 ]
 
 
-def main_local():
-    LOCAL_INGESTION_DIRECTORY = "query-queens-ingestion-bucket"
-    LOCAL_PROCESSING_DIRECTORY = "query-queens-processing-bucket"
+def main_local(path=''):
+    LOCAL_INGESTION_DIRECTORY = join(path, "ingestion") # TODO: use global vars etc
+    LOCAL_PROCESSING_DIRECTORY = join(path, "processed")
 
     date, time = get_last_updated(LOCAL_INGESTION_DIRECTORY, local=True)
     jsons = get_all_jsons(LOCAL_INGESTION_DIRECTORY, date, time, local=True)
@@ -264,5 +264,5 @@ def main_s3():
 
 
 if __name__ == "__main__":
-    main_s3()
-    # main_local()
+    # main_s3()
+    main_local()
