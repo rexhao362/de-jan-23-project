@@ -64,8 +64,6 @@ def load_file_from_s3(bucket, key):
         file_wrapper["status"] = 200
         file_wrapper["table"] = json.loads(response["Body"].read().decode("utf-8"))
     except Exception as e:
-        #print(e)
-        # print(key)
         logging.error('Could not get file from bucket')
     return file_wrapper
         
@@ -156,7 +154,7 @@ def get_last_updated(bucket_name, local=False):
     """
 
     try:
-        res = load_file_from_s3(bucket_name, 'date/last_updated.json') if local else load_file_from_local(join(bucket_name, 'date/last_updated.json'))
+        res = load_file_from_s3(bucket_name, 'date/last_updated.json') if not local else load_file_from_local(join(bucket_name, 'date/last_updated.json'))
         timestamp = res['table']['last_updated']
         return (timestamp[:10], timestamp[11:19])
     except:
@@ -166,11 +164,11 @@ def get_last_updated(bucket_name, local=False):
 #TODO enter default json structure if file not found, so dataframe compehension can proceed
 def get_all_jsons(bucket_name, date, time, local=False):
     files = ['address', 'counterparty', 'currency', 'department', 'design', 'payment', 'payment_type', 'purchase_order', 'sales_order', 'staff', 'transaction']
-    date, time = get_last_updated(bucket_name)
+    date, time = get_last_updated(bucket_name, local=local)
     json_files = {}
     for file in files:
         try:
-            if local:
+            if not local:
                 json_files[file] = load_file_from_s3(bucket_name, f'{date}/{time}/{file}.json')['table']
             else: json_files[file] = load_file_from_local(bucket_name, f'{date}/{time}/{file}.json')['table']
                 
