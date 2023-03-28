@@ -38,6 +38,6 @@ def test_create_bucket_with_last_updated(s3):
 def test_returns_date_and_time_with_successful_get(s3):
     from src.lambdas.process.utils import get_last_updated
     date, time = get_last_updated(bucket_name)
-    assert date == '2000-11-03'
+    assert date == '2020-11-03'
     assert time == '14:20:49'
     
