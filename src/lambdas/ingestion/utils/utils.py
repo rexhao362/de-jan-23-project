@@ -77,7 +77,7 @@ def get_table_data(table_name, timestamp):
     Raises:
         Error: Raises an exception.
     """
-    os.makedirs('./local/aws/s3/ingested/date', exist_ok=True)
+    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True) # TODO: use global variables or something, don't hardcode it
 
     if table_name in [
         'address',
