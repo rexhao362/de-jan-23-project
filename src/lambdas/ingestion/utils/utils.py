@@ -26,11 +26,11 @@ env_totesys_db = {
 
 # DB connection
 con = pg8000.native.Connection(
-    user = env_totesys_db['user'],
-    host = env_totesys_db['host'],
-    database = env_totesys_db['database'],
-    port = env_totesys_db['port'],
-    password = env_totesys_db['password']
+    user=env_totesys_db['user'],
+    host=env_totesys_db['host'],
+    database=env_totesys_db['database'],
+    port=env_totesys_db['port'],
+    password=env_totesys_db['password']
 )
 
 
@@ -159,14 +159,15 @@ def retrieve_last_updated():
         Error: Raises an exception.
     """
     s3 = boto3.client('s3')
-    response = s3.list_objects_v2(Bucket=get_ingested_bucket_name(), Prefix='date/')
+    response = s3.list_objects_v2(
+        Bucket=get_ingested_bucket_name(), Prefix='date/')
     if 'Contents' not in response:
         return datetime(2022, 10, 5, 16, 30, 42, 962000)
     else:
         list_objects = response['Contents']
         key = len(list_objects)
         res = s3.get_object(
-            Bucket=get_ingested_bucket_name(), Key=f'date/date-{key}.json')
+            Bucket=get_ingested_bucket_name(), Key=f'date/date-1.json')
         json_res = json.loads(res['Body'].read())
         timestamp = json_res['last_updated']
         return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
@@ -189,21 +190,22 @@ def store_last_updated(timestamp):
     date_to_store = timestamp
     for table_name in get_table_names():
         if table_name in ['address',
-                     'counterparty',
-                     'currency',
-                     'department',
-                     'design',
-                     'payment_type',
-                     'payment',
-                     'purchase_order',
-                     'sales_order',
-                     'staff',
-                     'transaction']:
+                          'counterparty',
+                          'currency',
+                          'department',
+                          'design',
+                          'payment_type',
+                          'payment',
+                          'purchase_order',
+                          'sales_order',
+                          'staff',
+                          'transaction']:
             most_recent = con.run(
                 f'SELECT last_updated FROM {table_name} GROUP BY last_updated ORDER BY last_updated DESC LIMIT 1')[0][0]
             if most_recent >= date_to_store:
                 date_to_store = most_recent
 
+    bucket_name = get_ingested_bucket_name()
     # writes files to local folder
     with open('./src/lambdas/ingestion/data/date/last_updated.json', 'w') as f:
         date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
@@ -213,8 +215,12 @@ def store_last_updated(timestamp):
     #  uploads files to S3 bucket
     with open('./src/lambdas/ingestion/data/date/last_updated.json', 'rb') as f:
         s3 = boto3.client('s3')
-        response = s3.list_objects_v2(Bucket=get_ingested_bucket_name(), Prefix='date/')
-        list_objects = [item['Key'] for item in response['Contents']] if 'Contents' in response else []
-        key = len(list_objects) + 1
-        s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
-                      Key=f'date/date-{key}.json')
+        response = s3.list_objects_v2(Bucket=bucket_name, Prefix='date/')
+        list_objects = [item['Key'] for item in response['Contents']
+                        ] if 'Contents' in response else []
+        if len(list_objects) > 0:
+            s3.copy_object(
+                Bucket=bucket_name, CopySource=f'/{bucket_name}/date/date-1.json', Key='date/date-2')
+
+        s3.put_object(Body=f, Bucket=bucket_name,
+                      Key=f'date/date-1.json')
