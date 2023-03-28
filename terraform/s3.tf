@@ -27,6 +27,8 @@ resource "aws_s3_object" "load_lambda" {
     source = "${path.module}/../function_zips/load.zip"
 }
 
+# add python_lib to code bucket for layer implementation
+
 # create bucket_notification / event bucket_notification
 # Ingestion lambda triggered by eventbridge
 # process lambda triggered by ingestion bucket event notification?
