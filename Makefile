@@ -70,6 +70,7 @@ run-flake:
 	$(call execute_in_env, flake8  src/* test/*)
 
 ## Run the unit tests
+# change this back to run all tests
 unit-test:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vrP test/lambdas/ingestion/*)
 
@@ -78,7 +79,13 @@ check-coverage:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run --omit 'venv/*' -m pytest && coverage report -m)
 
 ## Run all checks
+# need to add other checks back in
 run-checks: unit-test
+
+
+# Create backend bucket
+# create-backend:
+# 	$(SHELL aws s3 mb s3://s3-de-backend-query-queens)
 
 
 

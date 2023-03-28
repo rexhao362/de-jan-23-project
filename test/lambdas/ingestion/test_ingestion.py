@@ -1,15 +1,11 @@
 from decimal import Decimal
 from src.lambdas.ingestion.ingestion import data_ingestion
 from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.utils import upload_to_s3
-from src.lambdas.ingestion.utils.utils import retrieve_last_updated
 from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.utils import store_last_updated
 from src.lambdas.ingestion.utils.utils import get_table_data
 import os.path
 import os
 import json
-import re
 from datetime import datetime
 import boto3
 from moto import mock_s3
@@ -43,10 +39,9 @@ def bucket(s3):
 
 @freeze_time("2012-01-14 12:00:01")
 def test_data_ingestion(bucket, s3):
-    data_ingestion()
-    list_files = s3.list_objects_v2(Bucket=get_ingested_bucket_name())
+    data_ingestion("./local/aws/s3/ingestion")
     for table_name in get_table_names():
-        filepath = f'./src/lambdas/ingestion/data/table_data/{table_name}.json'
+        filepath = f'./local/aws/s3/ingestion/table_data/{table_name}.json'
         assert os.path.isfile(filepath)
         with open(filepath, 'r') as f:
             json_data = json.loads(f.read())

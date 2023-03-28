@@ -37,3 +37,8 @@ local/aws/
 
 # local scripts
 bin/
+
+# all terraform files created on init
+
+terraform/.terraform/
+terraform/.terraform.lock.hcl
