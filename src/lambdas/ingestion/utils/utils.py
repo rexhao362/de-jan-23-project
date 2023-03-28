@@ -4,6 +4,15 @@ import pg8000.native
 import os
 import json
 
+env_totesys_db = {
+    'host' : "nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com",
+ 'user':"project_user_1",
+ 'password':"UmaC43m32Zi6RW",
+ 'database':"totesys",
+ 'schema':"public",
+ 'port':5432
+}
+    
 
 # DB connection
 con = pg8000.native.Connection(
@@ -69,6 +78,9 @@ def get_table_data(table_name, timestamp):
     Raises:
         Error: Raises an exception.
     """
+    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True)
+    os.makedirs('./local/aws/s3/ingestion/table_data', exist_ok=True)
+
     if table_name in [
         'address',
         'counterparty',

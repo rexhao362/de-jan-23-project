@@ -1,15 +1,11 @@
 from decimal import Decimal
 from src.lambdas.ingestion.ingestion import data_ingestion
 from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.utils import upload_to_s3
-from src.lambdas.ingestion.utils.utils import retrieve_last_updated
 from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.utils import store_last_updated
 from src.lambdas.ingestion.utils.utils import get_table_data
 import os.path
 import os
 import json
-import re
 from datetime import datetime
 import boto3
 from moto import mock_s3
