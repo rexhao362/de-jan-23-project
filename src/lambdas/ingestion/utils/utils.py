@@ -77,8 +77,7 @@ def get_table_data(table_name, timestamp):
     Raises:
         Error: Raises an exception.
     """
-    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True)
-    os.makedirs('./local/aws/s3/ingestion/table_data', exist_ok=True)
+    os.makedirs('./local/aws/s3/ingested/date', exist_ok=True)
 
     if table_name in [
         'address',
@@ -236,7 +235,7 @@ def store_last_updated(timestamp, path):
     # writes files to local folder
     date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
     date_object = {'last_updated': date_string}
-    with open(f'{path}/date/last_updated.json', 'w') as f:
+    with open(f'./{path}/date/last_updated.json', 'w') as f:
         f.write(json.dumps(date_object))
     return date_to_store
     #  uploads files to S3 bucket

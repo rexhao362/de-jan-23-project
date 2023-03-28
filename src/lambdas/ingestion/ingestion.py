@@ -30,11 +30,11 @@ def data_ingestion(path):
     """
     path = join(path, "ingestion")  # TODO: use global/config variable
     timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
+    os.makedirs(f'./{path}/date', exist_ok=True)
     ts = store_last_updated(timestamp, path)
     ts_str = ts.strftime('%Y-%m-%dT%H:%M:%S.%f')
     string_time = (ts_str[:10], ts_str[11:19])
-    os.makedirs(f'{path}/{string_time[0]}/{string_time[1]}', exist_ok=True)
-    os.makedirs(f'{path}/date', exist_ok=True)
+    os.makedirs(f'./{path}/{string_time[0]}/{string_time[1]}', exist_ok=True)
     for table_name in get_table_names():
         table_entries = get_table_data(table_name, timestamp)
         for row in table_entries:
