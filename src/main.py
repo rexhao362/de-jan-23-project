@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 # debug only, remove in production
 import sys
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 local_bucket_path = "local/aws/s3"
 
