@@ -1,6 +1,7 @@
 import logging
 from src.lambdas.process.utils import *
 from src.lambdas.process.build import *
+from os.path import join
 
 
 def main_local():
@@ -32,16 +33,17 @@ def main_local():
     success = False
     
     try:
-        dim_currency = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['currency'])
-        dim_design = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['design'])
-        dim_staff = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['staff'])
-        dim_counterparty = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['counterparty'])
-        fact_sales_order = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['sales_order'])
-        dim_department = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['department'])
-        dim_address = load_file_from_local(LOCAL_INGESTION_DIRECTORY + table_names['address'])
+        dim_currency = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['currency']))
+        dim_design = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['design']))
+        dim_staff = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['staff']))
+        dim_counterparty = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['counterparty']))
+        fact_sales_order = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['sales_order']))
+        dim_department = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['department']))
+        dim_address = load_file_from_local(join(LOCAL_INGESTION_DIRECTORY, table_names['address']))
         success = True
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
+        print(e)
         logging.error("Couldn't load tables.")
         
         
