@@ -15,7 +15,7 @@ class DataTable:
     """
     def __init__(self, name, schema, *, dont_import=False):
         self.name = name
-        self.schema = schema
+        self.schema = schema # TODO: check for duplicate elements
         self.dont_import = dont_import
         self.column_names = [column_name for column_name in self.schema]
         self.source = None

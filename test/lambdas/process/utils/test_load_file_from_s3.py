@@ -3,10 +3,7 @@ from moto import mock_s3
 from pandas import read_parquet
 import pytest
 import os
-import io
 import boto3
-import pyarrow.parquet as pq
-from numpy import equal
 
 dataframe1 = read_parquet('test/lambdas/process/parquets/dim_currency.parquet')
 dataframe2 = read_parquet('test/lambdas/process/parquets/dim_currency_formatted.parquet')
@@ -44,15 +41,15 @@ def test_returns_404_status_on_unsuccessful_get(s3):
 
 def test_returns_200_status_on_successful_get(s3):
     from src.lambdas.process.utils import load_file_from_s3
-    s3.upload_file('test/lambdas/process/json_files/currency_test_2.json', bucket_name, 'test_1.json')
+    s3.upload_file('test/lambdas/process/json_files/currency.json', bucket_name, 'test_1.json')
     res = load_file_from_s3(bucket_name, 'test_1.json')
     assert res['status'] == 200
 
 def test_returns_unmutated_file(s3):
     from src.lambdas.process.utils import load_file_from_s3, load_file_from_local
-    s3.upload_file('test/lambdas/process/json_files/currency_test_2.json', bucket_name, 'test_1.json')
-    original = load_file_from_local('test/lambdas/process/json_files/currency_test_2.json')
-    downloaded = load_file_from_s3(bucket_name, 'test_1.json')['table']
+    s3.upload_file('test/lambdas/process/json_files/currency.json', bucket_name, 'test_1.json')
+    original = load_file_from_local('test/lambdas/process/json_files/currency.json')
+    downloaded = load_file_from_s3(bucket_name, 'test_1.json')
     assert downloaded == original
 
 

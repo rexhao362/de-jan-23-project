@@ -1,19 +1,31 @@
+from os import path
 import logging
 from src.lambdas.ingestion.ingestion import data_ingestion
+from src.lambdas.process.process import main_local
+from src.lambdas.load.load_new_data_into_warehouse_db import load_new_data_into_warehouse_db
 
 logger = logging.getLogger('main')
 logger.setLevel(logging.INFO)
 
-try:
-    data_ingestion()
-    process()
-    load_new_data_into_warehouse_db(test_path)
+# debug only, remove in production
+import sys
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-except Exception as exc:
-    logger.error(exc)
+local_bucket_path = "local/aws/s3"
+
+try:
+    data_ingestion(local_bucket_path)
+    main_local(local_bucket_path)
+    load_new_data_into_warehouse_db(local_bucket_path)
+
+except BaseException as exc:
+    import traceback
+    logger.critical( f'{exc.__class__.__name__} exception raised' )
+    msg = ''.join( traceback.format_tb(exc.__traceback__, 1) ) + str(exc)
+    logger.critical(msg)
     exit(1)
 
 finally:
     pass
     # clean up the process files
-    #cleanup()
+    # cleanup()
