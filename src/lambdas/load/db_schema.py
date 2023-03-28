@@ -7,7 +7,7 @@ db_schema = [
         "last_name": "VARCHAR",
         "department_name": "VARCHAR",
         "location": "VARCHAR",
-        "email_address": "VARCHAR" }, dont_import = True
+        "email_address": "VARCHAR" }, dont_import = False
     ),
     DataTable("dim_location", {
         "location_id": "INT",
@@ -22,13 +22,13 @@ db_schema = [
     DataTable("dim_currency", {
         "currency_id": "INT",
         "currency_code": "VARCHAR",
-        "currency_name": "VARCHAR" }, dont_import = True
+        "currency_name": "VARCHAR" }, dont_import = False
     ),
     DataTable("dim_design", {
         "design_id": "INT",
         "design_name": "VARCHAR",
         "file_location": "VARCHAR",
-        "file_name": "VARCHAR" }, dont_import = True
+        "file_name": "VARCHAR" }, dont_import = False
     ),
     DataTable("dim_date", {
         "date_id": "DATE",
@@ -49,7 +49,7 @@ db_schema = [
         "counterparty_legal_city": "VARCHAR",
         "counterparty_legal_postal_code": "VARCHAR",
         "counterparty_legal_country": "VARCHAR",
-        "counterparty_legal_phone_number": "VARCHAR" }, dont_import = True
+        "counterparty_legal_phone_number": "VARCHAR" }, dont_import = False
     ),
     DataTable("fact_sales_order", {
         "sales_order_id": "INT",
@@ -65,6 +65,6 @@ db_schema = [
         "design_id": "INT",
         "agreed_payment_date": "DATE",
         "agreed_delivery_date": "DATE",
-        "agreed_delivery_location_id": "INT" }
+        "agreed_delivery_location_id": "INT" }, dont_import = True
     )
 ]
