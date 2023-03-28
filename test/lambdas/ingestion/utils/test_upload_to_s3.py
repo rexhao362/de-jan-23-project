@@ -1,8 +1,6 @@
-from src.lambdas.ingestion.utils.utils import get_table_names
 from src.lambdas.ingestion.utils.utils import upload_to_s3
 from moto import mock_s3
 import boto3
-from datetime import datetime
 import pytest
 from freezegun import freeze_time
 import os.path

@@ -1,8 +1,7 @@
+from os.path import join
 import logging
 from src.lambdas.process.utils import *
 from src.lambdas.process.build import *
-from os.path import join
-import traceback
 
 input_tables = {
     'currency': {
@@ -175,7 +174,6 @@ def main_local(path=''):
     # If all is well, try writing remodeled dataframes to bucket
     if (success):
         try:
-
             for table in output_tables:
                 write_file_to_local(LOCAL_PROCESSING_DIRECTORY,
                                     table['dataframe'], table['prefix']+table['table_name']+'.parquet')
@@ -259,7 +257,6 @@ def main_s3():
             # Do something with the exception, tell Cloudwatch, and clean up the bucket
             logging.error("Couldn't write tables to bucket.")
             success = False
-
             # TO-DO clean up bucket ticket 85
 
 

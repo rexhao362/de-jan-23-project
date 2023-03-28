@@ -3,15 +3,23 @@ import boto3
 import pg8000.native
 import os
 import json
+from src.utils.secrets_manager import secrets_manager
+
+from src.environ.totesys_db import totesys_db_user as user
+from src.environ.totesys_db import totesys_db_password as passwd
+from src.environ.totesys_db import totesys_db_host as host
+from src.environ.totesys_db import totesys_db_port as port
+from src.environ.totesys_db import totesys_db_database as db
+from src.environ.totesys_db import totesys_db_schema as db_schema_name
 
 
 # DB connection
 con = pg8000.native.Connection(
-    user=env_totesys_db['user'],
-    host=env_totesys_db['host'],
-    database=env_totesys_db['database'],
-    port=env_totesys_db['port'],
-    password=env_totesys_db['password']
+    user=user,
+    host=host,
+    database=db,
+    port=port,
+    password=passwd
 )
 
 
@@ -31,8 +39,8 @@ def get_table_names():
     table_names = con.run(
         """SELECT table_name FROM information_schema.tables
         WHERE table_schema = :schema""",
-        schema=env_totesys_db['schema']
-        )
+        schema=db_schema_name
+    )
     return [item[0] for item in table_names]
 
 
@@ -69,8 +77,7 @@ def get_table_data(table_name, timestamp):
     Raises:
         Error: Raises an exception.
     """
-    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True)
-    os.makedirs('./local/aws/s3/ingestion/table_data', exist_ok=True)
+    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True) # TODO: use global variables or something, don't hardcode it
 
     if table_name in [
         'address',
@@ -214,27 +221,26 @@ def store_last_updated(timestamp, path):
             if most_recent > date_to_store:
                 date_to_store = most_recent
 
-    s3 = boto3.client('s3')
-    bucket_name = get_ingested_bucket_name()
-    response = s3.list_objects_v2(
-        Bucket=bucket_name, Prefix='date/date_')
-    if 'Contents' in response:
-        s3.copy_object(
-            Bucket=bucket_name,
-            CopySource=f'{bucket_name}/date/date_1.json',
-            Key='date/date_2.json'
-        )
+    # s3 = boto3.client('s3')
+    # bucket_name = get_ingested_bucket_name()
+    # response = s3.list_objects_v2(
+    #     Bucket=bucket_name, Prefix='date/date_')
+    # if 'Contents' in response:
+    #     s3.copy_object(
+    #         Bucket=bucket_name,
+    #         CopySource=f'{bucket_name}/date/date_1.json',
+    #         Key='date/date_2.json'
+    #     )
 
     # writes files to local folder
-    with open(f'{path}/date/last_updated.json', 'w') as f:
-        date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
-        date_object = {'last_updated': date_string}
+    date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    date_object = {'last_updated': date_string}
+    with open(f'./{path}/date/last_updated.json', 'w') as f:
         f.write(json.dumps(date_object))
-
+    return date_to_store
     #  uploads files to S3 bucket
-    with open(f'{path}/date/last_updated.json', 'rb') as f:
-        s3.put_object(
-            Body=f,
-            Bucket=bucket_name,
-            Key='date/date_1.json'
-        )
+    # s3.put_object(
+    #     Body=json.dumps(date_object),
+    #     Bucket=bucket_name,
+    #     Key='date/date_1.json'
+    # )
