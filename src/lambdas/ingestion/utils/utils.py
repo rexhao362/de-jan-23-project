@@ -7,21 +7,13 @@ from os import environ
 
 
 env_totesys_db = {
-    "host": "nc-data-eng-totesys-production.chpsczt8h1nu.eu-west-2.rds.amazonaws.com",
-    "user": "project_user_1",
-    "password": "UmaC43m32Zi6RW",
+    "user": environ.get('TOTESYS_DB_USER'),
+    "password": environ.get('TOTESYS_DB_PASSWORD'),
+    "host": environ.get('TOTESYS_DB_HOST', 'localhost'),
     "port": environ.get('TOTESYS_DB_PORT', 5432),
-    "database": "totesys",
-    "schema": "public"
+    "database": environ.get('TOTESYS_DB_DATABASE'),
+    "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
 }
-# env_totesys_db = {
-#     "user": environ.get('TOTESYS_DB_USER'),
-#     "password": environ.get('TOTESYS_DB_PASSWORD'),
-#     "host": environ.get('TOTESYS_DB_HOST', 'localhost'),
-#     "port": environ.get('TOTESYS_DB_PORT', 5432),
-#     "database": environ.get('TOTESYS_DB_DATABASE'),
-#     "schema": environ.get('TOTESYS_DB_DATABASE_SCHEMA')
-# }
 
 
 # DB connection
