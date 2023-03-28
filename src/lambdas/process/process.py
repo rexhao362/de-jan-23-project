@@ -5,7 +5,7 @@ from src.lambdas.process.build import *
 
 
 def main_local(path):
-    LOCAL_INGESTION_DIRECTORY = join(path, "ingested")
+    LOCAL_INGESTION_DIRECTORY = join(path, "ingestion") # TODO: use global vars etc
     LOCAL_PROCESSING_DIRECTORY = join(path, "processed")
 
     date, time = get_last_updated(LOCAL_INGESTION_DIRECTORY, local=True)
@@ -91,19 +91,19 @@ def main_local(path):
     # If all is well, try writing remodeled dataframes to bucket
     if (success):
         try:
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_currency, "currency.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_design,
-                                "design.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_staff,
-                                "staff.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_location,
-                                "location.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_date,
-                                "date.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), dim_counterparty,
-                                "counter_party.parquet")
-            write_file_to_local(join(LOCAL_PROCESSING_DIRECTORY, current_timestamp), fact_sales_order,
-                                "sales_order.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_currency, "dim_currency.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_design,
+                                "dim_design.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_staff,
+                                "dim_staff.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_location,
+                                "dim_location.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_date,
+                                "dim_date.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_counterparty,
+                                "dim_counter_party.parquet")
+            write_file_to_local(LOCAL_PROCESSING_DIRECTORY, fact_sales_order,
+                                "dim_sales_order.parquet")
 
             logging.info("All processed tables are written to the bucket.")
 
