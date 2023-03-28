@@ -43,9 +43,9 @@ def bucket(s3):
 
 @freeze_time("2012-01-14 12:00:01")
 def test_data_ingestion(bucket, s3):
-    data_ingestion()
+    data_ingestion("./local/aws/s3/ingestion")
     for table_name in get_table_names():
-        filepath = f'./src/lambdas/ingestion/data/table_data/{table_name}.json'
+        filepath = f'./local/aws/s3/ingestion/table_data/{table_name}.json'
         assert os.path.isfile(filepath)
         with open(filepath, 'r') as f:
             json_data = json.loads(f.read())

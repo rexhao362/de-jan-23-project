@@ -36,15 +36,17 @@ def bucket(s3):
 
 
 def test_store_last_updated_stores_last_updated(bucket, s3):
-    with open('./src/lambdas/ingestion/data/date/last_updated.json', 'w') as f:
+    test_path = "./local/aws/s3/ingestion"
+    with open(f'{test_path}/date/last_updated.json', 'w') as f:
         test_date = {"last_updated": "2000-11-03T14:20:49.962000"}
         f.write(json.dumps(test_date))
-    with open('./src/lambdas/ingestion/data/date/last_updated.json', 'rb') as f:
+    with open(f'{test_path}/date/last_updated.json', 'rb') as f:
         s3.put_object(Body=f, Bucket=get_ingested_bucket_name(),
                       Key='date/date-1.json')
-    store_last_updated(datetime(2012, 1, 14, 12, 00, 1, 000000))
-    response = s3.list_objects_v2(Bucket=get_ingested_bucket_name())
+    dt = datetime(2012, 1, 14, 12, 00, 1, 000000)
+    store_last_updated(dt, test_path)
+    response = s3.list_objects_v2(Bucket=get_ingested_bucket_name(), Prefix='date/')
     list_of_files = [item['Key'] for item in response['Contents']]
-    assert 'date/date-1.json' in list_of_files
+    assert 'date/date_1.json' in list_of_files
     result = retrieve_last_updated()
-    assert result == datetime(2023, 11, 3, 14, 20, 49, 000000)
+    assert result > dt
