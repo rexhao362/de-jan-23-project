@@ -103,7 +103,7 @@ def main_local(path):
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, dim_counterparty,
                                 "dim_counterparty.parquet")
             write_file_to_local(LOCAL_PROCESSING_DIRECTORY, fact_sales_order,
-                                "dim_sales_order.parquet")
+                                "fact_sales_order.parquet")
 
             logging.info("All processed tables are written to the bucket.")
 
