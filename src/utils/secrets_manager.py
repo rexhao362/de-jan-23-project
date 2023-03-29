@@ -3,6 +3,7 @@ usage:
 from src.utils.secrets_manager import secrets_manager
 
 user = secrets_manager.get_secret_value("WAREHOUSE_DB_USER")
+port = secrets_manager.get_secret_int_value('WAREHOUSE_DB_PORT', 5432)
 if user:
     # do something
 else:
@@ -22,7 +23,7 @@ class _SecretsManager:
     @staticmethod
     def get_secret_value(secret_name, default_value=None):
         """
-        Retrieves a secret by its name.
+        Retrieves a string secret by its name.
 
         Args:
             param1: secret_name, string.
@@ -48,6 +49,35 @@ class _SecretsManager:
             secret_value = environ[secret_name]
 
         return secret_value
+
+    @staticmethod
+    def get_secret_int_value(secret_name, default_value=None):
+        """
+        Retrieves an integer by its name.
+
+        Args:
+            param1: secret_name, string.
+            param2: default_value, int.
+
+        Returns:
+            Returns an integer value associated with the secret name if defined.
+
+        Raises:
+            ValueError if:
+                - secret not found
+                - secret not found and default_value is not an int
+                - name is not a string
+        """
+        try:
+            secret_value = _SecretsManager.get_secret_value(secret_name)
+            string_value = int(secret_value)
+        except BaseException:
+            if isinstance(default_value, int):
+                string_value = int(default_value)
+            else:
+                raise ValueError( f'unable to retrieve int value associated with secret "{secret_name}"' )
+
+        return string_value
 
 def _create_secrets_manager():
     return _SecretsManager()
