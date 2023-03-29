@@ -21,7 +21,9 @@ try:
 except BaseException as exc:
     import traceback
     logger.critical( f'{exc.__class__.__name__} exception raised' )
-    msg = ''.join( traceback.format_tb(exc.__traceback__, 1) ) + str(exc)
+    # TODO: this one maybe for production
+    #msg = ''.join( traceback.format_tb(exc.__traceback__, 1) ) + str(exc)
+    msg = ''.join( traceback.format_tb(exc.__traceback__) ) + str(exc)
     logger.critical(msg)
     exit(1)
 

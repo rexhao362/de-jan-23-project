@@ -1,4 +1,4 @@
-import os
+from os.path import join
 import pyarrow.parquet as pq
 from src.lambdas.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
@@ -33,7 +33,7 @@ class DataTable:
         file_name = override_file_name if override_file_name \
             else f'{self.name}{default_parquet_extension}'
 
-        full_path = os.path.join(path, file_name)
+        full_path = join(path, file_name)
         table = pq.read_table(full_path)
         return self.__from_source(table, DataFromParquetFile(full_path) )
 
@@ -44,8 +44,12 @@ class DataTable:
         return self
 
     @staticmethod
-    def __escape(element):
-        return str(element).replace("'", r"''")
+    def __format(element):
+        """
+        Returns a "NULL" string if was passed None to get the correct value in DB
+        Escapes single quotes in values by adding a single quote (psql style) and encloses the result in single quotes
+        """
+        return "NULL" if element == None else "'" + str(element).replace("'", r"''") + "'"
 
     def to_sql_values(self):
         assert self.has_data()
@@ -53,7 +57,7 @@ class DataTable:
         rows = self.table.to_pylist()
         rows_strs = []
         for row_number, row in enumerate(rows):
-            row_str = "(" + ', '.join( [ f"'{self.__escape(element)}'" for element in row.values() ] ) + ")"
+            row_str = "(" + ', '.join( [ f'{self.__format(element)}' for element in row.values() ] ) + ")"
             rows_strs.append(row_str)
 
         return ',\n'.join(rows_strs)
@@ -75,6 +79,8 @@ class DataTable:
         """
         for column_name, sql_data_type_name in self.schema.items():
             column_type = self.table[column_name].type
+            # print(f'\n{column_name} is {column_type}, class {column_type.__class__.__name__}')
+            # print(dir(column_type))
 
             if not get_sql_data_type(sql_data_type_name).matches_pyarrow_type(column_type):
                 msg = f'table "{self.name}": column "{column_name}" should be of type "{sql_data_type_name}", got "{column_type}"'

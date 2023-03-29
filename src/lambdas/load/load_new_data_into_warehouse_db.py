@@ -45,7 +45,12 @@ def load_new_data_into_warehouse_db(path):
             for table in tables_ready_to_load:
                 assert table.has_data()
                 request = table.to_sql_request(db_schema_name)
-                connection.run(request)
+                logger.debug("run SQL query:")
+                logger.debug(request)
+                response = connection.run(request)
+                # TODO: check response
+                msg = f'table {table.name}: {table.table.num_rows} row(s) loaded to the warehouse DB'
+                logger.info(msg)
 
         msg = f'{num_tables_to_load} table{"s" if num_tables_to_load > 1 else ""} loaded into "{db}" database (schema "{db_schema_name}")'
 
