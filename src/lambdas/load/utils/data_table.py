@@ -1,10 +1,10 @@
-from os.path import join
 import pyarrow.parquet as pq
+import src.utils.path as path
 from src.lambdas.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
 from src.lambdas.load.utils.sql_data_types import get_sql_data_type
 
-default_parquet_extension = ".parquet"
+default_parquet_extension = "parquet"
 
 class DataTable:
     """
@@ -29,13 +29,19 @@ class DataTable:
     def from_pyarrow(self, table):
         return self.__from_source(table, DataFromPyArrowTable() )
 
-    def from_parquet(self, path, override_file_name=None):                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-        file_name = override_file_name if override_file_name \
-            else f'{self.name}{default_parquet_extension}'
+    def get_file_name(self, extension=default_parquet_extension):
+        return f'{self.name}.{extension}'
 
-        full_path = join(path, file_name)
-        table = pq.read_table(full_path)
-        return self.__from_source(table, DataFromParquetFile(full_path) )
+    def get_file_path(self, bucket_path, override_file_name=None):
+        file_name = override_file_name if override_file_name \
+            else self.get_file_name()
+
+        return path.join(bucket_path, file_name)
+
+    def from_parquet(self, bucket_path, override_file_name=None):                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+        file_path = self.get_file_path(bucket_path)
+        table = pq.read_table(file_path)
+        return self.__from_source(table, DataFromParquetFile(file_path) )
 
     def __from_source(self, table, source):                                                                                                                                                                                                                                                                                                                                                                                                     
         self.table = table.select(self.column_names)
