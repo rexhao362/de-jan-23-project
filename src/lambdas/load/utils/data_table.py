@@ -39,7 +39,7 @@ class DataTable:
 
     def __from_source(self, table, source):                                                                                                                                                                                                                                                                                                                                                                                                     
         self.table = table.select(self.column_names)
-        #self.__check_column_types()
+        self.__check_column_types()
         self.source = source
         return self
 
@@ -79,6 +79,8 @@ class DataTable:
         """
         for column_name, sql_data_type_name in self.schema.items():
             column_type = self.table[column_name].type
+            #print(f'\n{column_name} is {column_type}, class {column_type.__class__.__name__}')
+            #print(dir(column_type))
 
             if not get_sql_data_type(sql_data_type_name).matches_pyarrow_type(column_type):
                 msg = f'table "{self.name}": column "{column_name}" should be of type "{sql_data_type_name}", got "{column_type}"'
