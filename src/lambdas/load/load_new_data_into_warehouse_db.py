@@ -1,15 +1,25 @@
 from os.path import join
 import logging
 from pg8000.native import Connection
-
-from src.environ.warehouse_db import warehouse_db_user as user
-from src.environ.warehouse_db import warehouse_db_password as passwd
-from src.environ.warehouse_db import warehouse_db_host as host
-from src.environ.warehouse_db import warehouse_db_port as port
-from src.environ.warehouse_db import warehouse_db_database as db
-from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
-
+from src.utils.secrets_manager import secrets_manager
 from src.lambdas.load.db_schema import db_schema
+
+# from src.environ.warehouse_db import warehouse_db_user as user
+# from src.environ.warehouse_db import warehouse_db_password as passwd
+# from src.environ.warehouse_db import warehouse_db_host as host
+# from src.environ.warehouse_db import warehouse_db_port as port
+# from src.environ.warehouse_db import warehouse_db_database as db
+# from src.environ.warehouse_db import warehouse_db_schema as db_schema_name
+
+default_host = 'localhost'
+default_port = 5432
+
+user = secrets_manager.get_secret_value('WAREHOUSE_DB_USER')
+passwd = secrets_manager.get_secret_value('WAREHOUSE_DB_PASSWORD')
+host = secrets_manager.get_secret_value('WAREHOUSE_DB_HOST', default_host)
+port = secrets_manager.get_secret_int_value('WAREHOUSE_DB_PORT', default_port)
+db = secrets_manager.get_secret_value('WAREHOUSE_DB_DATABASE')
+db_schema_name = secrets_manager.get_secret_value('WAREHOUSE_DB_DATABASE_SCHEMA')
 
 logger = logging.getLogger(__name__)
 
