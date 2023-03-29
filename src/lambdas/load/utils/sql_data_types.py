@@ -31,14 +31,15 @@ class SQLDataTypeVARCHAR(_SQLDataType):
 # where p: 0 to 6
 class SQLDataTypeTIME(_SQLDataType):
     def __init__(self, not_null, precision=None, without_time_zone=True):
-        super().__init__(pytypes.is_string, not_null)
+        super().__init__(pytypes.is_time64, not_null)
         self.precision = precision
         self.without_time_zone = without_time_zone
 
 # date
 class SQLDataTypeDATE(_SQLDataType):
     def __init__(self, not_null):
-        super().__init__(pytypes.is_string, not_null)
+        super().__init__(pytypes.is_date32, not_null)
+        #super().__init__(pytypes.is_timestamp, not_null)
 
 # NUMERIC [ (precision [, scale ] ) ] | DECIMAL [ (precision [, scale ] ) ]
 class SQLDataTypeNUMERIC(_SQLDataType):
