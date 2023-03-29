@@ -1,6 +1,6 @@
 from src.lambdas.load.utils.data_table import DataTable
 
-db_schema = [
+mvp_database_schema = [
     DataTable("dim_staff", {
         "staff_id": "INT NOT NULL",
         "first_name": "VARCHAR NOT NULL",
