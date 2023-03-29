@@ -59,5 +59,27 @@ def non_existing_secret_name():
 def test_returns_none_when_passed_unknown_secret_name(mock_environ, non_existing_secret_name):
     assert secrets_manager.get_secret_value(non_existing_secret_name) == None
 
-# def test_returns_none_when_passed_unknown_name_production_environ(production_mock_environ, non_existing_secret_name):
-#     assert secrets_manager.get_secret_value(non_existing_secret_name) == None
+@pytest.fixture
+def default_secret_value():
+    return "test_secret"
+
+@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
+def test_returns_default_value_when_passed_unknown_secret_name_and_default_value(mock_environ, non_existing_secret_name, default_secret_value):
+    assert secrets_manager.get_secret_value(non_existing_secret_name, default_secret_value) == default_secret_value
+
+## sad path
+@pytest.fixture
+def non_string_secret_name():
+    return 1234
+
+@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
+def test_returns_none_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name):
+    assert secrets_manager.get_secret_value(non_string_secret_name, "test_value") == None
+
+@pytest.fixture
+def non_string_secret_value():
+    return 1
+
+@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
+def test_returns_none_when_passed_unknown_secret_name_and_non_string_default_value(mock_environ, non_existing_secret_name, non_string_secret_value):
+    assert secrets_manager.get_secret_value(non_existing_secret_name, non_string_secret_value) == None

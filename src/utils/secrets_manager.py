@@ -18,12 +18,25 @@ class _SecretsManager:
     """
     Gets secret by name.
     Uses AWS Secrets Manager in Production environment and os.environ in Dev
-
-    Returns a string if successfull and None otherwise
     """
     @staticmethod
-    def get_secret_value(secret_name):
-        secret_value = None
+    def get_secret_value(secret_name, default_value=None):
+        """
+        Retrieves a secret by its name.
+
+        Args:
+            param1: secret_name, string.
+            param2: default_value, string.
+
+        Returns:
+            Returns a string value associated with the secret name if defined.
+            If not defined and no default_value specified, returns None, otherwise default_value.
+        """
+        _invalid_result = None
+        if not isinstance(secret_name, str):
+            return _invalid_result
+
+        secret_value = default_value if isinstance(default_value, str) else _invalid_result
         if is_production_environ():
             try:
                 secretm = boto3.client('secretsmanager')
