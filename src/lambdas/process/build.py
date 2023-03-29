@@ -171,7 +171,7 @@ def build_dim_date(start_date, end_date):
     month_name=dti.dt.month_name()
     quarter = dti.dt.quarter
     d={
-        'date_id': dti,
+        'date_id': dti.dt.date,
         'year': years,
         'month': months,
         'day': days,
@@ -181,7 +181,8 @@ def build_dim_date(start_date, end_date):
         'quarter': quarter
     }
     # df = pd.DataFrame(data=d)
-    return pd.DataFrame(data=d)
+    df= pd.DataFrame(data=d).reset_index(drop=True)
+    return df
     
 def build_dim_counterparty(original_dataframe, address_dataframe):
     """

@@ -131,7 +131,7 @@ def write_to_bucket(bucket_name, table, key):
     }
 
     s3 = boto3.client("s3")
-    parquet_binary = table.to_parquet()
+    parquet_binary = table.to_parquet(engine='pyarrow')
 
     try:
         response = s3.put_object(Body=parquet_binary, Bucket=bucket_name, Key=f'{key}') 
