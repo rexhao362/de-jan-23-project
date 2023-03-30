@@ -118,16 +118,17 @@ output_tables = [
 ]
 
 
-def main(path=''):
-    local = not is_production_environ()
-    print(local)
-    INGESTION_BUCKET_NAME = "query-queens-ingestion-bucket" if not local else join(
-        path, "ingestion")
-    PROCESSING_BUCKET_NAME = "query-queens-processing-bucket" if not local else join(
-        path, "processed")
+def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="query-queens-ingestion-bucket",
+         processing_bucket_name="query-queens-processing-bucket", ingestion_directory_name="ingestion", processing_directory_name="processed"):
+    local = is_dev_environ() or force_local
+    if force_s3:
+        local = False
+    INGESTION_BUCKET_NAME = ingestion_bucket_name if not local else join(
+        path, ingestion_directory_name)
+    PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
+        path, processing_directory_name)
 
     date, time = get_last_updated(INGESTION_BUCKET_NAME, local=local)
-    jsons = get_all_jsons(INGESTION_BUCKET_NAME, date, time, local=local)
 
     current_timestamp = f"{date}/{time}"
 
@@ -195,13 +196,16 @@ def main(path=''):
 
             # TO-DO clean up bucket ticket 85
 
+
 if __name__ == "__main__":
     main()
 
-def main_local(path=''):
-    # quick and dirty alias for compatibility with tests
-    return main(path)
 
-def main_s3(path=''):
-    # quick and dirty alias for compatibility with tests
-    return main(path)
+def main_local(**kwargs):
+    # compatibility wrapper for tests
+    return main(force_local=True, **kwargs)
+
+
+def main_s3(**kwargs):
+    # compatiblity wrapper for tests
+    return main(force_s3=True, **kwargs)

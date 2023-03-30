@@ -13,6 +13,7 @@ PROCESSING_DIRECTORY_NAME = "processed"
 INGESTION_DIRECTORY_NAME = "ingestion"
 INGESTION_BUCKET_NAME = "query-queens-ingestion-bucket"
 PROCESSING_BUCKET_NAME = "query-queens-processing-bucket"
+PATH = "test/lambdas/process/test_directories/"
 PREFIX = "2020-11-03/14:20:49/"
 
 
@@ -94,6 +95,7 @@ def test_main_s3_outputs_correct_parquet_files(s3, helpers):
     main_s3()
     processed_contents = s3.list_objects_v2(
         Bucket=PROCESSING_BUCKET_NAME)['Contents']
+    assert len(processed_contents)
 
     for s3_object in processed_contents:
         s3_filepath = s3_object['Key']
@@ -108,9 +110,9 @@ def test_main_s3_outputs_correct_parquet_files(s3, helpers):
 
 
 def test_local_write_to_bucket():
-    main_local()
+    main_local(path=PATH, ingestion_directory_name=INGESTION_DIRECTORY_NAME, processing_directory_name = PROCESSING_DIRECTORY_NAME)
     # list objects in the processing bucket
-    actual_keys = os.listdir(PROCESSING_DIRECTORY_NAME)
+    actual_keys = os.listdir(os.path.join(PATH, PROCESSING_DIRECTORY_NAME))
     expected_keys = ['dim_counterparty.parquet', 'dim_currency.parquet', 'dim_date.parquet',
                      'dim_design.parquet', 'dim_location.parquet', 'fact_sales_order.parquet', 'dim_staff.parquet']
     assert len(expected_keys) == len(actual_keys)
@@ -123,11 +125,11 @@ def test_local_outputs_correct_parquet_files(s3, helpers):
         'design_id', 'design_name', 'file_location', 'file_name'], 'dim_location': ['location_id', 'address_line_1', 'address_line_2', 'district', 'city', 'postal_code', 'country', 'phone'], 'fact_sales_order': ['sales_order_id', 'created_date', 'created_time', 'last_updated_date', 'last_updated_time', 'sales_staff_id', 'counterparty_id', 'units_sold', 'unit_price', 'currency_id', 'design_id', 'agreed_payment_date', 'agreed_delivery_date', 'agreed_delivery_location_id'], 'dim_staff': ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']}
     table_column_dict = {}
     helpers.mock_ingestion(s3)
-    main_local()
-    filepaths = os.listdir(PROCESSING_DIRECTORY_NAME)
+    main_local(path=PATH)
+    filepaths = os.listdir(os.path.join(PATH, PROCESSING_DIRECTORY_NAME))
 
     for filepath in filepaths:
-        filepath = os.path.join(PROCESSING_DIRECTORY_NAME, filepath)
+        filepath = os.path.join(PATH, PROCESSING_DIRECTORY_NAME, filepath)
         df = read_parquet(filepath)
         table_name = os.path.splitext(os.path.basename(filepath))[0]
         table_column_dict[table_name] = df.columns.tolist()
