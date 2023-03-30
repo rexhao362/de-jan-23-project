@@ -117,7 +117,7 @@ CREATE TABLE public.payment (
     last_updated TIMESTAMP,
     transaction_id INT REFERENCES transaction(transaction_id),
     counterparty_id INT REFERENCES counterparty(counterparty_id),
-    payment_amount NUMERIC,
+    payment_amount NUMERIC(10, 2),
     currency_id INT REFERENCES currency(currency_id),
     payment_type_id INT REFERENCES payment_type(payment_type_id),
     paid BOOLEAN,

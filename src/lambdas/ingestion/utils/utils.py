@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
 import boto3
 import pg8000.native
@@ -109,10 +110,11 @@ def get_table_data(table_name, timestamp):
                 WHERE last_updated >
                 TO_TIMESTAMP(:update_ts, :date_format)
                 """,
-                                     update_ts=timestamp.strftime(
+                                     update_ts=(timestamp + timedelta(seconds=1)).strftime(
                                          '%d-%m-%Y %H:%M:%S.%f'),
                                      date_format="dd-mm-yyyy hh24:mi:ss"
                                      )
+                
             # if len(table_data) > 0:
             #     logging.info(f'{table_name} has {len(table_data)} rows')
             table_data.insert(0, get_headers())
@@ -198,7 +200,7 @@ def retrieve_last_updated():
         bucket_name = get_ingested_bucket_name()
         response = s3.list_objects_v2(
             Bucket=bucket_name,
-            Prefix='date/'
+            Prefix='date/last_updated.json'
         )
         if 'Contents' not in response:
             return None
@@ -256,18 +258,18 @@ def store_last_updated(timestamp):
                 if date_to_store is None or most_recent > date_to_store:
                     date_to_store = most_recent
 
-        # s3 = boto3.client('s3')
-        # bucket_name = get_ingested_bucket_name()
-        # response = s3.list_objects_v2(
-        #     Bucket=bucket_name,
-        #     Prefix='date/'
-        # )
-        # if 'Contents' in response:
-        #     s3.copy_object(
-        #         Bucket=bucket_name,
-        #         CopySource=f'{bucket_name}/date/last_updated.json',
-        #         Key='date/date_2.json'
-        #     )
+        s3 = boto3.client('s3')
+        bucket_name = get_ingested_bucket_name()
+        response = s3.list_objects_v2(
+            Bucket=bucket_name,
+            Prefix='date/'
+        )
+        if 'Contents' in response:
+            s3.copy_object(
+                Bucket=bucket_name,
+                CopySource=f'{bucket_name}/date/last_updated.json',
+                Key='date/date_2.json'
+            )
 
         # writes files to local folder
         date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
@@ -278,12 +280,12 @@ def store_last_updated(timestamp):
             f.write(date_json)
         #-----
 
-        #  uploads files to S3 bucket
-        # s3.put_object(
-        #     Body=date_json,
-        #     Bucket=bucket_name,
-        #     Key='date/last_updated.json'
-        # )
+        # uploads files to S3 bucket
+        s3.put_object(
+            Body=date_json,
+            Bucket=bucket_name,
+            Key='date/last_updated.json'
+        )
 
         return f'{date_string[:10]}/{date_string[11:19]}'
 

@@ -32,7 +32,7 @@ def data_ingestion():
     #-------
     os.makedirs('./local/aws/s3/ingested/date', exist_ok=True)
     #-------
-    timestamp = None #retrieve_last_updated()
+    timestamp = retrieve_last_updated()
     date_time = store_last_updated(timestamp)
     #-------
     os.makedirs(f'./local/aws/s3/ingested/{date_time}', exist_ok=True)
@@ -45,7 +45,7 @@ def data_ingestion():
             f.write(json.dumps(table_dict))
         #-------
 
-        # upload_to_s3(table_dict, date_time)
+        upload_to_s3(table_dict, date_time)
 
 
 if __name__ == "__main__":

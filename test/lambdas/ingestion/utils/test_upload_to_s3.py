@@ -37,7 +37,7 @@ def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
     dt = datetime(2012, 1, 14, 12, 00, 1, 000000)
     date_time = store_last_updated(dt)
     data_ingestion()
-    response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket')
+    response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket', Prefix=date_time)
     list_of_files = [item['Key'] for item in response['Contents']]
     for table_name in table_names:
         assert f'{date_time}/{table_name}.json' in list_of_files
