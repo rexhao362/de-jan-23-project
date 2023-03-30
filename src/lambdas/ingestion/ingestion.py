@@ -1,6 +1,7 @@
 import json
 import os
 from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils.utils import select_last_updated
 from src.lambdas.ingestion.utils.utils import make_table_dict
 from src.lambdas.ingestion.utils.utils import get_table_names
 from src.lambdas.ingestion.utils.utils import retrieve_last_updated
@@ -33,19 +34,23 @@ def data_ingestion():
     os.makedirs('./local/aws/s3/ingested/date', exist_ok=True)
     #-------
     timestamp = retrieve_last_updated()
-    date_time = store_last_updated(timestamp)
+    date_time = select_last_updated(timestamp)
+    # if check_s3_data():
+    #     return None
     #-------
-    os.makedirs(f'./local/aws/s3/ingested/{date_time}', exist_ok=True)
+    os.makedirs(f'./local/aws/s3/ingested/{date_time[0]}', exist_ok=True)
     #-------
     for table_name in get_table_names():
         table_data = get_table_data(table_name, timestamp)
         table_dict = make_table_dict(table_name, table_data)
         #-------
-        with open(f'./local/aws/s3/ingested/{date_time}/{table_name}.json', 'w') as f:
+        with open(f'./local/aws/s3/ingested/{date_time[0]}/{table_name}.json', 'w') as f:
             f.write(json.dumps(table_dict))
         #-------
 
-        upload_to_s3(table_dict, date_time)
+        upload_to_s3(table_dict, date_time[0])
+    
+    store_last_updated(date_time[1])
 
 
 if __name__ == "__main__":

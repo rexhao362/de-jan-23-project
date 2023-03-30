@@ -1,6 +1,6 @@
 from datetime import datetime
 from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.ingestion.utils.utils import store_last_updated
+from src.lambdas.ingestion.utils.utils import select_last_updated
 from moto import mock_s3
 import boto3
 import pytest
@@ -35,7 +35,7 @@ def bucket(s3):
 def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
     table_names = ['counterparty', 'currency', 'department', 'design', 'payment', 'transaction', 'staff', 'sales_order', 'address', 'purchase_order', 'payment_type']
     dt = datetime(2012, 1, 14, 12, 00, 1, 000000)
-    date_time = store_last_updated(dt)
+    date_time = select_last_updated(dt)[0]
     data_ingestion()
     response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket', Prefix=date_time)
     list_of_files = [item['Key'] for item in response['Contents']]

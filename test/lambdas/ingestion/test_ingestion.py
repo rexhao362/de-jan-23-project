@@ -1,6 +1,6 @@
 from decimal import Decimal
 from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.ingestion.utils.utils import get_table_names
+from src.lambdas.ingestion.utils.utils import get_table_names, select_last_updated
 from src.lambdas.ingestion.utils.utils import retrieve_last_updated
 from src.lambdas.ingestion.utils.utils import store_last_updated
 from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
@@ -41,7 +41,7 @@ def bucket(s3):
 
 def test_data_ingestion(bucket, s3):
     data_ingestion()
-    date_time = store_last_updated(retrieve_last_updated())
+    date_time = select_last_updated(retrieve_last_updated())[0]
     bucket_name = get_ingested_bucket_name()
 
     for table_name in get_table_names():

@@ -217,7 +217,7 @@ def retrieve_last_updated():
         logging.error(e, 'Timestamp was not retrieved')
 
 
-def store_last_updated(timestamp):
+def select_last_updated(timestamp):
     """
     Finds the last updated date.
     Writes it to a file and then
@@ -236,7 +236,6 @@ def store_last_updated(timestamp):
     """
 
     try:
-        date_to_store = timestamp
         for table_name in get_table_names():
             if table_name in [
                 'address',
@@ -251,46 +250,18 @@ def store_last_updated(timestamp):
                 'staff',
                 'transaction'
             ]:
-                most_recent = con.run(
+                update = con.run(
                     f"""SELECT last_updated FROM {table_name}
                     GROUP BY last_updated ORDER BY
                     last_updated DESC LIMIT 1""")[0][0]
-                if date_to_store is None or most_recent > date_to_store:
-                    date_to_store = most_recent
-
-        s3 = boto3.client('s3')
-        bucket_name = get_ingested_bucket_name()
-        response = s3.list_objects_v2(
-            Bucket=bucket_name,
-            Prefix='date/'
-        )
-        if 'Contents' in response:
-            s3.copy_object(
-                Bucket=bucket_name,
-                CopySource=f'{bucket_name}/date/last_updated.json',
-                Key='date/date_2.json'
-            )
-
-        # writes files to local folder
-        date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
-        date_object = {'last_updated': date_string}
-        date_json = json.dumps(date_object)
-        #------
-        with open('./local/aws/s3/ingested/date/last_updated.json', 'w') as f:
-            f.write(date_json)
-        #-----
-
-        # uploads files to S3 bucket
-        s3.put_object(
-            Body=date_json,
-            Bucket=bucket_name,
-            Key='date/last_updated.json'
-        )
-
-        return f'{date_string[:10]}/{date_string[11:19]}'
-
+                if timestamp is None or update > timestamp:
+                    timestamp = update
+        
+        date_string = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        return (f'{date_string[:10]}/{date_string[11:19]}', date_string)
+    
     except Exception as e:
-        logging.error(e, 'Timestamp was not stored')
+        logging.error(e, 'Timestamp was not selected')
 
 
 def make_table_dict(table_name, table_data):
@@ -326,3 +297,49 @@ def make_table_dict(table_name, table_data):
 
     except Exception as e:
         logging.error(e, 'Table was not made in dict form')
+
+def store_last_updated(date_string):
+    try:
+        s3 = boto3.client('s3')
+        bucket_name = get_ingested_bucket_name()
+        response = s3.list_objects_v2(
+            Bucket=bucket_name,
+            Prefix='date/'
+        )
+        if 'Contents' in response:
+            s3.copy_object(
+                Bucket=bucket_name,
+                CopySource=f'{bucket_name}/date/last_updated.json',
+                Key='date/date_2.json'
+            )
+
+        # writes files to local folder
+        
+        date_object = {'last_updated': date_string}
+        date_json = json.dumps(date_object)
+        #------
+        with open('./local/aws/s3/ingested/date/last_updated.json', 'w') as f:
+            f.write(date_json)
+        #-----
+
+        # uploads files to S3 bucket
+        s3.put_object(
+            Body=date_json,
+            Bucket=bucket_name,
+            Key='date/last_updated.json'
+        )
+
+        
+
+    except Exception as e:
+        logging.error(e, 'Timestamp was not stored')
+
+
+def check_s3_data(date_time):
+    s3 = boto3.client('s3')
+    response = s3.list_objects_v2(
+        Bucket=get_ingested_bucket_name(),
+        Prefix=date_time
+        )
+    return 'Contents' in response
+        # logging.info('Data already in s3')
