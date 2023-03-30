@@ -10,6 +10,16 @@ from os import makedirs
 # import pyarrow
 
 def write_file_to_local(filepath, table, filename):
+    """
+    Write parquet from pandas dataframe.
+
+    Args:
+        param1: filepath, string
+        param2: table, pd dataframe
+        param3: filename, string
+
+    Returns: none
+    """
     parquet_binary = table.to_parquet()
     if not exists(filepath):
         makedirs(filepath)
