@@ -98,6 +98,29 @@ class _SecretsManager:
 
     @staticmethod
     def get_secret_totesys_config(secret_name):
+        """
+        A wrapper to get the whole configuration in one go.
+
+        Args:
+            param1: secret_name, string.
+
+        Returns:
+            A dictionary of the following structure:
+            {
+                "credentials": {
+                    "user": string,
+                    "password": string,
+                    "host": string,
+                    "port": int,
+                    "database": string,
+                },
+                "schema"; string
+            }
+
+        Raises:
+            TODO
+        """
+        
         return {
             "credentials": {
                 "user": environ["TOTESYS_DB_USER"],

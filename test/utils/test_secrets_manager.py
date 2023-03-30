@@ -9,6 +9,12 @@ from src.utils.environ import dev_environ_variable, dev_environ_variable_value
 
 from src.utils.secrets_manager import secrets_manager, project_secrets
 
+# https://docs.pytest.org/en/stable/how-to/mark.html
+# def pytest_configure(config):
+#     config.addinivalue_line(
+#         "markers", "totesys_config: descr"
+#     )
+
 @pytest.fixture
 def dev_mock_environ():
     with patch.dict("os.environ", {dev_environ_variable: dev_environ_variable_value}, clear=True) as e:
@@ -132,32 +138,31 @@ def test_raises_exception_when_passed_non_string_argument_as_secret_name(mock_en
         secrets_manager.get_secret_int_value(non_string_secret_name)
 
 ## special prefedined secrets for the project
+
+dev_with_totesys_config_env = {
+    dev_environ_variable: dev_environ_variable_value,
+    "TOTESYS_DB_USER": "user",
+    "TOTESYS_DB_PASSWORD": "passwd",
+    "TOTESYS_DB_HOST": "host",
+    "TOTESYS_DB_PORT": "1234",
+    "TOTESYS_DB_DATABASE": "db",
+    "TOTESYS_DB_DATABASE_SCHEMA": "schema_1"
+}
+
+@pytest.fixture
+def dev_with_totesys_config_mock_environ():
+    with patch.dict("os.environ", dev_with_totesys_config_env, clear=True) as e:
+        yield e
+
 @pytest.mark.totesys_config
-def test_get_secret_totesys_config_in_dev_env(dev_mock_environ):
+def test_get_secret_totesys_config_in_dev_env(dev_with_totesys_config_mock_environ):
     # arrange
-    def create_env_variable(name, value):
-        str_value = str(value)
-        environ[name] = str_value
-        assert environ[name] == str_value, "mock error"
-    
-    env_variables = {
-        "TOTESYS_DB_USER": { "value": "user", "convert_function": str},
-        "TOTESYS_DB_PASSWORD": { "value": "passwd", "convert_function": str},
-        "TOTESYS_DB_HOST": { "value": "host", "convert_function": str},
-        "TOTESYS_DB_PORT": { "value": "1234", "convert_function": int},
-        "TOTESYS_DB_DATABASE": { "value": "db", "convert_function": str},
-        "TOTESYS_DB_DATABASE_SCHEMA": { "value": "schema_1", "convert_function": str},
-    }
-
-    for variable, description in env_variables.items():
-        create_env_variable(variable, description["value"] )
-
     config = {
         "credentials": {
             "user": environ["TOTESYS_DB_USER"],
             "password": environ["TOTESYS_DB_PASSWORD"],
             "host": environ["TOTESYS_DB_HOST"],
-            "port": env_variables["TOTESYS_DB_PORT"]["convert_function"]( environ["TOTESYS_DB_PORT"] ),
+            "port": int( environ["TOTESYS_DB_PORT"] ),
             "database": environ["TOTESYS_DB_DATABASE"],
         },
         "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
@@ -166,11 +171,9 @@ def test_get_secret_totesys_config_in_dev_env(dev_mock_environ):
     config_string = json.dumps(config)
     secret_name = project_secrets["totesys_database_config"]
     environ[secret_name] = config_string
+    assert environ[secret_name] == config_string, "mock error"
 
     # act
-    # secret_json = secrets_manager.get_secret_value(secret_name)
-    # restored_config = json.loads(secret_json)
     restored_config = secrets_manager.get_secret_totesys_config(secret_name)
     # assert
     assert config == restored_config
-    print( f"restored_config: {restored_config}" )
