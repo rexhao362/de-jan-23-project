@@ -13,6 +13,7 @@ else:
 from os import environ
 import boto3
 from botocore.exceptions import ClientError
+import json
 from src.utils.environ import is_production_environ
 
 class _SecretsManager:
@@ -114,18 +115,19 @@ class _SecretsManager:
         Raises:
             TODO
         """
-        # if secret_name is None:
-        #     self.project_secrets["totesys_database_config"]
-        
-        return {
-            "credentials": {
-                "user": environ["TOTESYS_DB_USER"],
-                "password": environ["TOTESYS_DB_PASSWORD"],
-                "host": environ["TOTESYS_DB_HOST"],
-                "port": int( environ["TOTESYS_DB_PORT"] ),
-                "database": environ["TOTESYS_DB_DATABASE"],
-            },
-            "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
-        }
+        if is_production_environ():
+            config_json = _SecretsManager.get_secret_value(secret_name)
+            return json.loads(config_json)
+        else:
+            return {
+                "credentials": {
+                    "user": environ["TOTESYS_DB_USER"],
+                    "password": environ["TOTESYS_DB_PASSWORD"],
+                    "host": environ["TOTESYS_DB_HOST"],
+                    "port": int( environ["TOTESYS_DB_PORT"] ),
+                    "database": environ["TOTESYS_DB_DATABASE"],
+                },
+                "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
+            }
 
 secrets_manager = _SecretsManager()
