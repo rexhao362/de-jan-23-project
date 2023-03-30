@@ -1,6 +1,5 @@
 import boto3
 from moto import mock_s3
-from pandas import read_parquet
 import pytest
 import os
 import boto3
@@ -49,9 +48,9 @@ def test_get_all_jsons_returns_dict(s3):
     jsons = get_all_jsons(bucket_name, date, time)
     assert type(jsons) == dict
 
-#TODO - TDD really helps with building scripts when you don't have a partner, miss you George <3
+
 def test_iteration_with_jsons(s3):
-    from src.lambdas.process.utils import get_all_jsons, get_last_updated, process
+    from src.lambdas.process.utils import get_all_jsons, get_last_updated
     date, time = get_last_updated(bucket_name)
     jsons = get_all_jsons(bucket_name, date, time)
-
+    assert len(jsons) == 11
