@@ -7,7 +7,7 @@ from moto import mock_secretsmanager
 from botocore.exceptions import ClientError
 from src.utils.environ import dev_environ_variable, dev_environ_variable_value
 
-from src.utils.secrets_manager import secrets_manager, project_secrets
+from src.utils.secrets_manager import secrets_manager
 
 # https://docs.pytest.org/en/stable/how-to/mark.html
 # def pytest_configure(config):
@@ -169,11 +169,11 @@ def test_get_secret_totesys_config_in_dev_env(dev_with_totesys_config_mock_envir
     }
 
     config_string = json.dumps(config)
-    secret_name = project_secrets["totesys_database_config"]
+    secret_name = secrets_manager.project_secrets["totesys_database_config"]
     environ[secret_name] = config_string
     assert environ[secret_name] == config_string, "mock error"
 
     # act
-    restored_config = secrets_manager.get_secret_totesys_config(secret_name)
+    restored_config = secrets_manager.get_secret_totesys_config()
     # assert
     assert config == restored_config
