@@ -2,6 +2,10 @@ from os.path import join
 import logging
 from src.lambdas.process.utils import *
 from src.lambdas.process.build import *
+from os import environ
+from src.utils.environ import *
+dev_environ_variable = "DE_Q2_DEV"
+dev_environ_variable_value = "local"
 
 input_tables = {
     'currency': {
@@ -114,12 +118,17 @@ output_tables = [
 ]
 
 
-def main_local(path=''):
-    LOCAL_INGESTION_DIRECTORY = join(path, "ingestion") # TODO: use global vars etc
-    LOCAL_PROCESSING_DIRECTORY = join(path, "processed")
+def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="query-queens-ingestion-bucket",
+         processing_bucket_name="query-queens-processing-bucket", ingestion_directory_name="ingestion", processing_directory_name="processed"):
+    local = is_dev_environ() or force_local
+    if force_s3:
+        local = False
+    INGESTION_BUCKET_NAME = ingestion_bucket_name if not local else join(
+        path, ingestion_directory_name)
+    PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
+        path, processing_directory_name)
 
-    date, time = get_last_updated(LOCAL_INGESTION_DIRECTORY, local=True)
-    jsons = get_all_jsons(LOCAL_INGESTION_DIRECTORY, date, time, local=True)
+    date, time = get_last_updated(INGESTION_BUCKET_NAME, local=local)
 
     current_timestamp = f"{date}/{time}"
 
@@ -134,7 +143,8 @@ def main_local(path=''):
         for key, table in input_tables.items():
             if table['required']:
                 table['dataframe'] = load_file_from_local(
-                    join(LOCAL_INGESTION_DIRECTORY, current_timestamp, table['table_name'] + '.json'))
+                    join(INGESTION_BUCKET_NAME, current_timestamp, table['table_name'] + '.json')) if local else load_file_from_s3(INGESTION_BUCKET_NAME, join(
+                        current_timestamp, table['table_name'] + '.json'))
         success = True
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
@@ -153,7 +163,7 @@ def main_local(path=''):
         except Exception as e:
             # Do something with the exception, log it to Cloudwatch
             logging.error("Couldn't process tables.")
-
+            success = False
     # if all is well, try remodeling dataframes
 
     if (success):
@@ -175,91 +185,27 @@ def main_local(path=''):
     if (success):
         try:
             for table in output_tables:
-                write_file_to_local(LOCAL_PROCESSING_DIRECTORY,
-                                    table['dataframe'], table['prefix']+table['table_name']+'.parquet')
+                write_file_to_local(PROCESSING_BUCKET_NAME,
+                                    table['dataframe'], table['prefix']+table['table_name']+'.parquet') if local else write_to_bucket(
+                    PROCESSING_BUCKET_NAME, table['dataframe'], table['prefix'] + table['table_name']+'.parquet')
             logging.info("All processed tables are written to the bucket.")
 
         except Exception as e:
             # Do something with the exception, tell Cloudwatch, and clean up the bucket
             logging.error("Couldn't write tables to bucket.")
 
-            # TO-DO clean up bucket ticket 85
-
-
-def main_s3():
-    INGESTION_BUCKET_NAME = "query-queens-ingestion-bucket"
-    PROCESSING_BUCKET_NAME = "query-queens-processing-bucket"
-
-    date, time = get_last_updated(INGESTION_BUCKET_NAME)
-    jsons = get_all_jsons(INGESTION_BUCKET_NAME, date, time)
-
-    current_timestamp = f"{date}/{time}"
-
-    for key, table in input_tables.items():
-        table['filename'] = join(
-            current_timestamp, table['table_name'] + '.json')
-
-    # Try loading all the data
-    success = False
-
-    try:
-        for key, table in input_tables.items():
-            if table['required']:
-                table['dataframe'] = load_file_from_s3(INGESTION_BUCKET_NAME, join(
-                    current_timestamp, table['table_name'] + '.json'))
-        success = True
-    except Exception as e:
-        # Do something with the exception, log it to Cloudwatch
-        logging.error("Couldn't load tables.")
-        success = False
-
-    # If all is well, try processing dictionaries
-
-    if (success):
-        success = False
-        try:
-            for key, table in input_tables.items():
-                if table['required']:
-                    table['dataframe'] = process(table['dataframe'])
-            success = True
-        except Exception as e:
-            # Do something with the exception, log it to Cloudwatch
-            logging.error("Couldn't process tables.")
-            success = False
-
-    # if all is well, try remodeling dataframes
-
-    if (success):
-        success = False
-        try:
-            for table in output_tables:
-                deps = [input_tables[dep]['dataframe']
-                        for dep in table['dependencies']]
-                if (table['table_name'] == 'date'):
-                    # start and end dates generated for the dates table
-                    deps = ['2020/01/01', '2050/01/01']
-                table['dataframe'] = table['build_function'](*deps)
-            success = True
-        except Exception as e:
-            # Do something with the exception, log it to Cloudwatch
-            logging.error("Couldn't remodel dataframes.")
-            success = False
-
-    # If all is well, try writing remodeled dataframes to bucket
-    if (success):
-        try:
-            for table in output_tables:
-                write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table['prefix'] + table['table_name']+'.parquet')
-
-            logging.info("All processed tables are written to the bucket.")
-
-        except Exception as e:
-            # Do something with the exception, tell Cloudwatch, and clean up the bucket
-            logging.error("Couldn't write tables to bucket.")
-            success = False
             # TO-DO clean up bucket ticket 85
 
 
 if __name__ == "__main__":
-    # main_s3()
-    main_local()
+    main()
+
+
+def main_local(**kwargs):
+    # compatibility wrapper for tests
+    return main(force_local=True, **kwargs)
+
+
+def main_s3(**kwargs):
+    # compatiblity wrapper for tests
+    return main(force_s3=True, **kwargs)
