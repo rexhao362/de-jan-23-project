@@ -115,8 +115,8 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     dim_staff = dim_staff.drop(columns=['department_id', 'created_at', 'last_updated'])
     length = dim_staff.shape[0]
 
-    department_name_col = np.empty(length, dtype='U15')
-    location_col = np.empty(length, dtype='U10')
+    department_name_col = np.empty(length, dtype='U50')
+    location_col = np.empty(length, dtype='U50')
 
     for i, id in enumerate(department_id):
         department = department_dataframe.query(f"department_id == {id}")
@@ -209,13 +209,13 @@ def build_dim_counterparty(original_dataframe, address_dataframe):
     df = df.drop(columns=['last_updated', 'created_at', 'delivery_contact', 'commercial_contact', 'legal_address_id'])
     length = df.shape[0]
     #init new cols
-    l_add_1 = np.empty(length, dtype='U10')
-    l_add_2 = np.empty(length, dtype='U10')
-    l_district = np.empty(length, dtype='U10')
-    l_country = np.empty(length, dtype='U10')
-    l_city = np.empty(length, dtype='U10')
-    l_postal_code = np.empty(length, dtype='U10')
-    l_phone = np.empty(length, dtype='U10')
+    l_add_1 = np.empty(length, dtype='U50')
+    l_add_2 = np.empty(length, dtype='U50')
+    l_district = np.empty(length, dtype='U50')
+    l_country = np.empty(length, dtype='U50')
+    l_city = np.empty(length, dtype='U50')
+    l_postal_code = np.empty(length, dtype='U50')
+    l_phone = np.empty(length, dtype='U50')
     #for each record in dataframe and corresponding address_id
     for i, id in enumerate(ids):
         #query the address table for the right id
