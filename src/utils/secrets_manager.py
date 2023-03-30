@@ -15,11 +15,28 @@ import boto3
 from botocore.exceptions import ClientError
 from src.utils.environ import is_production_environ
 
+project_secrets = {
+    "totesys_database_config": "TOTESYS_DB_CONFIG",
+    "warehouse_database_config": "WAREHOUSE_DB_CONFIG"
+}
+
+totesys_database_config = {
+    "credentials": {
+        "user": None,
+        "password": None,
+        "host": None,
+        "port": None,
+        "database": None,
+    },
+    "schema": None
+}
+
 class _SecretsManager:
     """
     Gets secret by name.
     Uses AWS Secrets Manager in Production environment and os.environ in Dev
     """
+
     @staticmethod
     def get_secret_value(secret_name, default_value=None):
         """
@@ -79,8 +96,21 @@ class _SecretsManager:
 
         return string_value
 
-def _create_secrets_manager():
-    return _SecretsManager()
+    @staticmethod
+    def get_secret_totesys_config(secret_name):
+        return {
+            "credentials": {
+                "user": environ["TOTESYS_DB_USER"],
+                "password": environ["TOTESYS_DB_PASSWORD"],
+                "host": environ["TOTESYS_DB_HOST"],
+                "port": int( environ["TOTESYS_DB_PORT"] ),
+                "database": environ["TOTESYS_DB_DATABASE"],
+            },
+            "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
+        }
 
-secrets_manager = _create_secrets_manager()
-del _create_secrets_manager
+
+
+
+
+secrets_manager = _SecretsManager()

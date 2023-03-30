@@ -1,4 +1,5 @@
 from os import environ
+import json
 from unittest.mock import patch
 import pytest
 import boto3
@@ -6,7 +7,7 @@ from moto import mock_secretsmanager
 from botocore.exceptions import ClientError
 from src.utils.environ import dev_environ_variable, dev_environ_variable_value
 
-from src.utils.secrets_manager import secrets_manager
+from src.utils.secrets_manager import secrets_manager, project_secrets
 
 @pytest.fixture
 def dev_mock_environ():
@@ -27,7 +28,7 @@ def production_mock_environ():
         yield e
 
 # existing keys
-def _test_get_existing_secret_value_in_dev(dev_mock_environ):
+def test_get_existing_secret_value_in_dev(dev_mock_environ):
     # arrange
     secret_name = "WAREHOUSE_DB_USER"
     secret_value = "user"
@@ -39,7 +40,7 @@ def _test_get_existing_secret_value_in_dev(dev_mock_environ):
     assert value == secret_value
 
 @mock_secretsmanager
-def _test_get_existing_secret_value_in_production(production_mock_environ):
+def test_get_existing_secret_value_in_production(production_mock_environ):
     # arrange
     secret_name = "test_id"
     secret_value = "test_secret"
@@ -56,7 +57,7 @@ def non_existing_secret_name():
     return "complete_nonsense_101"
 
 @pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_non_existing_secret_name(mock_environ, non_existing_secret_name):
+def test_returns_none_when_passed_non_existing_secret_name(mock_environ, non_existing_secret_name):
     assert secrets_manager.get_secret_value(non_existing_secret_name) == None
 
 @pytest.fixture
@@ -64,7 +65,7 @@ def default_secret_value():
     return "test_secret"
 
 @pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_default_value_when_passed_non_existing_secret_name_and_default_value(mock_environ, non_existing_secret_name, default_secret_value):
+def test_returns_default_value_when_passed_non_existing_secret_name_and_default_value(mock_environ, non_existing_secret_name, default_secret_value):
     assert secrets_manager.get_secret_value(non_existing_secret_name, default_secret_value) == default_secret_value
 
 ## sad path
@@ -73,7 +74,7 @@ def non_string_secret_name():
     return 1234
 
 @pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name, default_secret_value):
+def test_returns_none_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name, default_secret_value):
     assert secrets_manager.get_secret_value(non_string_secret_name, default_secret_value) == None
 
 @pytest.fixture
@@ -81,7 +82,7 @@ def non_string_secret_value():
     return 1
 
 @pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_unknown_secret_name_and_non_string_default_value(mock_environ, non_existing_secret_name, non_string_secret_value):
+def test_returns_none_when_passed_unknown_secret_name_and_non_string_default_value(mock_environ, non_existing_secret_name, non_string_secret_value):
     assert secrets_manager.get_secret_value(non_existing_secret_name, non_string_secret_value) == None
 
 
@@ -129,3 +130,47 @@ def test_raises_exception_when_passed_non_existing_secret_name_and_non_int_defau
 def test_raises_exception_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name, default_secret_value):
     with pytest.raises(BaseException):
         secrets_manager.get_secret_int_value(non_string_secret_name)
+
+## special prefedined secrets for the project
+@pytest.mark.totesys_config
+def test_get_secret_totesys_config_in_dev_env(dev_mock_environ):
+    # arrange
+    def create_env_variable(name, value):
+        str_value = str(value)
+        environ[name] = str_value
+        assert environ[name] == str_value, "mock error"
+    
+    env_variables = {
+        "TOTESYS_DB_USER": { "value": "user", "convert_function": str},
+        "TOTESYS_DB_PASSWORD": { "value": "passwd", "convert_function": str},
+        "TOTESYS_DB_HOST": { "value": "host", "convert_function": str},
+        "TOTESYS_DB_PORT": { "value": "1234", "convert_function": int},
+        "TOTESYS_DB_DATABASE": { "value": "db", "convert_function": str},
+        "TOTESYS_DB_DATABASE_SCHEMA": { "value": "schema_1", "convert_function": str},
+    }
+
+    for variable, description in env_variables.items():
+        create_env_variable(variable, description["value"] )
+
+    config = {
+        "credentials": {
+            "user": environ["TOTESYS_DB_USER"],
+            "password": environ["TOTESYS_DB_PASSWORD"],
+            "host": environ["TOTESYS_DB_HOST"],
+            "port": env_variables["TOTESYS_DB_PORT"]["convert_function"]( environ["TOTESYS_DB_PORT"] ),
+            "database": environ["TOTESYS_DB_DATABASE"],
+        },
+        "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
+    }
+
+    config_string = json.dumps(config)
+    secret_name = project_secrets["totesys_database_config"]
+    environ[secret_name] = config_string
+
+    # act
+    # secret_json = secrets_manager.get_secret_value(secret_name)
+    # restored_config = json.loads(secret_json)
+    restored_config = secrets_manager.get_secret_totesys_config(secret_name)
+    # assert
+    assert config == restored_config
+    print( f"restored_config: {restored_config}" )
