@@ -1,8 +1,7 @@
 from datetime import datetime
-import json
 import os
 import pytest
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name, retrieve_last_updated, select_last_updated, store_last_updated
+from src.lambdas.ingestion.utils import get_ingested_bucket_name, retrieve_last_updated, select_last_updated, store_last_updated
 from moto import mock_s3
 import boto3
 

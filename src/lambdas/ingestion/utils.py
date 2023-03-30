@@ -2,26 +2,11 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 import boto3
-import pg8000.native
 import json
 import logging
-
-from src.environ.totesys_db import totesys_db_user as user
-from src.environ.totesys_db import totesys_db_password as passwd
-from src.environ.totesys_db import totesys_db_host as host
-from src.environ.totesys_db import totesys_db_port as port
-from src.environ.totesys_db import totesys_db_database as db
-from src.environ.totesys_db import totesys_db_schema as db_schema_name
-
-
-# DB connection
-con = pg8000.native.Connection(
-    user=user,
-    host=host,
-    database=db,
-    port=port,
-    password=passwd
-)
+from src.lambdas.ingestion.environ import env_totesys_db
+from src.lambdas.ingestion.environ import con
+from src.utils.environ import *
 
 
 def get_table_names():
@@ -41,7 +26,7 @@ def get_table_names():
         table_names = con.run(
             """SELECT table_name FROM information_schema.tables
             WHERE table_schema = :schema""",
-            schema=db_schema_name
+            schema=env_totesys_db['schema']
         )
         return [item[0] for item in table_names]
 
@@ -110,7 +95,7 @@ def get_table_data(table_name, timestamp):
                 WHERE last_updated >
                 TO_TIMESTAMP(:update_ts, :date_format)
                 """,
-                                     update_ts=(timestamp + timedelta(seconds=1)).strftime(
+                                     update_ts=timestamp.strftime(
                                          '%d-%m-%Y %H:%M:%S.%f'),
                                      date_format="dd-mm-yyyy hh24:mi:ss"
                                      )
@@ -175,6 +160,10 @@ def upload_to_s3(table, date_time):
             Bucket=get_ingested_bucket_name(),
             Key=key
         )
+
+        if is_production_environ():
+            with open(f'./local/aws/s3/ingested/{key}') as f:
+                f.write(table_json)
 
     except Exception as e:
         logging.error(e, 'JSON were not uploaded')
@@ -298,7 +287,7 @@ def make_table_dict(table_name, table_data):
     except Exception as e:
         logging.error(e, 'Table was not made in dict form')
 
-def store_last_updated(date_string):
+def store_last_updated(date_string, path=None):
     try:
         s3 = boto3.client('s3')
         bucket_name = get_ingested_bucket_name()
@@ -318,8 +307,9 @@ def store_last_updated(date_string):
         date_object = {'last_updated': date_string}
         date_json = json.dumps(date_object)
         #------
-        with open('./local/aws/s3/ingested/date/last_updated.json', 'w') as f:
-            f.write(date_json)
+        if is_dev_environ():
+            with open(f'{path}/date/last_updated.json', 'w') as f:
+                f.write(date_json)
         #-----
 
         # uploads files to S3 bucket

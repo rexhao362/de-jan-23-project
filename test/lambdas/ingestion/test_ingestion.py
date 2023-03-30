@@ -1,10 +1,10 @@
 from decimal import Decimal
 from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.ingestion.utils.utils import get_table_names, select_last_updated
-from src.lambdas.ingestion.utils.utils import retrieve_last_updated
-from src.lambdas.ingestion.utils.utils import store_last_updated
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils import get_table_names, select_last_updated
+from src.lambdas.ingestion.utils import retrieve_last_updated
+from src.lambdas.ingestion.utils import store_last_updated
+from src.lambdas.ingestion.utils import get_ingested_bucket_name
+from src.lambdas.ingestion.utils import get_table_data
 import os.path
 import os
 import json
@@ -40,7 +40,8 @@ def bucket(s3):
 
 
 def test_data_ingestion(bucket, s3):
-    data_ingestion()
+    test_path = './local/aws/s3/ingested'
+    data_ingestion(test_path)
     date_time = select_last_updated(retrieve_last_updated())[0]
     bucket_name = get_ingested_bucket_name()
 

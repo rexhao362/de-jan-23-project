@@ -1,4 +1,4 @@
-from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils import get_table_data
 from datetime import datetime
 import re
 from decimal import Decimal
