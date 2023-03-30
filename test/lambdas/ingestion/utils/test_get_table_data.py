@@ -4,7 +4,7 @@ import re
 from decimal import Decimal
 
 def test_get_table_data_extracts_list_table_data_address():
-    result = get_table_data('address', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('address', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -20,7 +20,7 @@ def test_get_table_data_extracts_list_table_data_address():
 
 
 def test_get_table_data_extracts_list_table_data_counterparty():
-    result = get_table_data('counterparty', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('counterparty', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -32,7 +32,7 @@ def test_get_table_data_extracts_list_table_data_counterparty():
 
 
 def test_get_table_data_extracts_list_table_data_currency():
-    result = get_table_data('currency', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('currency', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str and len(
@@ -42,7 +42,7 @@ def test_get_table_data_extracts_list_table_data_currency():
 
 
 def test_get_table_data_extracts_list_table_data_department():
-    result = get_table_data('department', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('department', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -53,7 +53,7 @@ def test_get_table_data_extracts_list_table_data_department():
 
 
 def test_get_table_data_extracts_list_table_data_design():
-    result = get_table_data('design', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('design', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -64,7 +64,7 @@ def test_get_table_data_extracts_list_table_data_design():
 
 
 def test_get_table_data_extracts_list_table_data_payment_type():
-    result = get_table_data('payment_type', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('payment_type', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str and result[i][1] in ['SALES_RECEIPT', 'SALES_REFUND', 'PURCHASE_PAYMENT', 'PURCHASE_REFUND']
@@ -73,7 +73,7 @@ def test_get_table_data_extracts_list_table_data_payment_type():
 
 
 def test_get_table_data_extracts_list_table_data_payment():
-    result = get_table_data('payment', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('payment', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -90,7 +90,7 @@ def test_get_table_data_extracts_list_table_data_payment():
 
 
 def test_get_table_data_extracts_list_table_data_purchase_order():
-    result = get_table_data('purchase_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('purchase_order', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -107,7 +107,7 @@ def test_get_table_data_extracts_list_table_data_purchase_order():
 
 
 def test_get_table_data_extracts_list_table_data_sales_order():
-    result = get_table_data('sales_order', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('sales_order', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == datetime
@@ -124,7 +124,7 @@ def test_get_table_data_extracts_list_table_data_sales_order():
 
 
 def test_get_table_data_extracts_list_table_data_staff():
-    result = get_table_data('staff', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('staff', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str
@@ -136,7 +136,7 @@ def test_get_table_data_extracts_list_table_data_staff():
 
 
 def test_get_table_data_extracts_list_table_data_transaction():
-    result = get_table_data('transaction', datetime(2022, 10, 5, 16, 30, 42, 962000))
+    result = get_table_data('transaction', None)
     for i in range(1, len(result)):
         assert type(result[i][0]) == int
         assert type(result[i][1]) == str

@@ -1,16 +1,15 @@
-from os.path import join
+import json
 import os
-from datetime import datetime
-from decimal import Decimal
 from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils.utils import make_table_dict
 from src.lambdas.ingestion.utils.utils import get_table_names
 from src.lambdas.ingestion.utils.utils import retrieve_last_updated
 from src.lambdas.ingestion.utils.utils import store_last_updated
 from src.lambdas.ingestion.utils.utils import upload_to_s3
-import json
+import logging
 
 
-def data_ingestion(path):
+def data_ingestion():
     """
     Uses the get_table_names() and the get_table_data() functions
     to retrieve data for each table. Formats datetime objects into
@@ -28,38 +27,33 @@ def data_ingestion(path):
     Raises:
         Error: Raises an exception.
     """
-    path = join(path, "ingestion")  # TODO: use global/config variable
-    timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
-    os.makedirs(f'./{path}/date', exist_ok=True)
-    ts = store_last_updated(timestamp, path)
-    ts_str = ts.strftime('%Y-%m-%dT%H:%M:%S.%f')
-    string_time = (ts_str[:10], ts_str[11:19])
-    os.makedirs(f'./{path}/{string_time[0]}/{string_time[1]}', exist_ok=True)
+    # path = join(path, "ingested")  # TODO: use global/config variable
+
+    #-------
+    os.makedirs('./local/aws/s3/ingested/date', exist_ok=True)
+    #-------
+    timestamp = None #retrieve_last_updated()
+    date_time = store_last_updated(timestamp)
+    #-------
+    os.makedirs(f'./local/aws/s3/ingested/{date_time}', exist_ok=True)
+    #-------
     for table_name in get_table_names():
-        table_entries = get_table_data(table_name, timestamp)
-        for row in table_entries:
-            for i in range(len(row)):
-                if isinstance(row[i], datetime):
-                    row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
-                elif isinstance(row[i], Decimal):
-                    row[i] = float(row[i])
+        table_data = get_table_data(table_name, timestamp)
+        table_dict = make_table_dict(table_name, table_data)
+        #-------
+        with open(f'./local/aws/s3/ingested/{date_time}/{table_name}.json', 'w') as f:
+            f.write(json.dumps(table_dict))
+        #-------
 
-        data = []
-        if len(table_entries) > 1:
-            data = table_entries[1:]
-
-        table_data = {
-            'table_name': table_name,
-            'headers': table_entries[0],
-            'data': data
-        }
-
-        filepath = f'{path}/{string_time[0]}/{string_time[1]}/{table_name}.json'
-        with open(filepath, 'w') as f:
-            f.write(json.dumps(table_data))
-
-    #upload_to_s3(path)
-
-    
+        # upload_to_s3(table_dict, date_time)
 
 
+if __name__ == "__main__":
+    try:
+        data_ingestion()
+
+    except Exception as e:
+        logging.error(f"\nError: {e}")
+
+    finally:
+        pass
