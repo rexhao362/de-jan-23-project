@@ -77,13 +77,24 @@ class _SecretsManager:
         Raises:
             ValueError if:
                 - secret not found
-                - secret not found and default_value is not an int
+                
+            TypeError if:
                 - name is not a string
+                - secret not found and default_value is not an int
         """
-        try:
-            secret_value = _SecretsManager.get_secret_value(secret_name)
-            string_value = int(secret_value)
-        except BaseException:
+        if not isinstance(secret_name, str):
+            msg = f'secret_name should be a string (got {secret_name} ({ type(secret_name) })'
+            raise TypeError(msg)
+        
+        secret_value = _SecretsManager.get_secret_value(secret_name)
+
+        if isinstance(secret_value, str):
+            try:
+                string_value = int(secret_value)
+            except:
+                msg = f'cannot convert "{secret_value}" to int'
+                raise TypeError(msg)
+        else:
             if isinstance(default_value, int):
                 string_value = int(default_value)
             else:
@@ -113,21 +124,32 @@ class _SecretsManager:
             }
 
         Raises:
-            TODO
+            KeyError in dev, TypeError in production:
+                - if secret_name does not exist
+                - totesys_config is incomplete
         """
+        #print( f'get_secret_totesys_config({secret_name}: is_production_environ() = {is_production_environ()}' )
         if is_production_environ():
             config_json = _SecretsManager.get_secret_value(secret_name)
-            return json.loads(config_json)
+            config = json.loads(config_json)
+            #print( f"get_secret_totesys_config(production) = {config}")
+            return config
         else:
-            return {
+            key = "TOTESYS_DB_HOST"
+            host = environ[key] if key in environ else "localhost"
+            key = "TOTESYS_DB_PORT"
+            port = environ[key] if key in environ else "5432"
+            config =  {
                 "credentials": {
                     "user": environ["TOTESYS_DB_USER"],
                     "password": environ["TOTESYS_DB_PASSWORD"],
-                    "host": environ["TOTESYS_DB_HOST"],
-                    "port": int( environ["TOTESYS_DB_PORT"] ),
+                    "host": host,
+                    "port": int(port),
                     "database": environ["TOTESYS_DB_DATABASE"],
                 },
                 "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
             }
+            #print( f"get_secret_totesys_config(dev) = {config}")
+            return config
 
 secrets_manager = _SecretsManager()
