@@ -1,9 +1,9 @@
-from datetime import datetime
 import os
 import pytest
-from src.lambdas.ingestion.utils import get_ingested_bucket_name, retrieve_last_updated, select_last_updated, store_last_updated
+from src.lambdas.ingestion.utils.dates import retrieve_last_updated, select_last_updated, store_last_updated
 from moto import mock_s3
 import boto3
+
 
 # Mocking AWS credentials
 @pytest.fixture(scope='module')
@@ -29,15 +29,10 @@ def bucket(s3):
     )
 
 
-def test_returns_key_string_format_of_timestamp(bucket, s3):
-    result = select_last_updated(None)
-    store_last_updated(result[1])
-    ts = retrieve_last_updated().strftime('%Y-%m-%dT%H:%M:%S.%f')
-    assert result[0] == f'{ts[:10]}/{ts[11:19]}'
 
-
-def test_returns_date_string_format_of_timestamp(bucket, s3):
+def test_returns_date_string_format_of_current_time(bucket, s3):
     result = select_last_updated(None)
-    store_last_updated(result[1])
+    store_last_updated(result, '')
     timestamp = retrieve_last_updated().strftime('%Y-%m-%dT%H:%M:%S.%f')
-    assert result[1] == timestamp
+    assert result == timestamp
+

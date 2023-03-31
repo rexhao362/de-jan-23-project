@@ -1,10 +1,8 @@
 from decimal import Decimal
 from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.ingestion.utils import get_table_names, select_last_updated
-from src.lambdas.ingestion.utils import retrieve_last_updated
-from src.lambdas.ingestion.utils import store_last_updated
-from src.lambdas.ingestion.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils import get_table_data
+from src.lambdas.ingestion.utils.utils import get_table_names
+from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
+from src.lambdas.ingestion.utils.utils import get_table_data
 import os.path
 import os
 import json
@@ -12,6 +10,11 @@ from datetime import datetime
 import boto3
 from moto import mock_s3
 import pytest
+from freezegun import freeze_time
+
+@pytest.fixture(scope='package')
+def unset():
+    del os.environ['DE_Q2_DEV']
 
 
 # Mocking AWS credentials
@@ -38,15 +41,14 @@ def bucket(s3):
         Bucket='s3-de-ingestion-query-queens-test-bucket'
     )
 
-
-def test_data_ingestion(bucket, s3):
+@freeze_time('20-10-2021 14:10:01')
+def test_data_ingestion(bucket, s3, unset):
     test_path = './local/aws/s3/ingested'
     data_ingestion(test_path)
-    date_time = select_last_updated(retrieve_last_updated())[0]
     bucket_name = get_ingested_bucket_name()
 
     for table_name in get_table_names():
-        key = f'{date_time}/{table_name}.json'
+        key = f'2021-10-20/14:10:01/{table_name}.json'
         response = s3.get_object(
             Bucket=bucket_name,
             Key=key

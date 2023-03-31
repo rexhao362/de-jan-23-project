@@ -1,14 +1,14 @@
 import json
 import pg8000.native
-from src.utils.secrets_manager import secrets_manager
 from os import environ
-from src.utils.environ import *
+from src.utils.secrets_manager import secrets_manager
+from src.utils.environ import is_production_environ
 
 
 def env_variables():
     if is_production_environ():
         totesys_credentials_json = secrets_manager.get_secret_value(
-        'TOTESYS_CREDENTIALS')
+            'TOTESYS_CREDENTIALS')
         return json.loads(totesys_credentials_json)
     else:
         return {
@@ -17,9 +17,10 @@ def env_variables():
             'TOTESYS_DB_HOST': environ.get('TOTESYS_DB_HOST', 'localhost'),
             'TOTESYS_DB_PORT': environ.get('TOTESYS_DB_PORT', 5432),
             'TOTESYS_DB_DATABASE': environ.get('TOTESYS_DB_DATABASE'),
-            'TOTESYS_DB_DATABASE_SCHEMA': environ.get('TOTESYS_DB_DATABASE_SCHEMA')
+            'TOTESYS_DB_SCHEMA': environ.get('TOTESYS_DB_DATABASE_SCHEMA')
         }
-    
+
+
 totesys_credentials = env_variables()
 # DB connection
 con = pg8000.native.Connection(
@@ -30,6 +31,5 @@ con = pg8000.native.Connection(
     password=totesys_credentials['TOTESYS_DB_PASSWORD'],
 )
 
-env_totesys_db = {
-    'schema': totesys_credentials['TOTESYS_DB_DATABASE_SCHEMA']
-}
+
+schema = totesys_credentials['TOTESYS_DB_SCHEMA']

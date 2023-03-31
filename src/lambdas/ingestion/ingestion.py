@@ -1,18 +1,15 @@
-import json
 import os
-from src.lambdas.ingestion.utils import get_table_data
-from src.lambdas.ingestion.utils import select_last_updated
-from src.lambdas.ingestion.utils import make_table_dict
-from src.lambdas.ingestion.utils import get_table_names
-from src.lambdas.ingestion.utils import retrieve_last_updated
-from src.lambdas.ingestion.utils import store_last_updated
-from src.lambdas.ingestion.utils import upload_to_s3
-import logging
-
+from src.lambdas.ingestion.utils.utils import get_table_data
+from src.lambdas.ingestion.utils.utils import make_table_dict
+from src.lambdas.ingestion.utils.utils import upload_to_s3
+from src.lambdas.ingestion.utils.utils import get_table_names
+from src.lambdas.ingestion.utils.dates import create_date_string
+from src.lambdas.ingestion.utils.dates import create_date_key
+from src.lambdas.ingestion.utils.dates import select_last_updated
+from src.lambdas.ingestion.utils.dates import retrieve_last_updated
+from src.lambdas.ingestion.utils.dates import store_last_updated
 from src.utils.environ import is_dev_environ
-from src.utils.environ import is_production_environ
-
-# from utils.environ import set_dev_environ
+import logging
 
 
 def data_ingestion(path=None):
@@ -33,24 +30,22 @@ def data_ingestion(path=None):
     Raises:
         Error: Raises an exception.
     """
-    if is_dev_environ():
-        os.makedirs(f'{path}/date', exist_ok=True)
-    #-------
+
     timestamp = retrieve_last_updated()
     date_time = select_last_updated(timestamp)
-    # if check_s3_data():
-    #     return None
-    #-------
+    date_key = create_date_key(create_date_string())
+
     if is_dev_environ():
-        os.makedirs(f'{path}/{date_time[0]}', exist_ok=True)
-    #-------
+        os.makedirs(f'{path}/{date_key}', exist_ok=True)
+        os.makedirs(f'{path}/date', exist_ok=True)
+
     for table_name in get_table_names():
         table_data = get_table_data(table_name, timestamp)
         table_dict = make_table_dict(table_name, table_data)
 
-        upload_to_s3(table_dict, date_time[0])
-    
-    store_last_updated(date_time[1], path)
+        upload_to_s3(table_dict, date_key)
+
+    store_last_updated(date_time, date_key, path)
 
 
 if __name__ == "__main__":
