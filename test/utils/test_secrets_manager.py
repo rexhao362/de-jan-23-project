@@ -1,16 +1,21 @@
 from os import environ
+import json
 from unittest.mock import patch
 import pytest
 import boto3
 from moto import mock_secretsmanager
 from botocore.exceptions import ClientError
-from src.utils.environ import dev_environ_variable, dev_environ_variable_value
+from src.utils.environ import \
+    set_dev_environ, \
+    is_dev_environ, \
+    is_production_environ
 
-from src.utils.secrets_manager import secrets_manager
+from src.utils.secrets_manager import secrets_manager, project_secrets
 
 @pytest.fixture
-def dev_mock_environ():
-    with patch.dict("os.environ", {dev_environ_variable: dev_environ_variable_value}, clear=True) as e:
+def mock_dev_environ():
+    with patch.dict("os.environ", {}, clear=True) as e:
+        set_dev_environ()
         yield e
 
 aws_credentials = {
@@ -22,15 +27,23 @@ aws_credentials = {
 }
 
 @pytest.fixture
-def production_mock_environ():
+def mock_production_environ():
     with patch.dict("os.environ", aws_credentials, clear=True) as e:
         yield e
 
+# existing secret
+@pytest.fixture
+def secret_name():
+    return "secret_name"
+
+@pytest.fixture
+def secret_value():
+    return "secret_value"
+
 # existing keys
-def _test_get_existing_secret_value_in_dev(dev_mock_environ):
+def test_get_secret_value_returns_existing_secret_value_in_dev_environ(mock_dev_environ, secret_name, secret_value):
+    assert is_dev_environ()
     # arrange
-    secret_name = "WAREHOUSE_DB_USER"
-    secret_value = "user"
     environ[secret_name] = secret_value
     assert environ[secret_name] == secret_value, "mock error"
     # act
@@ -38,94 +51,221 @@ def _test_get_existing_secret_value_in_dev(dev_mock_environ):
     # assert
     assert value == secret_value
 
+@pytest.fixture
+def mock_aws_secrets_manager():
+    return boto3.client('secretsmanager')
+
 @mock_secretsmanager
-def _test_get_existing_secret_value_in_production(production_mock_environ):
+def test_get_secret_value_returns_existing_secret_value_in_production_environ(mock_production_environ, secret_name, secret_value, mock_aws_secrets_manager):
+    assert is_production_environ()
     # arrange
-    secret_name = "test_id"
-    secret_value = "test_secret"
-    secretm = boto3.client('secretsmanager')
-    secretm.create_secret(Name=secret_name, SecretString=secret_value)
+    mock_aws_secrets_manager.create_secret(Name=secret_name, SecretString=secret_value)
     # act
     value = secrets_manager.get_secret_value(secret_name)
     # assert
     assert value == secret_value, f'secrets_manager.get_secret_value("{secret_name}") should return "{secret_value}" (got "{value}")'
 
-# non-existing secret name
-@pytest.fixture
-def non_existing_secret_name():
-    return "complete_nonsense_101"
-
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_non_existing_secret_name(mock_environ, non_existing_secret_name):
-    assert secrets_manager.get_secret_value(non_existing_secret_name) == None
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_value_returns_none_on_non_existing_secret_name(mock_environ, secret_name):
+    assert secrets_manager.get_secret_value(secret_name) == None
 
 @pytest.fixture
 def default_secret_value():
-    return "test_secret"
+    return "default_secret_value"
 
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_default_value_when_passed_non_existing_secret_name_and_default_value(mock_environ, non_existing_secret_name, default_secret_value):
-    assert secrets_manager.get_secret_value(non_existing_secret_name, default_secret_value) == default_secret_value
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_value_returns_default_value_on_non_existing_secret_name_and_default_value(mock_environ, secret_name, default_secret_value):
+    assert secrets_manager.get_secret_value(secret_name, default_secret_value) == default_secret_value
 
 ## sad path
 @pytest.fixture
 def non_string_secret_name():
     return 1234
 
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name, default_secret_value):
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_value_returns_none_on_non_string_secret_name(mock_environ, non_string_secret_name, default_secret_value):
     assert secrets_manager.get_secret_value(non_string_secret_name, default_secret_value) == None
 
 @pytest.fixture
-def non_string_secret_value():
+def non_string_default_value():
     return 1
 
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def _test_returns_none_when_passed_unknown_secret_name_and_non_string_default_value(mock_environ, non_existing_secret_name, non_string_secret_value):
-    assert secrets_manager.get_secret_value(non_existing_secret_name, non_string_secret_value) == None
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_value_returns_none_on_non_existing_secret_name_and_non_string_default_value(mock_environ, secret_name, non_string_default_value):
+    assert secrets_manager.get_secret_value(secret_name, non_string_default_value) == None
 
 
 ## get_secret_int_value
 
+@pytest.fixture
+def secret_int_value():
+    return 1234
+
 # existing key
-def test_get_existing_secret_int_value_in_dev(dev_mock_environ):
+def test_get_secret_int_value_returns_existing_secret_int_value_in_dev_environ(mock_dev_environ, secret_name, secret_int_value):
+    assert is_dev_environ()
     # arrange
-    secret_name = "PORT"
-    secret_int_value = 1234
-    secret_value = str(secret_int_value)
+    secret_value = str(secret_int_value)    # as secret_value must be a string
     environ[secret_name] = secret_value
     assert environ[secret_name] == secret_value, "mock error"
-    # act & assert
-    assert secrets_manager.get_secret_int_value(secret_name) == secret_int_value
+    # act
+    int_value = secrets_manager.get_secret_int_value(secret_name)
+    # assert
+    assert int_value == secret_int_value
 
 @mock_secretsmanager
-def test_get_existing_secret_int_value_in_production(production_mock_environ):
+def test_get_secret_int_value_returns_existing_secret_int_value_in_production_environ(mock_production_environ, secret_name, secret_int_value, mock_aws_secrets_manager):
+    assert is_production_environ()
     # arrange
-    secret_name = "PORT"
-    secret_int_value = 1234
     secret_value = str(secret_int_value)
-    secretm = boto3.client('secretsmanager')
-    secretm.create_secret(Name=secret_name, SecretString=secret_value)
-    assert secretm.get_secret_value(SecretId=secret_name)['SecretString'] == secret_value, "mock error"
+    mock_aws_secrets_manager.create_secret(Name=secret_name, SecretString=secret_value)
+    assert mock_aws_secrets_manager.get_secret_value(SecretId=secret_name)['SecretString'] == secret_value, "mock error"
     # act
-    value = secrets_manager.get_secret_int_value(secret_name)
+    int_value = secrets_manager.get_secret_int_value(secret_name)
     # assert
-    assert value == secret_int_value, f'secrets_manager.get_secret_int_value("{secret_name}") should return {secret_int_value} (got {value})'
+    assert int_value == secret_int_value, f'secrets_manager.get_secret_int_value("{secret_name}") should return {secret_int_value} (got {int_value})'
 
 # non-existing secret name
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def test_raises_exception_when_passed_non_existing_secret_name(mock_environ, non_existing_secret_name):
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_int_value_raises_exception_on_non_existing_secret_name(mock_environ, secret_name):
     with pytest.raises(BaseException):
-        secrets_manager.get_secret_int_value(non_existing_secret_name)
+        secrets_manager.get_secret_int_value(secret_name)
+
+@pytest.fixture
+def non_int_default_value():
+    return "1"
 
 # non-existing secret name and default_value is not int
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def test_raises_exception_when_passed_non_existing_secret_name_and_non_int_default_value(mock_environ, non_existing_secret_name, non_string_secret_value):
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_int_value_raises_exception_on_non_existing_secret_name_and_non_int_default_value(mock_environ, secret_name, non_int_default_value):
     with pytest.raises(BaseException):
-        secrets_manager.get_secret_int_value(non_existing_secret_name, non_string_secret_value)
+        secrets_manager.get_secret_int_value(secret_name, non_int_default_value)
 
 # non-string secret name
-@pytest.mark.parametrize("mock_environ", [dev_mock_environ, production_mock_environ])
-def test_raises_exception_when_passed_non_string_argument_as_secret_name(mock_environ, non_string_secret_name, default_secret_value):
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_int_value_raises_exception_on_non_string_secret_name(mock_environ, non_string_secret_name, secret_int_value):
     with pytest.raises(BaseException):
-        secrets_manager.get_secret_int_value(non_string_secret_name)
+        secrets_manager.get_secret_int_value(non_string_secret_name, secret_int_value)
+
+## special prefedined secrets for the project
+
+# get_secret_database_config
+mock_database_config_env_variables = {
+    "DB_USER": "user",
+    "DB_PASSWORD": "passwd",
+    "DB_HOST": "host",
+    "DB_PORT": "1234",
+    "DB_DATABASE": "db",
+    "DB_DATABASE_SCHEMA": "schema_1"
+}
+
+@pytest.fixture
+def mock_environ_with_database_config_variables():
+    with patch.dict("os.environ", mock_database_config_env_variables, clear=True) as e:
+        yield e
+
+@pytest.fixture
+def mock_dev_environ_with_database_config_variables():
+    with patch.dict("os.environ", mock_database_config_env_variables, clear=True) as e:
+        set_dev_environ()
+        yield e
+
+@pytest.fixture
+def mock_database_config_description():
+    return {
+        "name": "DB_CONFIG",
+        "variables": {
+            "user": "DB_USER",
+            "password": "DB_PASSWORD",
+            "host": { "name": "DB_HOST", "default": "localhost"},
+            "port": { "name": "DB_PORT", "default": 5432},
+            "database": "DB_DATABASE",
+            "schema": "DB_DATABASE_SCHEMA"
+        }
+    }
+
+@pytest.fixture
+def mock_database_config(mock_environ_with_database_config_variables):
+    return {
+        "credentials": {
+            "user": environ["DB_USER"],
+            "password": environ["DB_PASSWORD"],
+            "host": environ["DB_HOST"],
+            "port": int( environ["DB_PORT"] ),
+            "database": environ["DB_DATABASE"],
+        },
+        "schema": environ["DB_DATABASE_SCHEMA"]
+    }
+
+# no database description
+@pytest.mark.parametrize("mock_environ", [mock_dev_environ, mock_production_environ])
+def test_get_secret_database_config_returns_none_on_none(mock_environ):
+    assert secrets_manager.get_secret_database_config() is None
+
+# existing database_config
+def test_get_secret_database_config_returns_existing_database_config_in_dev_environ(mock_database_config_description, mock_database_config, mock_dev_environ_with_database_config_variables): # order of fixtures DOES MATTER here!
+    assert is_dev_environ()
+    # arrange
+    secret_value = json.dumps(mock_database_config)
+    secret_name = mock_database_config_description["name"]
+    environ[secret_name] = secret_value
+    assert environ[secret_name] == secret_value, "mock error"
+
+    # act
+    restored_config = secrets_manager.get_secret_database_config(mock_database_config_description)
+    # assert
+    assert mock_database_config == restored_config
+
+@mock_secretsmanager
+def test_get_secret_database_config_returns_existing_database_config_in_production_environ(mock_environ_with_database_config_variables, mock_database_config_description, mock_database_config, mock_aws_secrets_manager):
+    assert is_production_environ()
+    # arrange
+    secret_value =json.dumps(mock_database_config)
+    secret_name = mock_database_config_description["name"]
+    response = mock_aws_secrets_manager.create_secret(Name=secret_name, SecretString=secret_value)
+    assert response["ResponseMetadata"]["HTTPStatusCode"] == 200, "mock error"
+    
+    # act
+    restored_database_config = secrets_manager.get_secret_database_config(mock_database_config_description)
+    # assert
+    assert restored_database_config == mock_database_config, f'secrets_manager.get_secret_database_config("{secret_name}") should return "{database_config}" (got "{restored_database_config}")'
+
+# non-existing database_config
+def test_get_secret_database_config_returns_none_on_non_existing_database_config_in_dev(mock_dev_environ, mock_database_config_description):
+    assert secrets_manager.get_secret_database_config(mock_database_config_description) is None
+
+def test_get_secret_database_config_returns_none_on_non_existing_database_config_in_production(mock_production_environ, mock_database_config_description):
+    assert secrets_manager.get_secret_database_config(mock_database_config_description) is None
+
+# incomplete database_config
+incomplete_database_config_env_variables = {
+    "DB_PASSWORD": "passwd",
+    "DB_HOST": "host",
+    "DB_PORT": "1234",
+    "DB_DATABASE_SCHEMA": "schema_1"
+}
+
+@pytest.fixture
+def mock_production_environ_with_incomplete_database_config_variables():
+    with patch.dict("os.environ", incomplete_database_config_env_variables, clear=True) as e:
+        yield e
+
+@pytest.fixture
+def mock_dev_environ_with_incomplete_database_config_variables():
+    with patch.dict("os.environ", incomplete_database_config_env_variables, clear=True) as e:
+        set_dev_environ()
+        yield e
+
+@pytest.mark.parametrize( "mock_environ", [mock_dev_environ_with_incomplete_database_config_variables, mock_production_environ_with_incomplete_database_config_variables] )
+def test_get_secret_database_config_returns_none_on_incomplete_config_variables(mock_environ):
+    assert secrets_manager.get_secret_database_config(mock_database_config_description) is None
+
+## get_secret_totesys_db_config
+@pytest.mark.parametrize( "mock_environ", [mock_dev_environ, mock_production_environ] )
+def test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
+    assert secrets_manager.get_secret_totesys_db_config() == secrets_manager.get_secret_database_config( project_secrets["totesys_database_config"] )
+
+## get_secret_warehouse_db_config
+@pytest.mark.parametrize( "mock_environ", [mock_dev_environ, mock_production_environ] )
+def test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
+    assert secrets_manager.get_secret_warehouse_db_config() == secrets_manager.get_secret_database_config( project_secrets["warehouse_database_config"] )

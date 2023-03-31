@@ -20,6 +20,8 @@ coverage.xml
 
 # sensitive
 *_credentials.sh
+export_*.sh
+setup_*.sh
 
 # pyenv
 .python-version

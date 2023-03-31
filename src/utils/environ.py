@@ -43,6 +43,7 @@ def unset_dev_environ():
     """
     Deletes dev_environ_variable from os.environ
     """
-    del environ[dev_environ_variable]
+    if dev_environ_variable in environ:
+        del environ[dev_environ_variable]
 
 
