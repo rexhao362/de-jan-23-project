@@ -12,15 +12,9 @@ if not is_production_environ():
 class _ProcessedDataLoader:
     def __init__(self, db_schema=default_database_schema):
         logger.debug( f'_ProcessedDataLoader.__init__()' )
+        self.db_config = secrets_manager.get_secret_warehouse_db_config()
         self.db_schema = db_schema
         self._processed_bucket_path = None
-        self.db_credentials = {}
-        self.db_credentials["user"] = secrets_manager.get_secret_value('WAREHOUSE_DB_USER')
-        self.db_credentials["password"] = secrets_manager.get_secret_value('WAREHOUSE_DB_PASSWORD')
-        self.db_credentials["host"] = secrets_manager.get_secret_value('WAREHOUSE_DB_HOST')
-        self.db_credentials["port"] = secrets_manager.get_secret_int_value('WAREHOUSE_DB_PORT', 5432)
-        self.db_credentials["database"] = secrets_manager.get_secret_value('WAREHOUSE_DB_DATABASE')
-        self.db_schema_name = secrets_manager.get_secret_value('WAREHOUSE_DB_DATABASE_SCHEMA')
 
     def set_processed_bucket_path(self, processed_bucket_path=None):
         """
@@ -49,7 +43,7 @@ class _ProcessedDataLoader:
 
         if num_tables_with_new_data:
             self.__to_db(tables_with_new_data)
-            msg = f'database {self.db_credentials["database"]} (schema {self.db_schema_name}): new data loaded into {num_tables_with_new_data} table{"s" if num_tables_with_new_data > 1 else ""}'
+            msg = f'database {self.db_config["credentials"]["database"]} (schema {self.db_config["schema"]}): new data loaded into {num_tables_with_new_data} table{"s" if num_tables_with_new_data > 1 else ""}'
 
         logger.info(msg)
 
@@ -72,10 +66,10 @@ class _ProcessedDataLoader:
 
     def __to_db(self, tables):
         logger.debug( f'__to_db()' )
-        with Connection(**self.db_credentials) as connection:
+        with Connection( **self.db_config["credentials"] ) as connection:
             for table in tables:
-                prefix = f'table {self.db_schema_name}.{table.name}:'
-                request = table.to_sql_request(self.db_schema_name)
+                prefix = f'table { self.db_config["schema"] }.{ table.name }:'
+                request = table.to_sql_request( self.db_config["schema"] )
                 logger.debug("run SQL query:")
                 logger.debug(request)
                 logger.info( f'{prefix} inserting values ..' )
@@ -98,7 +92,7 @@ class _ProcessedDataLoader:
         for table in self.db_schema:
             if table.has_data():
                 file_path = table.source.path
-                logger.info( f'removing {table.source.path} ..')
+                logger.info( f'removing { table.source.path } ..')
                 # don't want to break if something goes wrong with rm
                 try:
                     remove(file_path)
