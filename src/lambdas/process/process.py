@@ -150,7 +150,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't load tables.")
-        raise Exception
+        raise Exception(e)
 
     # If all is well, try processing dictionaries
 
@@ -161,7 +161,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't process tables.")
-        raise Exception
+        raise Exception(e)
     # if all is well, try remodeling dataframes
 
     try:
@@ -175,7 +175,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't remodel dataframes.")
-        raise Exception
+        raise Exception(e)
 
     # If all is well, try writing remodeled dataframes to bucket, god willing
     try:
@@ -189,7 +189,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
         # Do something with the exception, tell Cloudwatch, and clean up the bucket
         # remove contents of bucket
         logging.error("Couldn't write tables to bucket.")
-        raise Exception
+        raise Exception(e)
 
 if __name__ == "__main__":
     main()
