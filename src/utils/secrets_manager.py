@@ -3,11 +3,17 @@ usage:
 from src.utils.secrets_manager import secrets_manager
 
 user = secrets_manager.get_secret_value("WAREHOUSE_DB_USER")
-port = secrets_manager.get_secret_int_value('WAREHOUSE_DB_PORT', 5432)
 if user:
     # do something
 else:
     raise Exception("cannot retrieve secret 'user'")
+
+port = secrets_manager.get_secret_int_value('WAREHOUSE_DB_PORT', 5432)
+
+db_config = secrets_manager.get_secret_totesys_db_config()
+if db_config:
+    with Connection(**db_config["credentials"]) as connection
+
 """
 
 from os import environ
@@ -16,21 +22,36 @@ from botocore.exceptions import ClientError
 import json
 from src.utils.environ import is_production_environ
 
+project_secrets = {
+        "totesys_database_config": {
+            "name": "TOTESYS_DB_CONFIG",
+            "variables": {
+                "user": "TOTESYS_DB_USER",
+                "password": "TOTESYS_DB_PASSWORD",
+                "host": { "name": "TOTESYS_DB_HOST", "default": "localhost"},
+                "port": { "name": "TOTESYS_DB_PORT", "default": 5432},
+                "database": "TOTESYS_DB_DATABASE",
+                "schema": "TOTESYS_DB_DATABASE_SCHEMA"
+            }
+        },
+        "warehouse_database_config": {
+            "name": "WAREHOUSE_DB_CONFIG",
+            "variables": {
+                "user": "WAREHOUSE_DB_USER",
+                "password": "WAREHOUSE_DB_PASSWORD",
+                "host": { "name": "WAREHOUSE_DB_HOST", "default": "localhost"},
+                "port": { "name": "WAREHOUSE_DB_PORT", "default": 5432},
+                "database": "WAREHOUSE_DB_DATABASE",
+                "schema": "WAREHOUSE_DB_DATABASE_SCHEMA"
+            }
+        }
+    }
+
 class _SecretsManager:
     """
     Gets secret by name.
     Uses AWS Secrets Manager in Production environment and os.environ in Dev
     """
-    project_secrets = {
-        "totesys_database_config": "TOTESYS_DB_CONFIG",
-        "warehouse_database_config": "WAREHOUSE_DB_CONFIG"
-    }
-
-    # def __init__(self):
-    #     self.project_secrets = {
-    #         "totesys_database_config": "TOTESYS_DB_CONFIG",
-    #         "warehouse_database_config": "WAREHOUSE_DB_CONFIG"
-    #     }
 
     @staticmethod
     def get_secret_value(secret_name, default_value=None):
@@ -103,7 +124,7 @@ class _SecretsManager:
         return string_value
 
     @staticmethod
-    def get_secret_totesys_config(secret_name=None):
+    def get_secret_database_config(database_config_decription=None):
         """
         A wrapper to get the whole configuration in one go.
 
@@ -123,28 +144,38 @@ class _SecretsManager:
                 "schema"; string
             }
 
-        Raises:
-            KeyError in dev, TypeError in production:
-                - if secret_name does not exist
-                - totesys_config is incomplete
+            or None if unseccessful (no description provided, secret_name does not exist, config is incomplete)
         """
+        if not database_config_decription:
+            return None
+
         if is_production_environ():
-            config_json = _SecretsManager.get_secret_value(secret_name)
-            return json.loads(config_json)
+            config_json = _SecretsManager.get_secret_value( database_config_decription["name"] )
+            return None if config_json is None else json.loads(config_json)
         else:
-            key = "TOTESYS_DB_HOST"
-            host = environ[key] if key in environ else "localhost"
-            key = "TOTESYS_DB_PORT"
-            port = environ[key] if key in environ else "5432"
-            return {
-                "credentials": {
-                    "user": environ["TOTESYS_DB_USER"],
-                    "password": environ["TOTESYS_DB_PASSWORD"],
-                    "host": host,
-                    "port": int(port),
-                    "database": environ["TOTESYS_DB_DATABASE"],
-                },
-                "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
-            }
+            try:
+                vars = database_config_decription["variables"]
+                config = {
+                    "credentials": {
+                        "user": environ[ vars["user"] ],
+                        "password": environ[ vars["password"] ],
+                        "host": environ.get( vars["host"]["name"],  vars["host"]["default"] ),
+                        "port": int( environ.get( vars["port"]["name"],  vars["port"]["default"] )),
+                        "database": environ[ vars["database"] ],
+                    },
+                    "schema": environ[ vars["schema"] ]
+                }
+            except:
+                config = None
+            return config
+    
+    @staticmethod
+    def get_secret_totesys_db_config():
+        return _SecretsManager.get_secret_database_config( project_secrets["totesys_database_config"] )
+
+    @staticmethod
+    def get_secret_warehouse_db_config():
+        return _SecretsManager.get_secret_database_config( project_secrets["warehouse_database_config"] )
+
 
 secrets_manager = _SecretsManager()
