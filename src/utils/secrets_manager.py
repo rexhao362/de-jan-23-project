@@ -128,18 +128,15 @@ class _SecretsManager:
                 - if secret_name does not exist
                 - totesys_config is incomplete
         """
-        #print( f'get_secret_totesys_config({secret_name}: is_production_environ() = {is_production_environ()}' )
         if is_production_environ():
             config_json = _SecretsManager.get_secret_value(secret_name)
-            config = json.loads(config_json)
-            #print( f"get_secret_totesys_config(production) = {config}")
-            return config
+            return json.loads(config_json)
         else:
             key = "TOTESYS_DB_HOST"
             host = environ[key] if key in environ else "localhost"
             key = "TOTESYS_DB_PORT"
             port = environ[key] if key in environ else "5432"
-            config =  {
+            return {
                 "credentials": {
                     "user": environ["TOTESYS_DB_USER"],
                     "password": environ["TOTESYS_DB_PASSWORD"],
@@ -149,7 +146,5 @@ class _SecretsManager:
                 },
                 "schema": environ["TOTESYS_DB_DATABASE_SCHEMA"]
             }
-            #print( f"get_secret_totesys_config(dev) = {config}")
-            return config
 
 secrets_manager = _SecretsManager()
