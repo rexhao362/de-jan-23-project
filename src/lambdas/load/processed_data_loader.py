@@ -109,9 +109,6 @@ def processed_data_loader_lambda(event, context):
     from src.utils.environ import is_production_environ
     import src.utils.path as path
     from src.lambdas.load.processed_data_loader import processed_data_loader
-    
-    from src.lambdas.process.process import main_local
-    from src.lambdas.load.processed_data_loader import processed_data_loader
 
     logger = logging.getLogger('DE_Q2_LOAD')
     logger.setLevel(logging.INFO)
@@ -123,13 +120,10 @@ def processed_data_loader_lambda(event, context):
     logger.info('started')
 
     s3_data_path = "s3://data" if is_production_environ() else "./local/aws/s3"
-    ingestion_bucket_name = "ingestion"
     processed_bucket_name = "processed"
     processed_bucket_path = path.join(s3_data_path, processed_bucket_name)
 
     try:
-        data_ingestion(s3_data_path)
-        main_local(path=s3_data_path)
         processed_data_loader.run(processed_bucket_path)
 
     except BaseException as exc:
@@ -144,6 +138,3 @@ def processed_data_loader_lambda(event, context):
     finally:
         processed_data_loader.cleanup()
         logger.info('completed')
-
-if not is_production_environ() or __name__ == "__main__":
-    processed_data_loader_lambda(None, None)
