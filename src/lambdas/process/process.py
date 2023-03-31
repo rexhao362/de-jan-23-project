@@ -128,6 +128,9 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
         path, processing_directory_name)
 
+    #TODO cleanup_bucket before execution, then we can just raise exceptions and halt execution instead of checking with success boolean
+    bucket_cleanup(PROCESSING_BUCKET_NAME)
+
     date, time = get_last_updated(INGESTION_BUCKET_NAME, local=local)
 
     current_timestamp = f"{date}/{time}"
@@ -137,65 +140,56 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
             current_timestamp, table['table_name'] + '.json')
 
 # Try loading all the data
-    success = False
 
     try:
         for key, table in input_tables.items():
             if table['required']:
                 table['dataframe'] = load_file_from_local(
-                    join(INGESTION_BUCKET_NAME, current_timestamp, table['table_name'] + '.json')) if local else load_file_from_s3(INGESTION_BUCKET_NAME, join(
-                        current_timestamp, table['table_name'] + '.json'))
-        success = True
+                    join(INGESTION_BUCKET_NAME, table['filename'])) if local \
+                    else load_file_from_s3(INGESTION_BUCKET_NAME, table['filename'])
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't load tables.")
-        success = False
+        raise Exception(e)
 
     # If all is well, try processing dictionaries
 
-    if (success):
-        success = False
-        try:
-            for key, table in input_tables.items():
-                if table['required']:
-                    table['dataframe'] = process(table['dataframe'])
-            success = True
-        except Exception as e:
-            # Do something with the exception, log it to Cloudwatch
-            logging.error("Couldn't process tables.")
-            success = False
+    try:
+        for key, table in input_tables.items():
+            if table['required']:
+                table['dataframe'] = process(table['dataframe'])
+    except Exception as e:
+        # Do something with the exception, log it to Cloudwatch
+        logging.error("Couldn't process tables.")
+        raise Exception(e)
     # if all is well, try remodeling dataframes
 
-    if (success):
-        success = False
-        try:
-            for table in output_tables:
-                deps = [input_tables[dep]['dataframe']
-                        for dep in table['dependencies']]
-                if (table['table_name'] == 'date'):
-                    # start and end dates generated for the dates table
-                    deps = ['2020/01/01', '2050/01/01']
-                table['dataframe'] = table['build_function'](*deps)
-            success = True
-        except Exception as e:
-            # Do something with the exception, log it to Cloudwatch
-            logging.error("Couldn't remodel dataframes.")
+    try:
+        for table in output_tables:
+            required_tables = [input_tables[dep]['dataframe']
+                    for dep in table['dependencies']]
+            if (table['table_name'] == 'date'):
+                # start and end dates generated for the dates table
+                required_tables = ['2020/01/01', '2050/01/01']
+            table['dataframe'] = table['build_function'](*required_tables)
+    except Exception as e:
+        # Do something with the exception, log it to Cloudwatch
+        logging.error("Couldn't remodel dataframes.")
+        raise Exception(e)
 
-    # If all is well, try writing remodeled dataframes to bucket
-    if (success):
-        try:
-            for table in output_tables:
-                write_file_to_local(PROCESSING_BUCKET_NAME,
-                                    table['dataframe'], table['prefix']+table['table_name']+'.parquet') if local else write_to_bucket(
-                    PROCESSING_BUCKET_NAME, table['dataframe'], table['prefix'] + table['table_name']+'.parquet')
-            logging.info("All processed tables are written to the bucket.")
+    # If all is well, try writing remodeled dataframes to bucket, god willing
+    try:
+        for table in output_tables:
+            table_output_path = f"{table['prefix']}{table['table_name']}.parquet"
+            write_file_to_local(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path) if local \
+            else write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path)
+        logging.info("All processed tables are written to the bucket.")
 
-        except Exception as e:
-            # Do something with the exception, tell Cloudwatch, and clean up the bucket
-            logging.error("Couldn't write tables to bucket.")
-
-            # TO-DO clean up bucket ticket 85
-
+    except Exception as e:
+        # Do something with the exception, tell Cloudwatch, and clean up the bucket
+        # remove contents of bucket
+        logging.error("Couldn't write tables to bucket.")
+        raise Exception(e)
 
 if __name__ == "__main__":
     main()

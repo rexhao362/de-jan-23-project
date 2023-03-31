@@ -152,6 +152,7 @@ def write_to_bucket(bucket_name, table, key):
 
     except Exception as e:
         logging.error("Could not load table into bucket")
+        raise e
     
     return response_object
 
@@ -190,3 +191,36 @@ def get_all_jsons(bucket_name, date, time, local=False):
             json_files[file] = {'table_name' : file, 'headers' : None, 'data' : None}
     
     return json_files
+
+def bucket_cleanup(bucket_name):
+    """
+    Removes contents of bucket, for use before and after process execution.
+    Args:
+        param1: bucket name, string
+    Returns:
+        Some sort of response object
+"""
+    response_object = {
+        "status": 404,
+        "response": None,
+    }
+    # we need to list all the current objects, and use that to delete
+    s3 = boto3.client("s3")
+    try:
+        list_response = s3.list_objects_v2(Bucket=bucket_name)
+    except Exception:
+        logging.error('Failed to list bucket contents before deletion.')
+    try:
+        keys_to_delete = [{'Key': item['Key']} for item in list_response['Contents']]
+        delete_config = {
+            'Objects' : keys_to_delete
+        }
+        delete_response = s3.delete_objects(Bucket=bucket_name, Delete=delete_config)
+        response_object['status'] = 200
+        response_object['response'] = delete_response
+        return response_object
+    except Exception:
+        logging.error('Failed to delete items from bucket.')
+        return response_object
+
+
