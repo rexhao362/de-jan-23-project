@@ -1,26 +1,13 @@
-from datetime import datetime
 import boto3
-import pg8000.native
-import os
 import json
-from src.utils.secrets_manager import secrets_manager
-
-from src.environ.totesys_db import totesys_db_user as user
-from src.environ.totesys_db import totesys_db_password as passwd
-from src.environ.totesys_db import totesys_db_host as host
-from src.environ.totesys_db import totesys_db_port as port
-from src.environ.totesys_db import totesys_db_database as db
-from src.environ.totesys_db import totesys_db_schema as db_schema_name
-
-
-# DB connection
-con = pg8000.native.Connection(
-    user=user,
-    host=host,
-    database=db,
-    port=port,
-    password=passwd
-)
+import logging
+from datetime import datetime
+from datetime import timedelta
+from decimal import Decimal
+from src.lambdas.ingestion.utils.environ import schema
+from src.lambdas.ingestion.utils.environ import con
+from src.utils.environ import is_dev_environ
+from src.utils.environ import is_production_environ
 
 
 def get_table_names():
@@ -34,14 +21,18 @@ def get_table_names():
         List of table names
 
     Raises:
-        KeyError: Raises an exception.
+        Error: Raises an exception.
     """
-    table_names = con.run(
-        """SELECT table_name FROM information_schema.tables
-        WHERE table_schema = :schema""",
-        schema=db_schema_name
-    )
-    return [item[0] for item in table_names]
+    try:
+        table_names = con.run(
+            """SELECT table_name FROM information_schema.tables
+            WHERE table_schema = :schema""",
+            schema=schema
+        )
+        return [item[0] for item in table_names]
+
+    except Exception as e:
+        logging.error(e, 'Table names were not extracted')
 
 
 def get_headers():
@@ -52,12 +43,17 @@ def get_headers():
         No args
 
     Returns:
-        List of column names
+        List of column names for the
+        last queried table
 
     Raises:
-        KeyError: Raises an exception.
+        Error: Raises an exception.
     """
-    return [c['name'] for c in con.columns]
+    try:
+        return [c['name'] for c in con.columns]
+
+    except Exception as e:
+        logging.error(e, 'Column names were not extracted')
 
 
 def get_table_data(table_name, timestamp):
@@ -77,29 +73,43 @@ def get_table_data(table_name, timestamp):
     Raises:
         Error: Raises an exception.
     """
-    os.makedirs('./local/aws/s3/ingestion/date', exist_ok=True) # TODO: use global variables or something, don't hardcode it
 
-    if table_name in [
-        'address',
-        'counterparty',
-        'currency',
-        'department',
-        'design',
-        'payment_type',
-        'payment',
-        'purchase_order',
-        'sales_order',
-        'staff',
-        'transaction'
-    ]:
-        query_string = f'SELECT * FROM {table_name} WHERE last_updated >'
-        table_data = con.run(
-            f'{query_string} TO_TIMESTAMP(:update_ts, :date_format)',
-            update_ts=timestamp.strftime('%d-%m-%Y %H:%M:%S'),
-            date_format="dd-mm-yyyy hh24:mi:ss"
-        )
-        table_data.insert(0, get_headers())
-        return table_data
+    try:
+        if table_name in [
+            'address',
+            'counterparty',
+            'currency',
+            'department',
+            'design',
+            'payment_type',
+            'payment',
+            'purchase_order',
+            'sales_order',
+            'staff',
+            'transaction'
+        ]:
+            if timestamp is None:
+                table_data = con.run(f'SELECT * FROM {table_name}')
+            else:
+                table_data = con.run(f"""
+                SELECT * FROM {table_name}
+                WHERE last_updated >
+                TO_TIMESTAMP(:update_ts, :date_format)
+                """,
+                                     update_ts=(
+                                         timestamp + timedelta(seconds=1))
+                                     .strftime(
+                                         '%d-%m-%Y %H:%M:%S.%f'),
+                                     date_format="dd-mm-yyyy hh24:mi:ss"
+                                     )
+
+            # if len(table_data) > 0:
+            #     logging.info(f'{table_name} has {len(table_data)} rows')
+            table_data.insert(0, get_headers())
+            return table_data
+
+    except Exception as e:
+        logging.error(e, f'Table {table_name} was not extracted')
 
 
 def get_ingested_bucket_name():
@@ -115,24 +125,33 @@ def get_ingested_bucket_name():
     Raises:
         Error: Raises an exception.
     """
-    s3 = boto3.client('s3')
-    list_buckets = s3.list_buckets()
-    bucket_prefix = 's3-de-ingestion-query-queens'
-    bucket_name = ''
-    for bucket in list_buckets['Buckets']:
-        if bucket['Name'].startswith(bucket_prefix):
-            bucket_name = bucket['Name']
-    return bucket_name
+    try:
+        s3 = boto3.client('s3')
+        list_buckets = s3.list_buckets()
+        bucket_prefix = 's3-de-ingestion-query-queens'
+        bucket_name = ''
+        for bucket in list_buckets['Buckets']:
+            if bucket['Name'].startswith(bucket_prefix):
+                bucket_name = bucket['Name']
+        return bucket_name
+
+    except Exception as e:
+        logging.error(e, 'Bucket name was not extracted')
 
 
-def upload_to_s3(path):
+def upload_to_s3(table_dict, date_key):
     """
-    Uploads files made by data_ingestion() function to the
+    Uploads files made during data_ingestion() function to the
     necessary s3 bucket with the current date
-    and times as the file path
+    and times as the file path.
+
+    Can also write the file when in local setting
 
     Args:
-        No args
+        param1:table in dictionary form including table name,
+        table headers and table data
+        param2: date key string for naming file prefixes
+
 
     Returns:
         No returns
@@ -140,107 +159,56 @@ def upload_to_s3(path):
     Raises:
         Error: Raises an exception.
     """
-    s3 = boto3.client('s3')
-    dt_now = datetime.now()
-    cur_day = dt_now.strftime('%d-%m-%Y')
-    cur_time = dt_now.strftime('%H:%M:%S')
-    for file_name in os.listdir(f'{path}/table_data'):
-        if file_name != '.nada':
-            with open(f'{path}/table_data/{file_name}', 'rb') as f:
-                s3.put_object(
-                    Body=f,
-                    Bucket=get_ingested_bucket_name(),
-                    Key=f'{cur_day}/{cur_time}/{file_name}'
-                )
+    try:
+        key = f'{date_key}/{table_dict["table_name"]}.json'
+        table_json = json.dumps(table_dict)
+
+        if is_production_environ():
+            s3 = boto3.client('s3')
+            s3.put_object(
+                Body=table_json,
+                Bucket=get_ingested_bucket_name(),
+                Key=key
+            )
+
+        if is_dev_environ():
+            with open(f'./local/aws/s3/ingested/{key}', 'w') as f:
+                f.write(table_json)
+
+    except Exception as e:
+        logging.error(e, 'JSON files were not uploaded')
 
 
-def retrieve_last_updated():
+def make_table_dict(table_name, table_data):
     """
-    Retrieves the last updated date from the s3 bucket.
-    If the file does not exist then uses a default date.
+    Turns table data into dictionary form
 
     Args:
-        No args
+        param1: table name
+        param2: table data received from get_table_data function
 
     Returns:
-        Returns the last updated date
+        dictionary form of table data
+        including table headers and data
 
     Raises:
         Error: Raises an exception.
     """
-    s3 = boto3.client('s3')
-    response = s3.list_objects_v2(
-        Bucket=get_ingested_bucket_name(), Prefix='date/')
-    if 'Contents' not in response:
-        return datetime(2022, 10, 5, 16, 30, 42, 962000)
-    else:
-        res = s3.get_object(
-            Bucket=get_ingested_bucket_name(), Key='date/date_1.json')
-        json_res = json.loads(res['Body'].read())
-        timestamp = json_res['last_updated']
-        return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
+    try:
+        for row in table_data:
+            for i in range(len(row)):
+                if isinstance(row[i], datetime):
+                    row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
+                elif isinstance(row[i], Decimal):
+                    row[i] = float(row[i])
 
+        data = table_data[1:] if len(table_data) > 1 else []
 
-def store_last_updated(timestamp, path):
-    """
-    Finds the last updated date.
-    Writes it to a file and then
-    sends it to the s3 bucket.
+        return {
+            'table_name': table_name,
+            'headers': table_data[0],
+            'data': data
+        }
 
-    Args:
-        param1: the last update timestamp retrieved using
-        the retrieve_last_updated() function to pass
-        to the get_table_data()
-
-    Returns:
-        No returns
-
-    Raises:
-        Error: Raises an exception.
-    """
-
-    date_to_store = timestamp
-    for table_name in get_table_names():
-        if table_name in [
-            'address',
-            'counterparty',
-            'currency',
-            'department',
-            'design',
-            'payment_type',
-            'payment',
-            'purchase_order',
-            'sales_order',
-            'staff',
-            'transaction'
-        ]:
-            most_recent = con.run(
-                f"""SELECT last_updated FROM {table_name}
-                GROUP BY last_updated ORDER BY
-                last_updated LIMIT 1""")[0][0]
-            if most_recent > date_to_store:
-                date_to_store = most_recent
-
-    # s3 = boto3.client('s3')
-    # bucket_name = get_ingested_bucket_name()
-    # response = s3.list_objects_v2(
-    #     Bucket=bucket_name, Prefix='date/date_')
-    # if 'Contents' in response:
-    #     s3.copy_object(
-    #         Bucket=bucket_name,
-    #         CopySource=f'{bucket_name}/date/date_1.json',
-    #         Key='date/date_2.json'
-    #     )
-
-    # writes files to local folder
-    date_string = date_to_store.strftime('%Y-%m-%dT%H:%M:%S.%f')
-    date_object = {'last_updated': date_string}
-    with open(f'./{path}/date/last_updated.json', 'w') as f:
-        f.write(json.dumps(date_object))
-    return date_to_store
-    #  uploads files to S3 bucket
-    # s3.put_object(
-    #     Body=json.dumps(date_object),
-    #     Bucket=bucket_name,
-    #     Key='date/date_1.json'
-    # )
+    except Exception as e:
+        logging.error(e, 'Table was not made in dict form')

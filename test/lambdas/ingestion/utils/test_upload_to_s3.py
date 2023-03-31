@@ -1,10 +1,12 @@
-from src.lambdas.ingestion.utils.utils import upload_to_s3
+from datetime import datetime
+from src.lambdas.ingestion.ingestion import data_ingestion
+from src.lambdas.ingestion.utils.dates import select_last_updated
 from moto import mock_s3
 import boto3
 import pytest
-from freezegun import freeze_time
 import os.path
 import os
+from freezegun import freeze_time
 
 
 # Mocking AWS credentials
@@ -24,18 +26,19 @@ def s3(aws_credentials):
     with mock_s3():
         yield boto3.client('s3')
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def bucket(s3):
     s3.create_bucket(
         Bucket='s3-de-ingestion-query-queens-test-bucket'
     )
 
-
-@ freeze_time("2012-01-14 12:00:01")
+@freeze_time('20-10-2021 14:10:01')
 def test_upload_to_s3_function_uploads_files_to_specified_bucket(bucket, s3):
     table_names = ['counterparty', 'currency', 'department', 'design', 'payment', 'transaction', 'staff', 'sales_order', 'address', 'purchase_order', 'payment_type']
-    upload_to_s3("./local/aws/s3/ingestion")
-    response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket')
+    dt = datetime(2012, 1, 14, 12, 00, 1, 000000)
+    date_time = select_last_updated(dt)[0]
+    data_ingestion()
+    response = s3.list_objects_v2(Bucket='s3-de-ingestion-query-queens-test-bucket', Prefix=date_time)
     list_of_files = [item['Key'] for item in response['Contents']]
-    for table in table_names:
-        assert f'14-01-2012/12:00:01/{table}.json' in list_of_files
+    for table_name in table_names:
+        assert f'2021-10-20/14:10:01/{table_name}.json' in list_of_files

@@ -1,16 +1,18 @@
-from os.path import join
 import os
-from datetime import datetime
-from decimal import Decimal
 from src.lambdas.ingestion.utils.utils import get_table_data
-from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.utils import retrieve_last_updated
-from src.lambdas.ingestion.utils.utils import store_last_updated
+from src.lambdas.ingestion.utils.utils import make_table_dict
 from src.lambdas.ingestion.utils.utils import upload_to_s3
-import json
+from src.lambdas.ingestion.utils.utils import get_table_names
+from src.lambdas.ingestion.utils.dates import create_date_string
+from src.lambdas.ingestion.utils.dates import create_date_key
+from src.lambdas.ingestion.utils.dates import select_last_updated
+from src.lambdas.ingestion.utils.dates import retrieve_last_updated
+from src.lambdas.ingestion.utils.dates import store_last_updated
+from src.utils.environ import is_dev_environ
+import logging
 
 
-def data_ingestion(path):
+def data_ingestion(path=None):
     """
     Uses the get_table_names() and the get_table_data() functions
     to retrieve data for each table. Formats datetime objects into
@@ -28,38 +30,31 @@ def data_ingestion(path):
     Raises:
         Error: Raises an exception.
     """
-    path = join(path, "ingestion")  # TODO: use global/config variable
-    timestamp = datetime(2012, 1, 14, 12, 00, 1, 000000)
-    os.makedirs(f'./{path}/date', exist_ok=True)
-    ts = store_last_updated(timestamp, path)
-    ts_str = ts.strftime('%Y-%m-%dT%H:%M:%S.%f')
-    string_time = (ts_str[:10], ts_str[11:19])
-    os.makedirs(f'./{path}/{string_time[0]}/{string_time[1]}', exist_ok=True)
+
+    timestamp = retrieve_last_updated()
+    date_time = select_last_updated(timestamp)
+    date_key = create_date_key(create_date_string())
+
+    if is_dev_environ():
+        os.makedirs(f'{path}/{date_key}', exist_ok=True)
+        os.makedirs(f'{path}/date', exist_ok=True)
+
     for table_name in get_table_names():
-        table_entries = get_table_data(table_name, timestamp)
-        for row in table_entries:
-            for i in range(len(row)):
-                if isinstance(row[i], datetime):
-                    row[i] = row[i].strftime('%Y-%m-%dT%H:%M:%S.%f')
-                elif isinstance(row[i], Decimal):
-                    row[i] = float(row[i])
+        table_data = get_table_data(table_name, timestamp)
+        table_dict = make_table_dict(table_name, table_data)
 
-        data = []
-        if len(table_entries) > 1:
-            data = table_entries[1:]
+        upload_to_s3(table_dict, date_key)
 
-        table_data = {
-            'table_name': table_name,
-            'headers': table_entries[0],
-            'data': data
-        }
-
-        filepath = f'{path}/{string_time[0]}/{string_time[1]}/{table_name}.json'
-        with open(filepath, 'w') as f:
-            f.write(json.dumps(table_data))
-
-    #upload_to_s3(path)
-
-    
+    store_last_updated(date_time, date_key, path)
 
 
+if __name__ == "__main__":
+    test_path = './local/aws/s3/ingested'
+    try:
+        data_ingestion(test_path)
+
+    except Exception as e:
+        logging.error(f"\nError: {e}")
+
+    finally:
+        pass
