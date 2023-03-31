@@ -104,7 +104,7 @@ class _ProcessedDataLoader:
 
 processed_data_loader = _ProcessedDataLoader()
 
-def processed_data_loader_lambda(event, context):
+def lambda_handler(event, context):
     import logging
     from src.utils.environ import is_production_environ
     import src.utils.path as path
