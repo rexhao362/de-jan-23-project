@@ -1,6 +1,7 @@
 # buckets
 resource "aws_s3_bucket" "code_bucket" {
   bucket_prefix = "de-01-2023-q2-prj-code-"
+  force_destroy = true
 }
 
 # resource "aws_s3_bucket" "ingestion_bucket" {
@@ -9,6 +10,7 @@ resource "aws_s3_bucket" "code_bucket" {
 
 resource "aws_s3_bucket" "process_bucket" {
   bucket_prefix = "de-01-2023-q2-prj-process-"
+  force_destroy = true
 }
 
 # lambda objects

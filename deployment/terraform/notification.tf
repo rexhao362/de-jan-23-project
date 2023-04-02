@@ -1,3 +1,5 @@
+# load_lambda
+
 resource "aws_s3_bucket_notification" "process_bucket" {
   bucket = aws_s3_bucket.process_bucket.id
 
@@ -5,7 +7,7 @@ resource "aws_s3_bucket_notification" "process_bucket" {
     lambda_function_arn = aws_lambda_function.load_lambda.arn
     events              = ["s3:ObjectCreated:*"]
     #filter_prefix       = "foldername"
-    filter_suffix = ".txt"
+    filter_suffix = "done.txt"
   }
 
   depends_on = [aws_lambda_permission.s3_permission_to_trigger_load_lambda]
