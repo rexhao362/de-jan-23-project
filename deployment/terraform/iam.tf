@@ -22,7 +22,7 @@ resource "aws_iam_role" "load_lambda_execution_role" {
 
 data "aws_iam_policy_document" "load_lambda_s3_document" {
   statement {
-    actions = ["s3:GetObject"]
+    actions = ["s3:DeleteObject", "s3:GetObjectAttributes", "s3:ListBucket", "s3:GetObject"]
 
     resources = [
       "${aws_s3_bucket.code_bucket.arn}/*",
