@@ -8,8 +8,8 @@ resource "aws_s3_bucket" "code_bucket" {
 #   bucket_prefix = "de-01-2023-q2-prj-ingestion-"
 # }
 
-resource "aws_s3_bucket" "process_bucket" {
-  bucket_prefix = "de-01-2023-q2-prj-process-"
+resource "aws_s3_bucket" "processed_bucket" {
+  bucket_prefix = "de-01-2023-q2-prj-processed-"
   force_destroy = true
 }
 

@@ -7,7 +7,7 @@ mvp_database_schema = [
         "last_name": "VARCHAR NOT NULL",
         "department_name": "VARCHAR NOT NULL",
         "location": "VARCHAR NOT NULL",
-        "email_address": "VARCHAR NOT NULL" }, dont_import = False
+        "email_address": "VARCHAR NOT NULL" }, dont_import = True
     ),
     DataTable("dim_location", {
         "location_id": "INT NOT NULL",
@@ -17,7 +17,7 @@ mvp_database_schema = [
         "city": "VARCHAR NOT NULL",
         "postal_code": "VARCHAR NOT NULL",
         "country": "VARCHAR NOT NULL",
-        "phone": "VARCHAR NOT NULL" }, dont_import = False
+        "phone": "VARCHAR NOT NULL" }, dont_import = True
     ),
     DataTable("dim_currency", {
         "currency_id": "INT NOT NULL",
@@ -28,7 +28,7 @@ mvp_database_schema = [
         "design_id": "INT NOT NULL",
         "design_name": "VARCHAR NOT NULL",
         "file_location": "VARCHAR NOT NULL",
-        "file_name": "VARCHAR NOT NULL" }, dont_import = False
+        "file_name": "VARCHAR NOT NULL" }, dont_import = True
     ),
     DataTable("dim_date", {
         "date_id": "DATE NOT NULL",
@@ -38,7 +38,7 @@ mvp_database_schema = [
         "day_of_week": "INT NOT NULL",
         "day_name": "VARCHAR NOT NULL",
         "month_name": "VARCHAR NOT NULL",
-        "quarter": "INT NOT NULL" }, dont_import = False
+        "quarter": "INT NOT NULL" }, dont_import = True
     ),
     DataTable("dim_counterparty", {
         "counterparty_id": "INT NOT NULL",
@@ -49,7 +49,7 @@ mvp_database_schema = [
         "counterparty_legal_city": "VARCHAR NOT NULL",
         "counterparty_legal_postal_code": "VARCHAR NOT NULL",
         "counterparty_legal_country": "VARCHAR NOT NULL",
-        "counterparty_legal_phone_number": "VARCHAR NOT NULL" }, dont_import = False
+        "counterparty_legal_phone_number": "VARCHAR NOT NULL" }, dont_import = True
     ),
     DataTable("fact_sales_order", {
         "sales_order_id": "INT NOT NULL",
@@ -65,6 +65,6 @@ mvp_database_schema = [
         "design_id": "INT NOT NULL",
         "agreed_payment_date": "DATE NOT NULL",
         "agreed_delivery_date": "DATE NOT NULL",
-        "agreed_delivery_location_id": "INT NOT NULL" }, dont_import = False
+        "agreed_delivery_location_id": "INT NOT NULL" }, dont_import = True
     )
 ]

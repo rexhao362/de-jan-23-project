@@ -1,7 +1,7 @@
 # load_lambda
 
-resource "aws_s3_bucket_notification" "process_bucket" {
-  bucket = aws_s3_bucket.process_bucket.id
+resource "aws_s3_bucket_notification" "processed_bucket" {
+  bucket = aws_s3_bucket.processed_bucket.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.load_lambda.arn
@@ -18,5 +18,5 @@ resource "aws_lambda_permission" "s3_permission_to_trigger_load_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.load_lambda.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.process_bucket.arn
+  source_arn    = aws_s3_bucket.processed_bucket.arn
 }
