@@ -1,0 +1,7 @@
+{"LambdaFunctionConfigurations": [
+    {
+      "LambdaFunctionArn": "arn:aws:lambda:us-east-1:845056425566:function:load_processed_data",
+      "Events": ["s3:ObjectCreated:*"]
+    }
+  ]
+}
