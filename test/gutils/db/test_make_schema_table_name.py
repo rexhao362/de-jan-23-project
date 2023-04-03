@@ -1,5 +1,9 @@
+# to allow running tests without PYTHONPATH
+import sys
+sys.path.append('./src')
+
 import pytest
-from src.utils.db.make_schema_table_name import make_schema_table_name
+from gutils.db.make_schema_table_name import make_schema_table_name
 
 def test_returns_correct_result_when_passed_valid_arguments():
     # arrange
