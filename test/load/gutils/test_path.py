@@ -1,6 +1,8 @@
-# to allow running flattened lambdas locally
+# to allow running tests without PYTHONPATH
 import sys
 sys.path.append('./')
+# to allow for flattened lambda file structure
+sys.path.append('./src/load/')
 
 from os import path
 from unittest.mock import patch
@@ -40,26 +42,42 @@ def test_join_returns_correct_value_in_production(mock_production_environ):
     file_name = "dim_currency.parquet"
     assert join(data_path, file_name) == f'{data_path}/{file_name}'
 
-# get_bucket_path
-def test_get_bucket_path_in_dev(mock_dev_environ):
+## get_bucket_path
+
+# existing bucket
+def test_get_bucket_path_returns_correct_result_in_dev(mock_dev_environ):
     default_local_path = "./local/aws/s3"
     bucket_label = "processed"
-    assert get_bucket_path(default_local_path, bucket_label) == path.join(default_local_path, bucket_label)
+    assert get_bucket_path(bucket_label, default_local_path) == path.join(default_local_path, bucket_label)
 
 @pytest.fixture
 def mock_aws_s3_client():
     return boto3.client('s3')
 
 @mock_s3
-def test_get_bucket_path_in_dev(mock_production_environ):
+def test_get_bucket_path_in_production(mock_production_environ, mock_aws_s3_client):
     processed_bucket_name = "de-q2-processed-bucket-1234"
-    mock_aws_s3_client = boto3.client('s3')
     mock_aws_s3_client.create_bucket(Bucket="random-bucket")
     mock_aws_s3_client.create_bucket(Bucket=processed_bucket_name)
     mock_aws_s3_client.create_bucket(Bucket="3rd-bucket")
-
     bucket_label = "processed"
-    assert get_bucket_path(None, bucket_label) == f's3://{processed_bucket_name}'
+    assert get_bucket_path(bucket_label) == f's3://{processed_bucket_name}'
+
+# no root specified
+def test_get_bucket_path_raises_when_passed_no_root_path_in_dev(mock_dev_environ):
+    bucket_label = "processed"
+    re = r'cannot be None in '
+    with pytest.raises(Exception, match=re) as exc:
+        get_bucket_path(bucket_label)
+
+@mock_s3
+def test_get_bucket_path_in_production(mock_production_environ, mock_aws_s3_client):
+    mock_aws_s3_client.create_bucket(Bucket="random-bucket")
+    mock_aws_s3_client.create_bucket(Bucket="3rd-bucket")
+    bucket_label = "processed"
+    re = r'not found$'
+    with pytest.raises(Exception, match=re):
+        get_bucket_path(bucket_label)
 
 
 
