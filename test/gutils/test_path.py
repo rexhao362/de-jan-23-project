@@ -1,16 +1,16 @@
 # to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./')
+sys.path.append('./src')
 # to allow for flattened lambda file structure
-sys.path.append('./src/load/')
+#sys.path.append('./src/load/')
 
 from os import path
 from unittest.mock import patch
 import pytest
 import boto3
 from moto import mock_s3
-from src.load.gutils.environ import set_dev_environ
-from src.load.gutils.path import (join, get_bucket_path)
+from gutils.environ import set_dev_environ
+from gutils.path import (join, get_bucket_path)
 
 @pytest.fixture
 def mock_dev_environ():

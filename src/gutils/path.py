@@ -1,9 +1,5 @@
-import logging
 from os import path
 from gutils.environ import is_production_environ
-
-logger = logging.getLogger("DE_Q2_LOAD")
-logger.setLevel(logging.INFO)
 
 def join(data_path, file_name):
     if is_production_environ():
@@ -37,7 +33,6 @@ def get_bucket_path(bucket_label, dev_local_root_s3_path=None):
 
         except BaseException as exc:
             msg = str(exc)
-            logging.error(msg)
             raise Exception(msg)
     else:
         if dev_local_root_s3_path is None:

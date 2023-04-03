@@ -1,3 +1,9 @@
+# to allow running flattened lambdas locally
+if __name__ == "__main__":
+    import sys
+    sys.path.append('./src')
+    # sys.path.append('./src/load/')
+
 from os import remove
 import logging
 from pg8000.native import Connection
@@ -107,7 +113,7 @@ processed_data_loader = _ProcessedDataLoader()
 
 # lambda
 def load_processed_data(event, context):
-    processed_bucket_path = get_bucket_path("./local/aws/s3", "processed")
+    processed_bucket_path = get_bucket_path("processed", "./local/aws/s3")
 
     try:
         processed_data_loader.run(processed_bucket_path)
