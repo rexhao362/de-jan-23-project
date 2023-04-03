@@ -155,7 +155,8 @@ def build_dim_date(start_date: str, end_date: str) -> pd.DataFrame:
     Args:
         start_date: First date to be generated, "yyyy/mm/dd"
         end_date: Last date to be generated, "yyyy/mm/dd"
-    Returns: dim_date, dataframe
+        
+    Returns: dim_date table
     
     Output columns:
         [date_id, year, month, day, day_of_week, day_name, month_name, quarter]
