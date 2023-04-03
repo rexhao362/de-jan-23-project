@@ -1,14 +1,13 @@
 # to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./')
+sys.path.append('./src/')
 # to allow for flattened lambda file structure
 sys.path.append('./src/load/')
 
 import pytest
-from src.load.processed_data_loader import _ProcessedDataLoader
-from src.load.db_schema import mvp_database_schema as default_database_schema
-import src.load.db_schema
-from src.load.utils.data_table import DataTable
+from processed_data_loader import _ProcessedDataLoader
+from db_schema import mvp_database_schema as default_database_schema
+from utils.data_table import DataTable
 
 def test_creates_loader_with_default_db_schema():
     dl = _ProcessedDataLoader()
