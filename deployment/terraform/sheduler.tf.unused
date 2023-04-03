@@ -1,0 +1,15 @@
+resource "aws_scheduler_schedule" "EveryFiveMinutesEvent" {
+  name       = "execute-load-lambda"
+  group_name = "default"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(5 minute)"
+
+  target {
+    arn      = aws_lambda_function.load_lambda.arn
+    role_arn = aws_iam_role.load_lambda_execution_role.arn
+  }
+}
