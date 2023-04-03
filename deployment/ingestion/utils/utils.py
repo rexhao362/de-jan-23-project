@@ -4,10 +4,10 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-from src.lambdas.ingestion.utils.connection import schema
-from src.lambdas.ingestion.utils.connection import con
-from src.utils.environ import is_dev_environ
-from src.utils.environ import is_production_environ
+from utils.connection import schema
+from utils.connection import con
+from utils.environ import is_dev_environ
+from utils.environ import is_production_environ
 
 
 def get_table_names():
