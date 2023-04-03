@@ -118,8 +118,31 @@ output_tables = [
 ]
 
 
-def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="query-queens-ingestion-bucket",
-         processing_bucket_name="query-queens-processing-bucket", ingestion_directory_name="ingestion", processing_directory_name="processed"):
+def main(path: str = '', force_local: bool = False, force_s3: bool = False,
+         ingestion_bucket_name: str = "query-queens-ingestion-bucket",
+         processing_bucket_name: str = "query-queens-processing-bucket",
+         ingestion_directory_name: str = "ingestion",
+         processing_directory_name: str = "processed") -> None:
+    """
+    Checks in the ingestion bucket for json tables, converts to pandas
+    dataframes, remodels the schema, and puts remodelled tables in the
+    processed bucket in parquet format.
+
+    Args:
+        path: Filepath to the directory containing the local buckets if applicable.
+        force_local: Overrides environmental variables to perform processing using local buckets.
+        force_s3: Overrides environmental variables to perform processing on AWS, overrides force_local.
+        ingestion_bucket_name:  name of the aws ingestion bucket.
+        processing_bucket_name: name of the aws processing bucket.
+        ingestion_directory_name: name of the local ingestion directory at <path>/<ingestion_directory_name>.
+        processing_directory_name: name of the local processing directory at <path>/<ingestion_directory_name>.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If could not load, process, remodel, or write table
+    """
     local = is_dev_environ() or force_local
     if force_s3:
         local = False
@@ -128,7 +151,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
         path, processing_directory_name)
 
-    #TODO cleanup_bucket before execution, then we can just raise exceptions and halt execution instead of checking with success boolean
+    # TODO cleanup_bucket before execution, then we can just raise exceptions and halt execution instead of checking with success boolean
     bucket_cleanup(PROCESSING_BUCKET_NAME)
 
     date, time = get_last_updated(INGESTION_BUCKET_NAME, local=local)
@@ -167,7 +190,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
     try:
         for table in output_tables:
             required_tables = [input_tables[dep]['dataframe']
-                    for dep in table['dependencies']]
+                               for dep in table['dependencies']]
             if (table['table_name'] == 'date'):
                 # start and end dates generated for the dates table
                 required_tables = ['2020/01/01', '2050/01/01']
@@ -182,7 +205,7 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
         for table in output_tables:
             table_output_path = f"{table['prefix']}{table['table_name']}.parquet"
             write_file_to_local(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path) if local \
-            else write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path)
+                else write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:
@@ -191,15 +214,30 @@ def main(path='', force_local=False, force_s3=False, ingestion_bucket_name="quer
         logging.error("Couldn't write tables to bucket.")
         raise Exception(e)
 
+
 if __name__ == "__main__":
     main()
 
 
-def main_local(**kwargs):
-    # compatibility wrapper for tests
+def main_local(**kwargs) -> None:
+    """Compatibility wrapper for main, calls main forcing local and passes all kwargs.
+
+    Args:
+        **kwargs: Key word arguments for main function.
+
+    Returns:
+        None
+    """
     return main(force_local=True, **kwargs)
 
 
-def main_s3(**kwargs):
-    # compatiblity wrapper for tests
+def main_s3(**kwargs) -> None:
+    """Compatibility wrapper for main, calls main forcing S3 and passes all kwargs.
+
+    Args:
+        **kwargs: Key word arguments for main function
+
+    Returns:
+        None
+    """
     return main(force_s3=True, **kwargs)
