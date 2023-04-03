@@ -6,14 +6,14 @@ import logging
 Functions used to build dimension & fact table dataframes from given table dataframes.
 """
 
-def build_dim_design(dataframe):
+def build_dim_design(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds dim_design table from original design table.
+    Builds dim_design table from ingested design table.
 
     Args: 
-        param1: design, dataframe
+        dataframe: The ingestion design table
 
-    Returns: dim_design, dataframe
+    Returns: The remodeled dim_design table
 
     Input columns: 
         [design_id, created_at, last_updated, design_name, file_location, file_name]
@@ -25,14 +25,14 @@ def build_dim_design(dataframe):
     dim_design = dataframe.copy().drop(columns=['created_at', 'last_updated'])
     return dim_design[['design_id', 'design_name', 'file_location', 'file_name']]
 
-def build_dim_currency(dataframe):
+def build_dim_currency(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds dim_currency table from original currency table.
+    Builds dim_currency table from ingested currency table.
 
     Args: 
-        param1: currency, dataframe
+        dataframe: The ingestion currency table
 
-    Returns: dim_currency, dataframe
+    Returns: The remodeled dim_currency table
 
     Input columns:
         [currency_id, currency_code, created_at, last_updated]
@@ -59,14 +59,14 @@ def build_dim_currency(dataframe):
     dim_currency = dim_currency[['currency_id','currency_code', 'currency_name']]
     return dim_currency
 
-def build_fact_sales_order(sales_order_dataframe):
+def build_fact_sales_order(sales_order_dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds fact_sales_order table from original sales table.
+    Builds fact_sales_order table from ingested sales table.
 
     Args: 
-        param1: sales, dataframe
+        sales_order_dataframe: The ingestion sales_order table
 
-    Returns: fact_sales_order, dataframe
+    Returns: The remodeled fact_sales_order table
 
     Input Columns: 
         ["sales_order_id", "created_at", "last_updated", "design_id", "staff_id", "counterparty_id", "units_sold", "unit_price", "currency_id", "agreed_delivery_date", "agreed_payment_date", "agreed_delivery_location_id"]
@@ -97,15 +97,15 @@ def build_fact_sales_order(sales_order_dataframe):
 
     return sales_order[order_list]
 
-def build_dim_staff(staff_dataframe, department_dataframe):
+def build_dim_staff(staff_dataframe: pd.DataFrame, department_dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds dim_staff table from original staff and department tables.
+    Builds dim_staff table from ingested staff and department tables.
 
     Args:
-        param1: staff, DataFrame
-        param2: department, DataFrame
+        staff_dataframe: The ingested staff table
+        department_dataframe: The ingested department table
 
-    Returns: dim_staff, DataFrame
+    Returns: The remodeled dim_staff table
 
     Output Columns:
         ['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']
@@ -127,14 +127,14 @@ def build_dim_staff(staff_dataframe, department_dataframe):
     dim_staff['location'] = location_col
     return dim_staff[['staff_id', 'first_name', 'last_name', 'department_name', 'location', 'email_address']] 
 
-def build_dim_location(dataframe):
+def build_dim_location(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds dim_location table from original location table.
+    Builds dim_location table from ingested location table.
 
     Args:
-        param1: addresses, dataframe
+        dataframe: The ingested location table
 
-    Returns: dim_location, dataframe
+    Returns: The remodeled dim_location table
 
     Input columns:
         [address_id, address_line_1, address_line_2, district, 
@@ -148,13 +148,13 @@ def build_dim_location(dataframe):
     dim_location = df.drop(columns=['created_at', 'last_updated'])
     return dim_location.rename(columns={'address_id':'location_id'})
 
-def build_dim_date(start_date, end_date):
+def build_dim_date(start_date: str, end_date: str) -> pd.DataFrame:
     """
-    Generates and populates a dataframe with a range of dates from start_date to end_date.
+    Generates and populates a pandas dataframe with an inclusive range of dates from start_date to end_date.
 
     Args:
-        param1: start date, string, "yyyy/mm/dd", inclusive
-        param2: end date, string, "yyyy/mm/dd", inclusive
+        start_date: First date to be generated, "yyyy/mm/dd"
+        end_date: Last date to be generated, "yyyy/mm/dd"
     Returns: dim_date, dataframe
     
     Output columns:
@@ -184,15 +184,15 @@ def build_dim_date(start_date, end_date):
     df= pd.DataFrame(data=d).reset_index(drop=True)
     return df
     
-def build_dim_counterparty(original_dataframe, address_dataframe):
+def build_dim_counterparty(original_dataframe: pd.DataFrame, address_dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Builds dim_counterparty table from original counterparty and address tables.
+    Builds dim_counterparty table from ingested counterparty and address tables.
     
     Args:
-        param1: counterparty, dataframe
-        param2: address, dataframe
-    
-    Returns: dim_counterparty, dataframe
+        original_dataframe: The ingested counterparty table
+        address_dataframe: The ingested address table
+        
+    Returns: dim_counterparty, The remodeled dim_counterparty table
     
     Input columns:
         [counterparty_id, counterparty_legal_name, legal_address_id,
