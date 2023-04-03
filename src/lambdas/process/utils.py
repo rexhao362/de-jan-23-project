@@ -9,16 +9,16 @@ from os import makedirs
 
 # import pyarrow
 
-def write_file_to_local(filepath, table, filename):
+def write_file_to_local(filepath: str, table: pd.DataFrame, filename: str) -> None:
     """
     Write parquet from pandas dataframe.
 
     Args:
-        param1: filepath, string
-        param2: table, pd dataframe
-        param3: filename, string
-
-    Returns: none
+        filepath: Filepath to the local processing bucket
+        table: Pandas dataframe containing the table to be processed
+        filename: filename for the output file at <filepath>/<filename>
+        
+    Returns: None
     """
     parquet_binary = table.to_parquet()
     if not exists(filepath):
@@ -26,14 +26,19 @@ def write_file_to_local(filepath, table, filename):
     with open(join(filepath, filename), "wb") as outfile:
         outfile.write(parquet_binary)
 
-def load_file_from_local(filepath):
+def load_file_from_local(filepath: str) -> dict[int, dict[list, list]]:
     """
-    Load JSON from local path.
+    Load json data representing a table from local .json file.
 
     Args:
-        param1: filepath, string
+        filepath: Complete filepath to the .json to be read
 
-    Returns: data, dict
+    Returns:
+        Dictionary object containing status and table
+            ['status']: status code (int)
+            ['table']: table (dict)
+                ['headers']: headers (list)
+                ['data']: data (list)
     """
     file_wrapper = {
         "status": 404,
@@ -52,15 +57,17 @@ def load_file_from_local(filepath):
         file_wrapper['table'] = []
     return file_wrapper
 
-def load_file_from_s3(bucket, key):
+def load_file_from_s3(bucket: str, key: str) -> dict:
     """
     Loads JSON from S3.
 
     Args:
-        param1: bucket name, string
-        param2: object key, string
+        bucket: Bucket name
+        key: Object key
 
-    Returns: JSON, dict
+    Returns: Response as a dictionary
+        ['status']: status code (int)
+        ['table']: parsed JSON (dict)
     
     Raises:
         KeyError: Raises an exception.
@@ -81,15 +88,15 @@ def load_file_from_s3(bucket, key):
         logging.error('Could not get file from bucket')
     return file_wrapper
         
-def process(table):
+def process(table: dict) -> pd.DataFrame:
     """
     Converts dictionary into a pandas DataFrame.
 
     Args:
-        param1: table, dict
+        table: Dictionary representing a table from the ingestion bucket
 
-    Returns: table, pd data frame
-
+    Returns: Table as a dataframe
+    
     Raises: 
         KeyError: Raises an exception.
     """
@@ -99,41 +106,51 @@ def process(table):
         raise(e)
     return df
 
-def print_csv(dataframe, filepath):
+def print_csv(dataframe: pd.DataFrame, filepath: str) -> None:
     """
     Writes given dataframe to .csv
 
     Args:
-        param1: table, dataframe
-        param2: filepath, string
+        dataframe: Dataframe to be written
+        filepath: Filepath to the output file
+        
+    Returns:
+        None
     """
     dataframe.to_csv(filepath)
 
-def timestamp_to_date(table, column):
+def timestamp_to_date(table:pd.DataFrame, column: str) -> pd.DataFrame:
     """
-    Converts given column of timecode to datetime object, trunkating to YYYY/MM/DD
+    Converts given column of timecode to datetime object, truncating to YYYY/MM/DD
 
     Args
-        param1: table, dataframe 
-        param2: column key, string
+        table: Dataframe containign a timecode column
+        column: Column key for the timecode column
 
-    Returns: table, dataframe
+    Returns:
+        Dataframe of one column with datetime objects
     """
     table[column] = pd.to_datetime(table[column])
     table[column] = table[column].dt.date
     return table
 
-def write_to_bucket(bucket_name, table, key):
+def write_to_bucket(bucket_name: str, table: pd.DataFrame, key: str) -> dict:
     """
-    Posts given object to given s3 bucket.
+    Converts pandas dataframe to parquet and puts the parquet in the specified S3 bucket.
 
     Args:
-        param1: bucket, string
-        param2: table, dataframe
-        param3: key, string
+        bucket_name: Processing bucket name for the output parquet file
+        table: Table to be converted and put into S3
+        key: Key for the output table in the S3 bucket
 
-    Returns: {"status" : int, "response" : dict}
+    Returns:
+        A dictionary with a status code and response
+            ['status']: Status code (int)
+            ['response']: Response from AWS (dict)
     }
+    
+    Raises:
+        Exception: If could not put table into bucket
     """
     response_object = {
         "status": 404,
@@ -151,21 +168,23 @@ def write_to_bucket(bucket_name, table, key):
             response_object["response"] = response
 
     except Exception as e:
-        logging.error("Could not load table into bucket")
+        logging.error("Could not put table into bucket")
         raise e
     
     return response_object
 
-def get_last_updated(bucket_name, local=False):
+def get_last_updated(bucket_name: str, local: bool = False) -> tuple[str, str]:
     """
-    Gets and processes the datetime held within s3://date/last_updated.json
+    Gets the datetime held within s3://date/last_updated.json and returns the date and time
     
     Args:
-        param1: bucket_name, string
+        bucket_name: Name of the ingestion bucket
+        local: local, optional, defaults to false
 
     Returns:
-        date, string, [0]
-        time, string, [1]
+        A tuple containing a date and time
+            [0]: date (str)
+            [1]: time (str)
     """
 
     try:
@@ -177,7 +196,32 @@ def get_last_updated(bucket_name, local=False):
         return (None, None)
 
 #TODO enter default json structure if file not found, so dataframe compehension can proceed
-def get_all_jsons(bucket_name, date, time, local=False):
+def get_all_jsons(bucket_name: str, date: str, time: str, local: bool = False) -> dict:
+    """
+    Unfinished or unstable, do not use.
+    
+    Gets all the most recent JSONs from the ingestion bucket according to the last_updated.json.
+
+    Args:
+        bucket_name: name of the bucket
+        date: date string
+        time: time string
+        local (optional): If true, use local buckets, if false, use S3. Defaults to False.
+
+    Returns:
+        Dictionary of tables
+            ['address']: The address table (dict)
+            ['counterparty']: The counterparty table (dict)
+            ['currency']: The currency table (dict)
+            ['department']: The department table (dict)
+            ['design']: The design table (dict)
+            ['payment']: The payment table (dict)
+            ['payment_type']: The payment_type table (dict)
+            ['purchase_order']: The purchase_order table (dict)
+            ['sales_order']: The sales_order table (dict)
+            ['staff']: The staff table (dict)
+            ['transaction']: The transaction table (dict)
+    """
     files = ['address', 'counterparty', 'currency', 'department', 'design', 'payment', 'payment_type', 'purchase_order', 'sales_order', 'staff', 'transaction']
     date, time = get_last_updated(bucket_name, local=local)
     json_files = {}
@@ -192,14 +236,18 @@ def get_all_jsons(bucket_name, date, time, local=False):
     
     return json_files
 
-def bucket_cleanup(bucket_name):
+def bucket_cleanup(bucket_name) -> dict[int, str]:
     """
-    Removes contents of bucket, for use before and after process execution.
+    Removes contents of S3 bucket, for use before and after process execution.
+    
     Args:
-        param1: bucket name, string
+        bucket_name: Name of the bucket to clean up
+        
     Returns:
-        Some sort of response object
-"""
+        Dictionary containing a status code and response
+            ['status']: status code (int)
+            ['response']: AWS response (str)
+    """
     response_object = {
         "status": 404,
         "response": None,
