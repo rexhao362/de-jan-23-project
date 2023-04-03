@@ -9,6 +9,7 @@ from src.lambdas.ingestion.utils.dates import select_last_updated
 from src.lambdas.ingestion.utils.dates import retrieve_last_updated
 from src.lambdas.ingestion.utils.dates import store_last_updated
 from src.utils.environ import is_dev_environ
+from src.utils.path import join
 import logging
 
 
@@ -30,6 +31,8 @@ def data_ingestion(path=None):
     Raises:
         Error: Raises an exception.
     """
+    if is_dev_environ():
+        join(path, 'ingested')
 
     timestamp = retrieve_last_updated()
     date_time = select_last_updated(timestamp)
@@ -43,7 +46,7 @@ def data_ingestion(path=None):
         table_data = get_table_data(table_name, timestamp)
         table_dict = make_table_dict(table_name, table_data)
 
-        upload_to_s3(table_dict, date_key)
+        upload_to_s3(table_dict, date_key, path)
 
     store_last_updated(date_time, date_key, path)
 
@@ -54,7 +57,7 @@ def lambda_handler(context, event):
 
 
 if __name__ == "__main__":
-    test_path = './local/aws/s3/ingested'
+    test_path = './local/aws/s3/'
     try:
         data_ingestion(path=test_path)
 
