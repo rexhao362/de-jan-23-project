@@ -1,3 +1,7 @@
+# to allow running tests without PYTHONPATH
+import sys
+sys.path.append('./')
+
 from os import environ
 import json
 from unittest.mock import patch
