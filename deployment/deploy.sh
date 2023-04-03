@@ -17,7 +17,7 @@ echo "created"
 echo -n "Creating deployment package .. "
 cd alt_src/load/
 find ./ -type d -name '__pycache__' -exec rm -rf {} +
-zip ../../deployment/zip/processed_data_loader.zip -r ./*
+zip ../../deployment/terraform/zip/processed_data_loader.zip -r ./*
 cd ../../
 echo "created"
 
