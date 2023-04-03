@@ -1,8 +1,10 @@
 # to allow running flattened lambdas locally
+import sys
+
 if __name__ == "__main__":
-    import sys
     sys.path.append('./src')
-    # sys.path.append('./src/load/')
+else:
+    sys.path.append('./src/load')
 
 from os import remove
 import logging
