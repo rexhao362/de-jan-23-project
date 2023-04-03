@@ -105,7 +105,7 @@ def get_sql_data_type(data_type_name):
             scale = int(scale)
 
         not_null = m.group(6) != None
-        return SQLDataTypeNUMERIC(precision, scale)
+        return SQLDataTypeNUMERIC(not_null, precision, scale)
 
     msg = f'unsupported/invalid SQL data type "{data_type_name}"'
     raise ValueError(msg)
