@@ -1,9 +1,14 @@
+# to allow running flattened lambdas locally
+import sys
+sys.path.append('./src/load')
+
+
 import logging
 from src.utils.environ import is_production_environ
 import src.utils.path as path
 from src.lambdas.ingestion.ingestion import data_ingestion
 from src.lambdas.process.process import main_local
-from src.lambdas.load.processed_data_loader import processed_data_loader
+from src.load.processed_data_loader import processed_data_loader
 
 logger = logging.getLogger('DE_Q2_MAIN') # change it in your lambda!
 logger.setLevel(logging.INFO)
@@ -34,5 +39,5 @@ except BaseException as exc:
     exit(1)
 
 finally:
-    processed_data_loader.cleanup()
+    #processed_data_loader.cleanup()
     logger.info('completed')

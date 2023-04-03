@@ -1,7 +1,11 @@
+# to allow running flattened lambdas locally
+import sys
+sys.path.append('./')
+
 from os import environ
 from unittest.mock import patch
 import pytest
-from src.utils.environ import \
+from src.load.gutils.environ import \
     dev_environ_variable, \
     dev_environ_variable_value, \
     set_dev_environ, \

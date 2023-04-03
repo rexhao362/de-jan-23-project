@@ -107,11 +107,7 @@ processed_data_loader = _ProcessedDataLoader()
 
 # lambda
 def load_processed_data(event, context):
-    # s3_data_path = "s3://data" if is_production_environ() else "./local/aws/s3"
-    # processed_bucket_name = "processed"
-    # processed_bucket_path = path.join(s3_data_path, processed_bucket_name)
     processed_bucket_path = get_bucket_path("./local/aws/s3", "processed")
-    #logger.info( f'processed_bucket_path={processed_bucket_path}' )
 
     try:
         processed_data_loader.run(processed_bucket_path)
