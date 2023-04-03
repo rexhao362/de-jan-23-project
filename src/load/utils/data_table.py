@@ -26,9 +26,9 @@ class DataTable:
         self.table = None
 
     def has_data(self):
-        return self.source != None and \
-            self.table != None and \
-            self.table.num_rows
+        return self.source is not None and \
+            self.table is not None and \
+            self.table.num_rows > 0
 
     def from_pyarrow(self, table):
         return self.__from_source(table, DataFromPyArrowTable() )

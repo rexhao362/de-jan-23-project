@@ -1,10 +1,10 @@
 # to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./')
+sys.path.append('./src/load')
 
 import pytest
 import pyarrow as pa
-from src.load.utils.sql_data_types import \
+from utils.sql_data_types import \
     get_sql_data_type, \
     SQLDataTypeINT, \
     SQLDataTypeVARCHAR, \

@@ -1,14 +1,13 @@
 # to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./')
-# to allow for flattened lambda file structure
-sys.path.append('./src/load/')
+sys.path.append('./src/')
+sys.path.append('./src/load')
 
 import pytest
 import pyarrow as pa
-from src.load.utils.data_table_source import \
+from utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from src.load.utils.data_table import DataTable
+from utils.data_table import DataTable
 
 @pytest.fixture
 def test_path():
@@ -82,7 +81,6 @@ def test_constructs_empty_data_table_when_passed_name_and_schema(empty_test_data
     except Exception as exc:
         assert False, exc
 
-@pytest.mark.xfail
 def test_loads_data_from_pyarrow_table(empty_test_data_table, test_table):
     dt = empty_test_data_table.from_pyarrow(test_table)
     assert isinstance(dt.source, DataFromPyArrowTable), '"source" property should be of type DataFromPyArrowTable'
@@ -91,7 +89,6 @@ def test_loads_data_from_pyarrow_table(empty_test_data_table, test_table):
     assert dt.has_data() is True, "method has_data() should return True"
 
 # TODO: use mock
-@pytest.mark.xfail
 def test_loads_data_from_parquet_file(empty_test_data_table, test_path):
     dt = empty_test_data_table.from_parquet(test_path)
     source = dt.source
