@@ -1,4 +1,4 @@
-# to allow running flattened lambdas locally
+# to allow running tests without PYTHONPATH
 import sys
 sys.path.append('./')
 
