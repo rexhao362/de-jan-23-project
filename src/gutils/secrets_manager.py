@@ -17,10 +17,15 @@ if db_config:
 """
 
 from os import environ
+import logging
+import traceback
 import boto3
 from botocore.exceptions import ClientError
 import json
 from gutils.environ import is_production_environ
+
+logger = logging.getLogger("DE_Q2_LOAD")
+logger.setLevel(logging.INFO)
 
 # DB config descriptions
 project_secrets = {
@@ -155,7 +160,6 @@ class _SecretsManager:
             if is_production_environ():
                 config_json = _SecretsManager.get_secret_value( database_config_decription["name"] )
                 config = json.loads(config_json)
-                credentials = config["credentials"]
                 values = config["credentials"]
                 values["schema"] = config["schema"]
             else:
@@ -175,7 +179,7 @@ class _SecretsManager:
                 "schema": values["schema"]
             }
         except BaseException as exc:
-            msg = ''.join( traceback.format_tb(exc.__traceback__, traceback_depth_limit) ) + str(exc)
+            msg = ''.join( traceback.format_tb(exc.__traceback__) ) + str(exc)
             logger.warning(msg)
         return None
     

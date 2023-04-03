@@ -158,6 +158,7 @@ def test_get_secret_int_value_raises_exception_on_non_string_secret_name(mock_en
 
 # no database description provided
 def test_get_secret_database_config_returns_none_on_none_in_dev(mock_dev_environ):
+    assert is_dev_environ()
     assert secrets_manager.get_secret_database_config() is None
 
 mock_database_config_env_variables = {
@@ -246,21 +247,21 @@ def mock_incomplete_database_config_description():
     }
 
 @pytest.fixture
-def mock_incomplete_database_config(mock_environ_with_database_config_variables):
+def mock_incomplete_database_config(mock_dev_environ_with_incomplete_database_config_env_variables):
     return {
         "credentials": {
             "password": environ["DB_PASSWORD"],
             "host": environ["DB_HOST"],
             "port": int( environ["DB_PORT"] ),
-            "database": environ["DB_DATABASE"],
         },
         "schema": environ["DB_DATABASE_SCHEMA"]
     }
 
 
-def _test_get_secret_database_config_returns_none_on_incomplete_config_variables_in_dev(
+def test_get_secret_database_config_returns_none_on_incomplete_config_variables_in_dev(
     mock_dev_environ_with_incomplete_database_config_env_variables
     ):
+    assert is_dev_environ()
     assert secrets_manager.get_secret_database_config(mock_dev_environ_with_incomplete_database_config_env_variables) is None
 
 
@@ -269,14 +270,15 @@ def _test_get_secret_database_config_returns_none_on_incomplete_config_variables
 
 # no database description provided
 def test_get_secret_database_config_returns_none_on_none_in_production(mock_production_environ):
+    assert is_production_environ()
     assert secrets_manager.get_secret_database_config() is None
 
 # existing config name
 @mock_secretsmanager
-def _test_get_secret_database_config_returns_existing_database_config_in_production_environ(
-    mock_production_environ, mock_aws_secrets_manager,
-    mock_database_config_description, mock_database_config
-    ):
+def test_get_secret_database_config_returns_existing_database_config_in_production_environ(
+     mock_aws_secrets_manager,
+    mock_database_config_description, mock_database_config, mock_production_environ
+    ):  # order is important here!
     assert is_production_environ()
     # arrange
     secret_name = mock_database_config_description["name"]
@@ -288,36 +290,39 @@ def _test_get_secret_database_config_returns_existing_database_config_in_product
     restored_database_config = secrets_manager.get_secret_database_config(mock_database_config_description)
     # assert
     assert restored_database_config == mock_database_config
-    print( f'mock_database_config={mock_database_config}')
-    print( f'restored_database_config={restored_database_config}')
 
 # unknown name
 @mock_secretsmanager
-def _test_get_secret_database_config_returns_none_on_unknown_database_config_name_in_production(mock_production_environ, mock_database_config_description):
+def test_get_secret_database_config_returns_none_on_unknown_database_config_name_in_production(
+    mock_production_environ, mock_database_config_description
+    ):
+    assert is_production_environ()
     assert secrets_manager.get_secret_database_config(mock_database_config_description) is None
 
 @mock_secretsmanager
-def _test_get_secret_database_config_returns_none_on_incomplete_database_config_in_production(
-    mock_production_environ, mock_database_config, mock_incomplete_database_config_description
+def test_get_secret_database_config_returns_none_on_incomplete_database_config_in_production(
+    mock_incomplete_database_config, mock_incomplete_database_config_description,
+    mock_aws_secrets_manager, mock_production_environ
     ):
+    assert is_production_environ()
     # arrange
-    secret_value =json.dumps(mock_database_config)
-    secret_name = mock_database_config_description["name"]
+    secret_value =json.dumps(mock_incomplete_database_config)
+    secret_name = mock_incomplete_database_config_description["name"]
     response = mock_aws_secrets_manager.create_secret(Name=secret_name, SecretString=secret_value)
     assert response["ResponseMetadata"]["HTTPStatusCode"] == 200, "mock error"
     
     # act
     restored_database_config = secrets_manager.get_secret_database_config(mock_database_config_description)
     # assert
-    assert secrets_manager.get_secret_database_config(mock_production_environ_with_incomplete_database_config_variables) is None
+    assert restored_database_config is None
 
 
 ## --- get_secret_totesys_db_config
 @pytest.mark.parametrize( "mock_environ", [mock_dev_environ, mock_production_environ] )
-def _test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
+def test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
     assert secrets_manager.get_secret_totesys_db_config() == secrets_manager.get_secret_database_config( project_secrets["totesys_database_config"] )
 
 ## --- get_secret_warehouse_db_config
 @pytest.mark.parametrize( "mock_environ", [mock_dev_environ, mock_production_environ] )
-def _test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
+def test_get_secret_totesys_db_config_returns_the_same_as_get_secret_database_config(mock_environ):
     assert secrets_manager.get_secret_warehouse_db_config() == secrets_manager.get_secret_database_config( project_secrets["warehouse_database_config"] )
