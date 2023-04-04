@@ -1,5 +1,5 @@
 import pyarrow.parquet as pq
-import src.utils.path as path
+import src.gutils.path as path
 from src.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
 from src.load.utils.sql_data_types import get_sql_data_type

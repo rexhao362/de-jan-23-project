@@ -8,8 +8,8 @@ from src.ingestion.dates import create_date_key
 from src.ingestion.dates import select_last_updated
 from src.ingestion.dates import retrieve_last_updated
 from src.ingestion.dates import store_last_updated
-from src.utils.environ import is_dev_environ
-from src.utils.path import join
+from src.gutils.environ import is_dev_environ
+from src.gutils.path import join
 import logging
 
 

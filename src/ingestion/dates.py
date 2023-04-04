@@ -7,7 +7,7 @@ from src.ingestion.utils import get_ingested_bucket_name
 from src.ingestion.utils import get_table_names
 from src.ingestion.environ import con
 from src.ingestion.environ import is_production_environ
-from src.utils.environ import is_dev_environ
+from src.gutils.environ import is_dev_environ
 
 
 def retrieve_last_updated():

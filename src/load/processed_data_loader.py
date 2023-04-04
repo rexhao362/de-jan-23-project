@@ -1,8 +1,8 @@
 from os import remove
 import logging
 from pg8000.native import Connection
-from src.utils.secrets_manager import secrets_manager
-from src.utils.environ import is_production_environ
+from src.gutils.secrets_manager import secrets_manager
+from src.gutils.environ import is_production_environ
 from src.load.db_schema import mvp_database_schema as default_database_schema
 
 logger = logging.getLogger("DE_Q2_LOAD")
@@ -106,8 +106,8 @@ processed_data_loader = _ProcessedDataLoader()
 
 def lambda_handler(event, context):
     import logging
-    from src.utils.environ import is_production_environ
-    import src.utils.path as path
+    from src.gutils.environ import is_production_environ
+    import src.gutils.path as path
     from src.load.processed_data_loader import processed_data_loader
 
     logger = logging.getLogger('DE_Q2_LOAD')

@@ -1,6 +1,6 @@
 import logging
-from src.utils.environ import is_production_environ
-import src.utils.path as path
+from src.gutils.environ import is_production_environ
+import src.gutils.path as path
 from src.ingestion.ingestion import data_ingestion
 from src.process.process import main_local
 from src.load.processed_data_loader import processed_data_loader

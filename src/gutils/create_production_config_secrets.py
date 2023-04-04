@@ -1,6 +1,6 @@
 import json
-from src.utils.environ import set_dev_environ, unset_dev_environ
-from src.utils.secrets_manager import secrets_manager 
+from src.gutils.environ import set_dev_environ, unset_dev_environ
+from src.gutils.secrets_manager import secrets_manager 
 
 totesys_database_config_name = "TOTESYS_DB_CONFIG"
 warehouse_database_config_name = "WAREHOUSE_DB_CONFIG"

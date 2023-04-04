@@ -6,8 +6,8 @@ from datetime import timedelta
 from decimal import Decimal
 from src.ingestion.environ import schema
 from src.ingestion.environ import con
-from src.utils.environ import is_dev_environ
-from src.utils.environ import is_production_environ
+from src.gutils.environ import is_dev_environ
+from src.gutils.environ import is_production_environ
 
 
 def get_table_names():

@@ -1,4 +1,4 @@
-from src.utils.environ import is_production_environ
+from src.gutils.environ import is_production_environ
 
 if not is_production_environ():
     from os import path

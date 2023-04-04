@@ -14,7 +14,7 @@ from src.process.build import (build_dim_counterparty,
                                        build_dim_location,
                                        build_dim_staff,
                                        build_fact_sales_order)
-from src.utils.environ import is_dev_environ
+from src.gutils.environ import is_dev_environ
 dev_environ_variable = "DE_Q2_DEV"
 dev_environ_variable_value = "local"
 
