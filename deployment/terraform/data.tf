@@ -18,8 +18,9 @@ data "aws_region" "current" {}
 
 data "archive_file" "load_lambda" {
   type        = "zip"
-  source_dir  = "${path.module}/../../src/load"
-  output_path = "${path.module}/zip/load.zip"
+  source_file = "${path.module}/../../src/load/lambda_function.py"
+  # source_file = "${path.module}/../../src/load/${local.load_module_name}.py"
+  output_path = "${path.module}/zip/${local.load_package_name}"
 }
 
 

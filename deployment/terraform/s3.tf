@@ -27,6 +27,6 @@ resource "aws_s3_bucket" "processed_bucket" {
 
 resource "aws_s3_object" "load_lambda" {
   bucket = aws_s3_bucket.code_bucket.bucket
-  key    = "load.zip"
-  source = "${path.module}/zip/load.zip"
+  key    = local.load_package_name
+  source = "${path.module}/zip/${local.load_package_name}"
 }
