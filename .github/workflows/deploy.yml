@@ -57,16 +57,16 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2.0.3
       - name: Terraform Init
-        run: terraform init && terraform plan
+        run: terraform init
         working-directory: deployment/terraform
       - name: Terraform Plan
         id: plan
         run: terraform plan
-        working-directory: ./terraform
+        working-directory: deployment/terraform
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
-        working-directory: ./terraform
+        working-directory: deployment/terraform
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        working-directory: ./terraform
+        working-directory: deployment/terraform
