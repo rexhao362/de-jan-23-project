@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from ingestion.utils import get_table_data
 from datetime import datetime
 import re

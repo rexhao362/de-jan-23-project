@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import json
 from ingestion.dates import retrieve_last_updated
 from ingestion.dates import store_last_updated
