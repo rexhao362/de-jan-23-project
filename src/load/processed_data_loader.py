@@ -4,6 +4,7 @@ import sys
 if __name__ == "__main__":
     sys.path.append('./src')
 else:
+    sys.path.append('./')
     sys.path.append('./src/load')
 
 from os import remove
