@@ -185,10 +185,9 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     try:
         for key, table in input_tables.items():
             if table['required']:
-                table['dataframe'] = load_file_from_local(
-                    join(INGESTION_BUCKET_NAME, table['filename'])) if local \
-                    else load_file_from_s3(INGESTION_BUCKET_NAME,
-                                           table['filename'])
+                load_file = load_file_from_local if local else load_file_from_s3
+                table['dataframe'] = load_file(
+                    join(INGESTION_BUCKET_NAME, table['filename']))
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't load tables.")
@@ -223,12 +222,10 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     try:
         for table in output_tables:
             output_path = f"{table['prefix']}{table['table_name']}.parquet"
-            write_file_to_local(PROCESSING_BUCKET_NAME,
+            write_file = write_file_to_local if local else write_to_bucket
+            write_file(PROCESSING_BUCKET_NAME,
                                 table['dataframe'],
-                                output_path) if local \
-                else write_to_bucket(PROCESSING_BUCKET_NAME,
-                                     table['dataframe'],
-                                     output_path)
+                                output_path)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:
