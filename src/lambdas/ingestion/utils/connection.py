@@ -4,6 +4,7 @@ import pg8000.native
 
 if os.path.exists('./src/'):
     sys.path.append('./src')
+    
 from utils.secrets_manager import secrets_manager as sm
 
 

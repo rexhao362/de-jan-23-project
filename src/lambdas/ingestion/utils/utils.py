@@ -9,11 +9,10 @@ from decimal import Decimal
 
 if os.path.exists('./src/'):
     sys.path.append('./src/lambdas/ingestion')
+    sys.path.append('./src')
+
 from utils.connection import schema
 from utils.connection import con
-
-if os.path.exists('./src/'):
-    sys.path.append('./src')
 from utils.environ import is_dev_environ
 from utils.environ import is_production_environ
 

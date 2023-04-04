@@ -20,8 +20,8 @@ processed_bucket_name = "processed"
 processed_bucket_path = path.join(s3_data_path, processed_bucket_name)
 
 try:
-    # data_ingestion(s3_data_path)
-    # main_local(path=s3_data_path)
+    data_ingestion(path=s3_data_path)
+    main_local(path=s3_data_path)
     processed_data_loader.run(processed_bucket_path)
 
 except BaseException as exc:

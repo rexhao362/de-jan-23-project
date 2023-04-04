@@ -4,6 +4,8 @@ import logging
 
 if os.path.exists('./src/'):
     sys.path.append('./src/lambdas/ingestion')
+    sys.path.append('./src')
+
 from utils.utils import get_table_data
 from utils.utils import make_table_dict
 from utils.utils import upload_to_s3
@@ -13,9 +15,6 @@ from utils.dates import create_date_key
 from utils.dates import select_last_updated
 from utils.dates import retrieve_last_updated
 from utils.dates import store_last_updated
-
-if os.path.exists('./src/'):
-    sys.path.append('./src/')
 from utils.environ import is_dev_environ
 from utils.path import join
 
