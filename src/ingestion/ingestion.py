@@ -1,25 +1,22 @@
 import os
 import logging
 import sys
-
-if os.path.exists('./src'):
-    sys.path.append('./src/ingestion')
-    sys.path.append('./src')
-
-from utils import get_table_data
-from utils import make_table_dict
-from utils import upload_to_s3
-from utils import get_table_names
-from dates import create_date_string
-from dates import create_date_key
-from dates import select_last_updated
-from dates import retrieve_last_updated
-from dates import store_last_updated
-from gutils.environ import is_dev_environ
-from gutils.path import join
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from utils import get_table_data  # noqa: E402
+from utils import make_table_dict  # noqa: E402
+from utils import upload_to_s3  # noqa: E402
+from utils import get_table_names  # noqa: E402
+from dates import create_date_string  # noqa: E402
+from dates import create_date_key  # noqa: E402
+from dates import select_last_updated  # noqa: E402
+from dates import retrieve_last_updated  # noqa: E402
+from dates import store_last_updated  # noqa: E402
+from gutils.environ import is_dev_environ  # noqa: E402
+from gutils.path import join  # noqa: E402
 
 
-def data_ingestion(context=None, event=None, path=None):
+def data_ingestion(path=None):
     """
     Uses the get_table_names() and the get_table_data() functions
     to retrieve data for each table. Formats datetime objects into
@@ -57,6 +54,10 @@ def data_ingestion(context=None, event=None, path=None):
         upload_to_s3(table_dict, date_key, path)
 
     store_last_updated(date_time, date_now, path)
+
+
+def lambda_handler(context, event):
+    data_ingestion()
 
 
 if __name__ == "__main__":

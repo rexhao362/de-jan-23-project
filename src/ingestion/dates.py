@@ -4,16 +4,13 @@ import json
 import logging
 from datetime import datetime
 import sys
-
-if os.path.exists('./src'):
-    sys.path.append('./src/ingestion')
-    sys.path.append('./src')
-
-from utils import get_ingested_bucket_name
-from utils import get_table_names
-from connection import con
-from gutils.environ import is_production_environ
-from gutils.environ import is_dev_environ
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from utils import get_ingested_bucket_name  # noqa: E402
+from utils import get_table_names  # noqa: E402
+from connection import con  # noqa: E402
+from gutils.environ import is_production_environ  # noqa: E402
+from gutils.environ import is_dev_environ  # noqa: E402
 
 
 def retrieve_last_updated(path=None):

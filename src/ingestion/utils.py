@@ -4,17 +4,13 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-import os
 import sys
-
-if os.path.exists('./src'):
-    sys.path.append('./src/ingestion')
-    sys.path.append('./src')
-
-from connection import schema
-from connection import con
-from gutils.environ import is_dev_environ
-from gutils.environ import is_production_environ
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from connection import schema  # noqa: E402
+from connection import con  # noqa: E402
+from gutils.environ import is_dev_environ  # noqa: E402
+from gutils.environ import is_production_environ  # noqa: E402
 
 
 def get_table_names():

@@ -1,4 +1,4 @@
-from ingestion.utils import get_table_data
+from src.ingestion.utils import get_table_data
 from datetime import datetime
 import re
 from decimal import Decimal
@@ -84,7 +84,7 @@ def test_get_table_data_extracts_list_table_data_payment():
         assert type(result[i][6]) == int
         assert type(result[i][7]) == int
         assert type(result[i][8]) == bool
-        assert type(result[i][9]) == str and re.match('^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])', result[i][9]) != None
+        assert type(result[i][9]) == str and re.match('\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])', result[i][9]) != None
         assert type(result[i][10]) == int
         assert type(result[i][11]) == int
 

@@ -1,23 +1,15 @@
 import pg8000.native
-import os
 import sys
-
-if os.path.exists('./src'):
-    sys.path.append('./src/ingestion')
-    sys.path.append('./src')
-
-from gutils.secrets_manager import secrets_manager as sm
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from gutils.secrets_manager import secrets_manager as sm  # noqa: E402
 
 
 totesys_db = sm.get_secret_totesys_db_config()
 
 # DB connection
 con = pg8000.native.Connection(
-    user=totesys_db['credentials']['user'],
-    host=totesys_db['credentials']['host'],
-    database=totesys_db['credentials']['database'],
-    port=totesys_db['credentials']['port'],
-    password=totesys_db['credentials']['password']
+    **totesys_db['credentials']
 )
 
 schema = totesys_db['schema']
