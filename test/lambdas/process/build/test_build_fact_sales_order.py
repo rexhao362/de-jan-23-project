@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from process.utils import load_file_from_local, process
 from process.build import build_fact_sales_order
 from pandas import DataFrame
