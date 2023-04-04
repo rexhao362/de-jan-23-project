@@ -1,4 +1,7 @@
-from src.ingestion.dates import create_date_string
+import sys
+sys.path.append('./src/')
+from ingestion.dates import create_date_string
+
 from freezegun import freeze_time
 
 @freeze_time('20-10-2021 14:10:01')

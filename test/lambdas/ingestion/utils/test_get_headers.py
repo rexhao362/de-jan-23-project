@@ -1,4 +1,6 @@
-from src.ingestion.utils import get_table_data
+import sys
+sys.path.append('./src/')
+from ingestion.utils import get_table_data
 from datetime import datetime
 import pytest
 

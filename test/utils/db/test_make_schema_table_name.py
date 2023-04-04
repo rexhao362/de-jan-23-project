@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import pytest
 from gutils.db.make_schema_table_name import make_schema_table_name
 

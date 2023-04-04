@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from datetime import datetime
 from src.ingestion.ingestion import data_ingestion
 from src.ingestion.dates import select_last_updated

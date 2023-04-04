@@ -1,11 +1,13 @@
-
-#TODO - Could do with more tests, or move this into test_utils.py and keep it short?
+import sys
+sys.path.append('./src/')
 import boto3
 from moto import mock_s3
 from pandas import read_parquet
 import pytest
 import os
 import boto3
+
+#TODO - Could do with more tests, or move this into test_utils.py and keep it short?
 
 dataframe1 = read_parquet('test/lambdas/process/parquets/dim_currency.parquet')
 dataframe2 = read_parquet('test/lambdas/process/parquets/dim_currency_formatted.parquet')

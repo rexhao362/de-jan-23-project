@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import os
 import pytest
 from src.ingestion.dates import retrieve_last_updated
