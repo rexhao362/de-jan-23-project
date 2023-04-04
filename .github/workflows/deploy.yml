@@ -55,7 +55,7 @@ jobs:
           - name: Install Loading Requirements
             run: pip install -r src/load/requirements.txt --target src/load
           - name: Install Terraform
-            uses: harshicorp/setup-terraform@v2
+            uses: harshicorp/setup-terraform@v2.0.3
           - name: Terraform Init
             run: terraform init
             working-directory: ./terraform
