@@ -3,9 +3,15 @@ import boto3
 import json
 import logging
 from datetime import datetime
-from ingestion.utils import get_ingested_bucket_name
-from ingestion.utils import get_table_names
-from ingestion.connection import con
+import sys
+
+if os.path.exists('./src'):
+    sys.path.append('./src/ingestion')
+    sys.path.append('./src')
+
+from utils import get_ingested_bucket_name
+from utils import get_table_names
+from connection import con
 from gutils.environ import is_production_environ
 from gutils.environ import is_dev_environ
 

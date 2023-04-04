@@ -4,8 +4,15 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-from ingestion.connection import schema
-from ingestion.connection import con
+import os
+import sys
+
+if os.path.exists('./src'):
+    sys.path.append('./src/ingestion')
+    sys.path.append('./src')
+
+from connection import schema
+from connection import con
 from gutils.environ import is_dev_environ
 from gutils.environ import is_production_environ
 

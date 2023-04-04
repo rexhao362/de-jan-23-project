@@ -1,4 +1,11 @@
 import pg8000.native
+import os
+import sys
+
+if os.path.exists('./src'):
+    sys.path.append('./src/ingestion')
+    sys.path.append('./src')
+
 from gutils.secrets_manager import secrets_manager as sm
 
 
