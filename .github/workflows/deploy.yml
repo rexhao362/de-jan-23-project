@@ -56,6 +56,8 @@ jobs:
         run: pip install -r src/load/requirements.txt --target src/load
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2.0.3
+      - name: Terraform Reconfigure
+        run: terraform init -reconfigure
       - name: Terraform Init
         run: terraform init
         working-directory: deployment/terraform
@@ -65,7 +67,7 @@ jobs:
         working-directory: ./terraform
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
-        run: terraform init -reconfigure
+        run: exit 1
         working-directory: ./terraform
       - name: Terraform Apply
         run: terraform apply -auto-approve
