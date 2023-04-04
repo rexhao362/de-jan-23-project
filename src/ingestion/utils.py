@@ -4,10 +4,10 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-from src.ingestion.environ import schema
-from src.ingestion.environ import con
-from src.gutils.environ import is_dev_environ
-from src.gutils.environ import is_production_environ
+from ingestion.environ import schema
+from ingestion.environ import con
+from gutils.environ import is_dev_environ
+from gutils.environ import is_production_environ
 
 
 def get_table_names():

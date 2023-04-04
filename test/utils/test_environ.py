@@ -1,7 +1,7 @@
 from os import environ
 from unittest.mock import patch
 import pytest
-from src.gutils.environ import \
+from gutils.environ import \
     dev_environ_variable, \
     dev_environ_variable_value, \
     set_dev_environ, \

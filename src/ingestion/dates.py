@@ -3,11 +3,11 @@ import boto3
 import json
 import logging
 from datetime import datetime
-from src.ingestion.utils import get_ingested_bucket_name
-from src.ingestion.utils import get_table_names
-from src.ingestion.environ import con
-from src.ingestion.environ import is_production_environ
-from src.gutils.environ import is_dev_environ
+from ingestion.utils import get_ingested_bucket_name
+from ingestion.utils import get_table_names
+from ingestion.environ import con
+from ingestion.environ import is_production_environ
+from gutils.environ import is_dev_environ
 
 
 def retrieve_last_updated():

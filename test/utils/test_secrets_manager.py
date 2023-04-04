@@ -5,12 +5,12 @@ import pytest
 import boto3
 from moto import mock_secretsmanager
 from botocore.exceptions import ClientError
-from src.gutils.environ import \
+from gutils.environ import \
     set_dev_environ, \
     is_dev_environ, \
     is_production_environ
 
-from src.gutils.secrets_manager import secrets_manager, project_secrets
+from gutils.secrets_manager import secrets_manager, project_secrets
 
 @pytest.fixture
 def mock_dev_environ():

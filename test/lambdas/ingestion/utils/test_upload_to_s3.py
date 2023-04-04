@@ -1,6 +1,6 @@
 from datetime import datetime
-from src.ingestion.ingestion import data_ingestion
-from src.ingestion.dates import select_last_updated
+from ingestion.ingestion import data_ingestion
+from ingestion.dates import select_last_updated
 from moto import mock_s3
 import boto3
 import pytest

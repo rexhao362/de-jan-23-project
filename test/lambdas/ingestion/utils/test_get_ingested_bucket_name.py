@@ -1,4 +1,4 @@
-from src.ingestion.utils import get_ingested_bucket_name
+from ingestion.utils import get_ingested_bucket_name
 import pytest
 from moto import mock_s3
 import boto3

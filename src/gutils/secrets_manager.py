@@ -1,6 +1,6 @@
 """
 usage:
-from src.gutils.secrets_manager import secrets_manager
+from gutils.secrets_manager import secrets_manager
 
 user = secrets_manager.get_secret_value("WAREHOUSE_DB_USER")
 if user:
@@ -20,7 +20,7 @@ from os import environ
 import boto3
 from botocore.exceptions import ClientError
 import json
-from src.gutils.environ import is_production_environ
+from gutils.environ import is_production_environ
 
 project_secrets = {
         "totesys_database_config": {
