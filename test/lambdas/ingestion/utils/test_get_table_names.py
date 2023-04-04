@@ -1,4 +1,4 @@
-from src.lambdas.ingestion.utils.utils import get_table_names
+from ingestion.utils import get_table_names
 
 def test_get_table_names_queries_database_for_table_names():
     result = get_table_names()

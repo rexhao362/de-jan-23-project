@@ -3,7 +3,7 @@ import os
 import logging
 
 if os.path.exists('./src/'):
-    sys.path.append('./src/lambdas/ingestion')
+    sys.path.append('./src/ingestion')
     sys.path.append('./src')
 
 from utils.utils import get_table_data
@@ -15,8 +15,8 @@ from utils.dates import create_date_key
 from utils.dates import select_last_updated
 from utils.dates import retrieve_last_updated
 from utils.dates import store_last_updated
-from utils.environ import is_dev_environ
-from utils.path import join
+from gutils.environ import is_dev_environ
+from gutils.path import join
 
 
 def data_ingestion(context=None, event=None, path=None):

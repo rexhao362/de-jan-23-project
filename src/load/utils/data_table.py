@@ -1,8 +1,8 @@
 import pyarrow.parquet as pq
-import src.utils.path as path
-from src.lambdas.load.utils.data_table_source import \
+import gutils.path as path
+from load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from src.lambdas.load.utils.sql_data_types import get_sql_data_type
+from load.utils.sql_data_types import get_sql_data_type
 
 default_parquet_extension = "parquet"
 

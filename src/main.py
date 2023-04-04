@@ -1,9 +1,9 @@
 import logging
-from src.utils.environ import is_production_environ
-import src.utils.path as path
-from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.process.process import main_local
-from src.lambdas.load.processed_data_loader import processed_data_loader
+from gutils.environ import is_production_environ
+import gutils.path as path
+from ingestion.ingestion import data_ingestion
+from process.process import main_local
+from load.processed_data_loader import processed_data_loader
 
 logger = logging.getLogger('DE_Q2_MAIN') # change it in your lambda!
 logger.setLevel(logging.INFO)
