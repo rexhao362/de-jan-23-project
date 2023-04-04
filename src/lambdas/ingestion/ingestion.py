@@ -32,11 +32,12 @@ def data_ingestion(path=None):
         Error: Raises an exception.
     """
     if is_dev_environ():
-        join(path, 'ingested')
+        path = join(path, 'ingestion')
 
-    timestamp = retrieve_last_updated()
+    timestamp = retrieve_last_updated(path)
     date_time = select_last_updated(timestamp)
-    date_key = create_date_key(create_date_string())
+    date_now = create_date_string()
+    date_key = create_date_key(date_now)
 
     if is_dev_environ():
         os.makedirs(f'{path}/{date_key}', exist_ok=True)
@@ -48,7 +49,7 @@ def data_ingestion(path=None):
 
         upload_to_s3(table_dict, date_key, path)
 
-    store_last_updated(date_time, date_key, path)
+    store_last_updated(date_time, date_now, path)
 
 
 def lambda_handler(context, event):
