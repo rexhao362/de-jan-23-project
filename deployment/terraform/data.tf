@@ -18,8 +18,8 @@ data "aws_region" "current" {}
 
 data "archive_file" "load_lambda" {
   type        = "zip"
-  source_dir  = "${path.module}/../.../src/load"
-  output_path = "${path.module}/zip/load.zip"
+  source_dir  = "src/load"
+  output_path = "deployment/terraform/zip/load.zip"
 }
 
 
