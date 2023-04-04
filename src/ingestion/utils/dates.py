@@ -7,12 +7,10 @@ from datetime import datetime
 
 if os.path.exists('./src/'):
     sys.path.append('./src/lambdas/ingestion')
+    sys.path.append('./src/')
 from utils.utils import get_ingested_bucket_name
 from utils.utils import get_table_names
 from utils.connection import con
-
-if os.path.exists('./src/'):
-    sys.path.append('./src/')
 from utils.environ import is_production_environ
 from utils.environ import is_dev_environ
 
