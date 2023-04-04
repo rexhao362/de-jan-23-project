@@ -1,13 +1,13 @@
 import os
-from src.ingestion.utils.utils import get_table_data
-from src.ingestion.utils.utils import make_table_dict
-from src.ingestion.utils.utils import upload_to_s3
-from src.ingestion.utils.utils import get_table_names
-from src.ingestion.utils.dates import create_date_string
-from src.ingestion.utils.dates import create_date_key
-from src.ingestion.utils.dates import select_last_updated
-from src.ingestion.utils.dates import retrieve_last_updated
-from src.ingestion.utils.dates import store_last_updated
+from src.ingestion.utils import get_table_data
+from src.ingestion.utils import make_table_dict
+from src.ingestion.utils import upload_to_s3
+from src.ingestion.utils import get_table_names
+from src.ingestion.dates import create_date_string
+from src.ingestion.dates import create_date_key
+from src.ingestion.dates import select_last_updated
+from src.ingestion.dates import retrieve_last_updated
+from src.ingestion.dates import store_last_updated
 from src.utils.environ import is_dev_environ
 from src.utils.path import join
 import logging

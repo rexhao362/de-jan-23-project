@@ -1,7 +1,7 @@
 import json
-from src.ingestion.utils.dates import retrieve_last_updated
-from src.ingestion.utils.dates import store_last_updated
-from src.ingestion.utils.utils import get_ingested_bucket_name
+from src.ingestion.dates import retrieve_last_updated
+from src.ingestion.dates import store_last_updated
+from src.ingestion.utils import get_ingested_bucket_name
 from moto import mock_s3
 import boto3
 from datetime import datetime
