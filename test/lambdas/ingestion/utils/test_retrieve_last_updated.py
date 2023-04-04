@@ -1,5 +1,5 @@
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.dates import retrieve_last_updated
+from ingestion.utils import get_ingested_bucket_name
+from ingestion.dates import retrieve_last_updated
 import pytest
 from moto import mock_s3
 import boto3

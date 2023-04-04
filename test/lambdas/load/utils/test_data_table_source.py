@@ -1,4 +1,4 @@
-from src.lambdas.load.utils.data_table_source import \
+from load.utils.data_table_source import \
     BaseTableDataSource, DataFromPyArrowTable, DataFromParquetFile
 
 def test_creates_uninitialized_object_when_passed_no_arguments():

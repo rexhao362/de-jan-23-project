@@ -1,15 +1,15 @@
 import os
-from src.lambdas.ingestion.utils.utils import get_table_data
-from src.lambdas.ingestion.utils.utils import make_table_dict
-from src.lambdas.ingestion.utils.utils import upload_to_s3
-from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.dates import create_date_string
-from src.lambdas.ingestion.utils.dates import create_date_key
-from src.lambdas.ingestion.utils.dates import select_last_updated
-from src.lambdas.ingestion.utils.dates import retrieve_last_updated
-from src.lambdas.ingestion.utils.dates import store_last_updated
-from src.utils.environ import is_dev_environ
-from src.utils.path import join
+from ingestion.utils import get_table_data
+from ingestion.utils import make_table_dict
+from ingestion.utils import upload_to_s3
+from ingestion.utils import get_table_names
+from ingestion.dates import create_date_string
+from ingestion.dates import create_date_key
+from ingestion.dates import select_last_updated
+from ingestion.dates import retrieve_last_updated
+from ingestion.dates import store_last_updated
+from gutils.environ import is_dev_environ
+from gutils.path import join
 import logging
 
 
