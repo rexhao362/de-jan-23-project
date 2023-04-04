@@ -1,19 +1,26 @@
+import sys
 import os
-from src.lambdas.ingestion.utils.utils import get_table_data
-from src.lambdas.ingestion.utils.utils import make_table_dict
-from src.lambdas.ingestion.utils.utils import upload_to_s3
-from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.dates import create_date_string
-from src.lambdas.ingestion.utils.dates import create_date_key
-from src.lambdas.ingestion.utils.dates import select_last_updated
-from src.lambdas.ingestion.utils.dates import retrieve_last_updated
-from src.lambdas.ingestion.utils.dates import store_last_updated
-from src.utils.environ import is_dev_environ
-from src.utils.path import join
 import logging
 
+if os.path.exists('./src/'):
+    sys.path.append('./src/lambdas/ingestion')
+from utils.utils import get_table_data
+from utils.utils import make_table_dict
+from utils.utils import upload_to_s3
+from utils.utils import get_table_names
+from utils.dates import create_date_string
+from utils.dates import create_date_key
+from utils.dates import select_last_updated
+from utils.dates import retrieve_last_updated
+from utils.dates import store_last_updated
 
-def data_ingestion(path=None):
+if os.path.exists('./src/'):
+    sys.path.append('./src/')
+from utils.environ import is_dev_environ
+from utils.path import join
+
+
+def data_ingestion(context=None, event=None, path=None):
     """
     Uses the get_table_names() and the get_table_data() functions
     to retrieve data for each table. Formats datetime objects into

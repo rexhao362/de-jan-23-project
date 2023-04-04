@@ -1,5 +1,10 @@
+import sys
+import os
 import pg8000.native
-from src.utils.secrets_manager import secrets_manager as sm
+
+if os.path.exists('./src/'):
+    sys.path.append('./src')
+from utils.secrets_manager import secrets_manager as sm
 
 
 totesys_db = sm.get_secret_totesys_db_config()
