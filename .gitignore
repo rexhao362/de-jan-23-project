@@ -43,3 +43,9 @@ terraform/.terraform/
 terraform/.terraform.lock.hcl
 
 function_zips/*
+
+.terraform.lock.hcl
+terraform.tfstate
+.terraform/
+
+*.zip

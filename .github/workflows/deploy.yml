@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - 10
+      - 123
 
 jobs:
     run-tests:
@@ -44,11 +44,21 @@ jobs:
                 aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
                 aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
                 aws-region: ${{secrets.AWS_REGION}}
+          - name: Use Python
+            uses: actions/setup-python@v4
+            with:
+                python-version: "3.9"
+          # - name: Install Ingestion Requirements
+          #   run: pip install -r src/ingestion/requirements.txt --target src/ingestion
+          # - name: Install Processing Requirements
+          #   run: pip install -r src/process/requirements.txt --target src/process
+          - name: Install Loading Requirements
+            run: pip install -r src/load/requirements.txt --target src/load
           - name: Install Terraform
-            uses: harshicorp/setup-terraform@v2
+            uses: hashicorp/setup-terraform@v2.0.3
           - name: Terraform Init
             run: terraform init
-            working-directory: ./terraform
+            working-directory: ./deployment/terraform
           - name: Terraform Plan
             id: plan
             run: terraform plan
@@ -61,6 +71,8 @@ jobs:
             run: terraform apply -auto-approve
             working-directory: ./terraform
             
+
+
 
 
 
