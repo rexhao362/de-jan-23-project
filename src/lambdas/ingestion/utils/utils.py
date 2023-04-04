@@ -139,7 +139,7 @@ def get_ingested_bucket_name():
         logging.error(e, 'Bucket name was not extracted')
 
 
-def upload_to_s3(table_dict, date_key):
+def upload_to_s3(table_dict, date_key, path):
     """
     Uploads files made during data_ingestion() function to the
     necessary s3 bucket with the current date
@@ -172,7 +172,7 @@ def upload_to_s3(table_dict, date_key):
             )
 
         if is_dev_environ():
-            with open(f'./local/aws/s3/ingested/{key}', 'w') as f:
+            with open(f'{path}/{key}', 'w') as f:
                 f.write(table_json)
 
     except Exception as e:
