@@ -37,6 +37,7 @@ def data_ingestion(context=None, event=None, path=None):
     Raises:
         Error: Raises an exception.
     """
+
     if is_dev_environ():
         path = join(path, 'ingestion')
 
@@ -56,11 +57,6 @@ def data_ingestion(context=None, event=None, path=None):
         upload_to_s3(table_dict, date_key, path)
 
     store_last_updated(date_time, date_now, path)
-
-
-def lambda_handler(context, event):
-    data_ingestion()
-    return None
 
 
 if __name__ == "__main__":

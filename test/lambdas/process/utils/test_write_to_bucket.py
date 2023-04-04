@@ -52,12 +52,13 @@ def test_returns_status_code_200_with_successful_write(s3):
     assert obj_key_1 in objects['Contents'][0]['Key']
     assert upload['status'] == 200
     
-def test_returns_status_code_404_with_unsuccessful_write(s3):
+def test_returns_status_code_404_with_unsuccessful_write_and_raises_exception(s3):
     from src.lambdas.process.utils import (write_to_bucket)
     obj_key_1 = 'test/test_1'
-    upload = write_to_bucket(bucket_name + "_", dataframe1, obj_key_1)
-    assert upload['status'] == 404
-    assert upload['response'] == None
+    with pytest.raises(Exception):
+        upload = write_to_bucket(bucket_name + "_", dataframe1, obj_key_1)
+        assert upload['status'] == 404
+        assert upload['response'] == None
 
 
 def test_key_is_maintained_in_bucket(s3):

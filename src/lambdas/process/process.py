@@ -1,9 +1,20 @@
 from os.path import join
 import logging
-from src.lambdas.process.utils import *
-from src.lambdas.process.build import *
-from os import environ
-from src.utils.environ import *
+from src.lambdas.process.utils import (write_to_bucket,
+                                       write_file_to_local,
+                                       load_file_from_local,
+                                       load_file_from_s3,
+                                       get_last_updated,
+                                       process,
+                                       bucket_cleanup)
+from src.lambdas.process.build import (build_dim_counterparty,
+                                       build_dim_currency,
+                                       build_dim_date,
+                                       build_dim_design,
+                                       build_dim_location,
+                                       build_dim_staff,
+                                       build_fact_sales_order)
+from src.utils.environ import is_dev_environ
 dev_environ_variable = "DE_Q2_DEV"
 dev_environ_variable_value = "local"
 
@@ -129,13 +140,18 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     processed bucket in parquet format.
 
     Args:
-        path: Filepath to the directory containing the local buckets if applicable.
-        force_local: Overrides environmental variables to perform processing using local buckets.
-        force_s3: Overrides environmental variables to perform processing on AWS, overrides force_local.
+        path: Filepath to the directory containing
+        the local buckets if applicable.
+        force_local: Overrides environmental variables
+        to perform processing using local buckets.
+        force_s3: Overrides environmental variables to
+        perform processing on AWS, overrides force_local.
         ingestion_bucket_name:  name of the aws ingestion bucket.
         processing_bucket_name: name of the aws processing bucket.
-        ingestion_directory_name: name of the local ingestion directory at <path>/<ingestion_directory_name>.
-        processing_directory_name: name of the local processing directory at <path>/<ingestion_directory_name>.
+        ingestion_directory_name: name of the local ingestion
+        directory at <path>/<ingestion_directory_name>.
+        processing_directory_name: name of the local processing
+        directory at <path>/<ingestion_directory_name>.
 
     Returns:
         None
@@ -151,7 +167,9 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
         path, processing_directory_name)
 
-    # TODO cleanup_bucket before execution, then we can just raise exceptions and halt execution instead of checking with success boolean
+    # TODO cleanup_bucket before execution, then
+    # we can just raise exceptions and halt execution
+    # instead of checking with success boolean
     bucket_cleanup(PROCESSING_BUCKET_NAME)
 
     date, time = get_last_updated(INGESTION_BUCKET_NAME, local=local)
@@ -167,9 +185,9 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     try:
         for key, table in input_tables.items():
             if table['required']:
-                table['dataframe'] = load_file_from_local(
-                    join(INGESTION_BUCKET_NAME, table['filename'])) if local \
-                    else load_file_from_s3(INGESTION_BUCKET_NAME, table['filename'])
+                load_file = load_file_from_local if local else load_file_from_s3
+                table['dataframe'] = load_file(
+                    join(INGESTION_BUCKET_NAME, table['filename']))
     except Exception as e:
         # Do something with the exception, log it to Cloudwatch
         logging.error("Couldn't load tables.")
@@ -203,14 +221,16 @@ def main(path: str = '', force_local: bool = False, force_s3: bool = False,
     # If all is well, try writing remodeled dataframes to bucket, god willing
     try:
         for table in output_tables:
-            table_output_path = f"{table['prefix']}{table['table_name']}.parquet"
-            write_file_to_local(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path) if local \
-                else write_to_bucket(PROCESSING_BUCKET_NAME, table['dataframe'], table_output_path)
+            output_path = f"{table['prefix']}{table['table_name']}.parquet"
+            write_file = write_file_to_local if local else write_to_bucket
+            write_file(PROCESSING_BUCKET_NAME,
+                                table['dataframe'],
+                                output_path)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:
-        # Do something with the exception, tell Cloudwatch, and clean up the bucket
-        # remove contents of bucket
+        # Do something with the exception, tell Cloudwatch,
+        # and clean up the bucket
         logging.error("Couldn't write tables to bucket.")
         raise Exception(e)
 
@@ -220,7 +240,8 @@ if __name__ == "__main__":
 
 
 def main_local(**kwargs) -> None:
-    """Compatibility wrapper for main, calls main forcing local and passes all kwargs.
+    """Compatibility wrapper for main,
+    calls main forcing local and passes all kwargs.
 
     Args:
         **kwargs: Key word arguments for main function.

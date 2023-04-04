@@ -205,7 +205,7 @@ def store_last_updated(date_string, date_key, path=None):
                 Key='date/date.json'
             )
             s3.put_object(
-                Body=date_json,
+                Body=update_json,
                 Bucket=bucket_name,
                 Key='date/last_updated.json'
             )
