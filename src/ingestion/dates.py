@@ -5,12 +5,12 @@ import logging
 from datetime import datetime
 from ingestion.utils import get_ingested_bucket_name
 from ingestion.utils import get_table_names
-from ingestion.environ import con
-from ingestion.environ import is_production_environ
+from ingestion.connection import con
+from gutils.environ import is_production_environ
 from gutils.environ import is_dev_environ
 
 
-def retrieve_last_updated():
+def retrieve_last_updated(path=None):
     """
     Retrieves the last updated date from the s3 bucket.
     If the file does not exist then uses a default date.
@@ -45,11 +45,11 @@ def retrieve_last_updated():
             return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
 
         else:
-            path = './local/aws/s3/ingested/date/date.json'
-            if not os.path.exists(path):
+            date_file = f'{path}/date/date.json'
+            if not os.path.exists(date_file):
                 return None
             else:
-                with open(path, 'rb') as f:
+                with open(date_file, 'rb') as f:
                     timestamp = json.loads(f.read())['last_updated']
                     return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
 

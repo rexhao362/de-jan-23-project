@@ -1,20 +1,14 @@
-import sys
 import os
 import logging
-
-if os.path.exists('./src/'):
-    sys.path.append('./src/ingestion')
-    sys.path.append('./src')
-
-from utils.utils import get_table_data
-from utils.utils import make_table_dict
-from utils.utils import upload_to_s3
-from utils.utils import get_table_names
-from utils.dates import create_date_string
-from utils.dates import create_date_key
-from utils.dates import select_last_updated
-from utils.dates import retrieve_last_updated
-from utils.dates import store_last_updated
+from ingestion.utils import get_table_data
+from ingestion.utils import make_table_dict
+from ingestion.utils import upload_to_s3
+from ingestion.utils import get_table_names
+from ingestion.dates import create_date_string
+from ingestion.dates import create_date_key
+from ingestion.dates import select_last_updated
+from ingestion.dates import retrieve_last_updated
+from ingestion.dates import store_last_updated
 from gutils.environ import is_dev_environ
 from gutils.path import join
 
