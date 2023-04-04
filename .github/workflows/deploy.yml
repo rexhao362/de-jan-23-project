@@ -44,6 +44,16 @@ jobs:
                 aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
                 aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
                 aws-region: ${{secrets.AWS_REGION}}
+          - name: Use Python
+            uses: actions/setup-python@v4
+            with:
+                python-version: "3.9"
+          # - name: Install Ingestion Requirements
+          #   run: pip install -r src/ingestion/requirements.txt --target src/ingestion
+          # - name: Install Processing Requirements
+          #   run: pip install -r src/process/requirements.txt --target src/process
+          - name: Install Loading Requirements
+            run: pip install -r src/load/requirements.txt --target src/load
           - name: Install Terraform
             uses: harshicorp/setup-terraform@v2
           - name: Terraform Init
@@ -60,6 +70,8 @@ jobs:
           - name: Terraform Apply
             run: terraform apply -auto-approve
             working-directory: ./terraform
+            
+
             
 
 
