@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from load.data_loader import DataLoader
 from load.db_schema import db_schema
 from load.utils.data_table import DataTable

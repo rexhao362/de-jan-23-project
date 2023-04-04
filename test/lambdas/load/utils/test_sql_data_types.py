@@ -1,4 +1,5 @@
-import pytest
+import sys
+sys.path.append('./src/')
 import pyarrow as pa
 
 from load.utils.sql_data_types import \
