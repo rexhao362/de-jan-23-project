@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import boto3
 from moto import mock_s3
 import pytest

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from decimal import Decimal
 from ingestion.ingestion import data_ingestion
 from ingestion.utils import get_table_names

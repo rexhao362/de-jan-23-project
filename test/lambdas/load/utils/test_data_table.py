@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import pytest
 import pyarrow as pa
 from load.utils.data_table_source import \

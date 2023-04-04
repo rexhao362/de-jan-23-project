@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 from load.utils.data_table_source import \
     BaseTableDataSource, DataFromPyArrowTable, DataFromParquetFile
 
