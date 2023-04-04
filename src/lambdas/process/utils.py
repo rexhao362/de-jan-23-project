@@ -256,13 +256,8 @@ def get_all_jsons(bucket_name: str, date: str,
     json_files = {}
     for file in files:
         try:
-            if not local:
-                json_files[file] = load_file_from_s3(
-                    bucket_name, f'{date}/{time}/{file}.json')['table']
-            else:
-                json_files[file] = load_file_from_local(
-                    bucket_name, f'{date}/{time}/{file}.json')['table']
-
+            load_file = load_file_from_local if local else load_file_from_s3
+            json_files[file] = load_file(bucket_name, f'{date}/{time}/{file}.json')['table']
         except Exception:
             json_files[file] = {
                 'table_name': file, 'headers': None, 'data': None}
