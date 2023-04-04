@@ -1,7 +1,7 @@
 import pytest
 import pyarrow as pa
 
-from src.lambdas.load.utils.sql_data_types import \
+from src..load.utils.sql_data_types import \
     get_sql_data_type, \
     SQLDataTypeINT, \
     SQLDataTypeVARCHAR, \

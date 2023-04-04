@@ -1,13 +1,13 @@
 from os.path import join
 import logging
-from src.lambdas.process.utils import (write_to_bucket,
+from src.process.utils import (write_to_bucket,
                                        write_file_to_local,
                                        load_file_from_local,
                                        load_file_from_s3,
                                        get_last_updated,
                                        process,
                                        bucket_cleanup)
-from src.lambdas.process.build import (build_dim_counterparty,
+from src.process.build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
                                        build_dim_design,

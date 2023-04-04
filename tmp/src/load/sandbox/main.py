@@ -5,8 +5,8 @@ import pyarrow.parquet as pq
 import pandas
 from pg8000.native import Connection
 
-from src.lambdas.load.format_dim_currency_data import format_dim_currency_data
-from src.lambdas.load.populate_dim_currency import populate_dim_currency
+from src..load.format_dim_currency_data import format_dim_currency_data
+from src..load.populate_dim_currency import populate_dim_currency
 
 # setup credentials fron env variables
 # based on https://github.com/tlocke/pg8000#use-environment-variables-as-connection-defaults

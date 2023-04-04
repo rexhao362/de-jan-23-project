@@ -30,7 +30,7 @@ def test_create_bucket_with_last_updated(s3):
     assert 'Contents' in objects
 
 def test_upload_all_last_updated_jsons(s3):
-    from src.lambdas.process.utils import get_last_updated
+    from src..process.utils import get_last_updated
     date, time = get_last_updated(bucket_name)
     s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, f'{date}/{time}/address.json')
     s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, f'{date}/{time}/counterparty.json')
@@ -43,14 +43,14 @@ def test_upload_all_last_updated_jsons(s3):
     assert len(objects['Contents']) == 8
 
 def test_get_all_jsons_returns_dict(s3):
-    from src.lambdas.process.utils import get_all_jsons, get_last_updated
+    from src..process.utils import get_all_jsons, get_last_updated
     date, time = get_last_updated(bucket_name)
     jsons = get_all_jsons(bucket_name, date, time)
     assert type(jsons) == dict
 
 
 def test_iteration_with_jsons(s3):
-    from src.lambdas.process.utils import get_all_jsons, get_last_updated
+    from src..process.utils import get_all_jsons, get_last_updated
     date, time = get_last_updated(bucket_name)
     jsons = get_all_jsons(bucket_name, date, time)
     assert len(jsons) == 11

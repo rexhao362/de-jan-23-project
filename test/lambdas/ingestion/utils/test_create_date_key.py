@@ -1,5 +1,5 @@
-from src.lambdas.ingestion.utils.dates import create_date_key
-from src.lambdas.ingestion.utils.dates import create_date_string
+from src..ingestion.utils.dates import create_date_key
+from src..ingestion.utils.dates import create_date_string
 from freezegun import freeze_time
 
 

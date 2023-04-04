@@ -1,8 +1,8 @@
 from decimal import Decimal
-from src.lambdas.ingestion.ingestion import data_ingestion
-from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.utils import get_table_data
+from src..ingestion.ingestion import data_ingestion
+from src..ingestion.utils.utils import get_table_names
+from src..ingestion.utils.utils import get_ingested_bucket_name
+from src..ingestion.utils.utils import get_table_data
 import os.path
 import os
 import json
