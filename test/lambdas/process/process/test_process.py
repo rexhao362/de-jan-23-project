@@ -5,7 +5,7 @@ import os
 import boto3
 import io
 from pandas import read_parquet
-from src..process.process import (main_local, main_s3)
+from src.process.process import (main_local, main_s3)
 from botocore.exceptions import ClientError
 
 

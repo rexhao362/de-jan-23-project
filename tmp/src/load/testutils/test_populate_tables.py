@@ -7,7 +7,7 @@ from src.environ.warehouse_db import warehouse_db_port as port
 from src.environ.warehouse_db import warehouse_db_database as db
 from src.environ.warehouse_db import warehouse_db_schema as db_schema
 
-import src..load.populate_functions as populate_functions
+import src.load.populate_functions as populate_functions
 from src.utils.db.make_schema_table_name import make_schema_table_name
 
 def _test_populate_independent_table(table_name, input_data):

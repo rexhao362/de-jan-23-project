@@ -39,13 +39,13 @@ def test_create_bucket(s3):
 #     assert result["Buckets"][0]["Name"] == bucket_name
 
 def test_write_to_s3_returns_dict(s3):
-    from src..process.utils import (write_to_bucket)
+    from src.process.utils import (write_to_bucket)
     obj_key_1 = 'test/test_1'
     upload = write_to_bucket(bucket_name, dataframe1, obj_key_1)
     assert type(upload) == dict 
 
 def test_returns_status_code_200_with_successful_write(s3):
-    from src..process.utils import (write_to_bucket)
+    from src.process.utils import (write_to_bucket)
     obj_key_1 = 'test/test_1'
     upload = write_to_bucket(bucket_name, dataframe1, obj_key_1)
     objects = s3.list_objects_v2(Bucket=bucket_name)
@@ -53,7 +53,7 @@ def test_returns_status_code_200_with_successful_write(s3):
     assert upload['status'] == 200
     
 def test_returns_status_code_404_with_unsuccessful_write_and_raises_exception(s3):
-    from src..process.utils import (write_to_bucket)
+    from src.process.utils import (write_to_bucket)
     obj_key_1 = 'test/test_1'
     with pytest.raises(Exception):
         upload = write_to_bucket(bucket_name + "_", dataframe1, obj_key_1)
@@ -62,7 +62,7 @@ def test_returns_status_code_404_with_unsuccessful_write_and_raises_exception(s3
 
 
 def test_key_is_maintained_in_bucket(s3):
-    from src..process.utils import (write_to_bucket)
+    from src.process.utils import (write_to_bucket)
     obj_key_1 = 'test/test_1'
     obj_key_2 = 'test/test_2'
     write_to_bucket(bucket_name, dataframe1, obj_key_1)

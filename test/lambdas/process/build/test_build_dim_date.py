@@ -1,5 +1,5 @@
-from src..process.utils import load_file_from_local, process
-from src..process.build import build_dim_date
+from src.process.utils import load_file_from_local, process
+from src.process.build import build_dim_date
 from pandas import DataFrame
 from pandas import testing as pdtesting
 from pandas import to_datetime as to_datetime

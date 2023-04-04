@@ -1,5 +1,5 @@
 import pytest
-from src..load.data_loader import DataLoader
+from src.load.data_loader import DataLoader
 
 @pytest.fixture
 def test_path():

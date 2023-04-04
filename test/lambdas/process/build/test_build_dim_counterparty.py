@@ -1,5 +1,5 @@
-from src..process.utils import load_file_from_local, process
-from src..process.build import build_dim_counterparty
+from src.process.utils import load_file_from_local, process
+from src.process.build import build_dim_counterparty
 from pandas import DataFrame
 from numpy import equal
 import pytest

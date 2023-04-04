@@ -1,4 +1,4 @@
-from src..load.utils.data_table import DataTable
+from src.load.utils.data_table import DataTable
 
 mvp_database_schema = [
     DataTable("dim_staff", {

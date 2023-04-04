@@ -1,8 +1,8 @@
 import pytest
 import pyarrow as pa
-from src..load.utils.data_table_source import \
+from src.load.utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from src..load.utils.data_table import DataTable
+from src.load.utils.data_table import DataTable
 
 @pytest.fixture
 def test_path():

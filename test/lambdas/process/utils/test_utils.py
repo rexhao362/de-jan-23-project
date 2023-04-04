@@ -1,4 +1,4 @@
-from src..process.utils import ( load_file_from_s3, load_file_from_local, process, print_csv)
+from src.process.utils import ( load_file_from_s3, load_file_from_local, process, print_csv)
 from pandas import DataFrame
 import pytest
 import numpy as np

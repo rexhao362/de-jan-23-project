@@ -3,10 +3,10 @@ import boto3
 import json
 import logging
 from datetime import datetime
-from src..ingestion.utils.utils import get_ingested_bucket_name
-from src..ingestion.utils.utils import get_table_names
-from src..ingestion.utils.environ import con
-from src..ingestion.utils.environ import is_production_environ
+from src.ingestion.utils.utils import get_ingested_bucket_name
+from src.ingestion.utils.utils import get_table_names
+from src.ingestion.utils.environ import con
+from src.ingestion.utils.environ import is_production_environ
 from src.utils.environ import is_dev_environ
 
 
