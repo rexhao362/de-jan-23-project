@@ -1,9 +1,0 @@
-Stage 1
-create a simple .py script with import from module, import from package.module that can run when uploaded as lambda via AWS console
-
-Stage 2
-It can be run by EventBridge on shedule
----
-
-Stage 3
-Export 
