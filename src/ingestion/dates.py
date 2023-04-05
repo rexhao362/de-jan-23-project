@@ -3,11 +3,11 @@ import boto3
 import json
 import logging
 from datetime import datetime
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
-from src.lambdas.ingestion.utils.utils import get_table_names
-from src.lambdas.ingestion.utils.environ import con
-from src.lambdas.ingestion.utils.environ import is_production_environ
-from src.utils.environ import is_dev_environ
+from ingestion.utils import get_ingested_bucket_name
+from ingestion.utils import get_table_names
+from ingestion.environ import con
+from ingestion.environ import is_production_environ
+from gutils.environ import is_dev_environ
 
 
 def retrieve_last_updated():
@@ -198,7 +198,7 @@ def store_last_updated(date_string, date_key, path=None):
                 Key='date/date.json'
             )
             s3.put_object(
-                Body=date_json,
+                Body=update_json,
                 Bucket=bucket_name,
                 Key='date/last_updated.json'
             )

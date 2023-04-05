@@ -1,11 +1,13 @@
-
-#TODO - Could do with more tests, or move this into test_utils.py and keep it short?
+import sys
+sys.path.append('./src/')
 import boto3
 from moto import mock_s3
 from pandas import read_parquet
 import pytest
 import os
 import boto3
+
+#TODO - Could do with more tests, or move this into test_utils.py and keep it short?
 
 dataframe1 = read_parquet('test/lambdas/process/parquets/dim_currency.parquet')
 dataframe2 = read_parquet('test/lambdas/process/parquets/dim_currency_formatted.parquet')
@@ -36,7 +38,7 @@ def test_create_bucket_with_last_updated(s3):
     assert 'Contents' in objects
 
 def test_returns_date_and_time_with_successful_get(s3):
-    from src.lambdas.process.utils import get_last_updated
+    from process.utils import get_last_updated
     date, time = get_last_updated(bucket_name)
     assert date == '2020-11-03'
     assert time == '14:20:49'

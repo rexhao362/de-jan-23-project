@@ -1,9 +1,9 @@
 import traceback
 import pyarrow.parquet as pq
 from pg8000.native import Connection
-from src.environ.warehouse_db import env_warehouse_db as env
-import src.lambdas.load.format_functions as format_namespace
-from src.lambdas.load.populate_dim_currency import populate_dim_currency
+from environ.warehouse_db import env_warehouse_db as env
+import load.format_functions as format_namespace
+from load.populate_dim_currency import populate_dim_currency
 
 
 def load_new_data_to_warehouse_db(data_path):

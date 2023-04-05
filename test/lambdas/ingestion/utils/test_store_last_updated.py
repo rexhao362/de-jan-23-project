@@ -1,7 +1,9 @@
+import sys
+sys.path.append('./src/')
 import json
-from src.lambdas.ingestion.utils.dates import retrieve_last_updated
-from src.lambdas.ingestion.utils.dates import store_last_updated
-from src.lambdas.ingestion.utils.utils import get_ingested_bucket_name
+from ingestion.dates import retrieve_last_updated
+from ingestion.dates import store_last_updated
+from ingestion.utils import get_ingested_bucket_name
 from moto import mock_s3
 import boto3
 from datetime import datetime
@@ -50,10 +52,10 @@ def test_store_last_updated_stores_last_updated(bucket, s3_s):
 
 def test_store_last_updated_copies_previous_update(bucket, s3_s):
     test_date = "2000-11-03T14:20:49.962000"
-    store_last_updated(test_date, test_date)
+    store_last_updated(test_date)
 
     dt = "2022-11-03T14:20:49.962000"
-    store_last_updated(dt, dt)
+    store_last_updated(dt)
 
     response = s3_s.list_objects_v2(
         Bucket=get_ingested_bucket_name(),

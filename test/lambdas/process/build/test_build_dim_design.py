@@ -1,5 +1,7 @@
-from src.lambdas.process.utils import load_file_from_local, process
-from src.lambdas.process.build import build_dim_design
+import sys
+sys.path.append('./src/')
+from process.utils import load_file_from_local, process
+from process.build import build_dim_design
 from pandas import DataFrame
 from numpy import equal
 

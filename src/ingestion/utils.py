@@ -4,10 +4,10 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-from src.lambdas.ingestion.utils.environ import schema
-from src.lambdas.ingestion.utils.environ import con
-from src.utils.environ import is_dev_environ
-from src.utils.environ import is_production_environ
+from ingestion.environ import schema
+from ingestion.environ import con
+from gutils.environ import is_dev_environ
+from gutils.environ import is_production_environ
 
 
 def get_table_names():
@@ -139,7 +139,7 @@ def get_ingested_bucket_name():
         logging.error(e, 'Bucket name was not extracted')
 
 
-def upload_to_s3(table_dict, date_key):
+def upload_to_s3(table_dict, date_key, path):
     """
     Uploads files made during data_ingestion() function to the
     necessary s3 bucket with the current date
@@ -172,7 +172,7 @@ def upload_to_s3(table_dict, date_key):
             )
 
         if is_dev_environ():
-            with open(f'./local/aws/s3/ingested/{key}', 'w') as f:
+            with open(f'{path}/{key}', 'w') as f:
                 f.write(table_json)
 
     except Exception as e:

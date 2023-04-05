@@ -1,5 +1,7 @@
-from src.lambdas.ingestion.utils.dates import create_date_key
-from src.lambdas.ingestion.utils.dates import create_date_string
+import sys
+sys.path.append('./src/')
+from ingestion.dates import create_date_key
+from ingestion.dates import create_date_string
 from freezegun import freeze_time
 
 

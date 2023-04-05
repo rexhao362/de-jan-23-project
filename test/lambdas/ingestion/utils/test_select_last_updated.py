@@ -1,6 +1,8 @@
+import sys
+sys.path.append('./src/')
 import os
 import pytest
-from src.lambdas.ingestion.utils.dates import retrieve_last_updated, select_last_updated, store_last_updated
+from ingestion.dates import retrieve_last_updated, select_last_updated, store_last_updated
 from moto import mock_s3
 import boto3
 

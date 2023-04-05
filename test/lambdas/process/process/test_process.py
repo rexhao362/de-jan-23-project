@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./src/')
 import boto3
 from moto import mock_s3
 import pytest
@@ -5,7 +7,7 @@ import os
 import boto3
 import io
 from pandas import read_parquet
-from src.lambdas.process.process import (main_local, main_s3)
+from process.process import (main_local, main_s3)
 from botocore.exceptions import ClientError
 
 

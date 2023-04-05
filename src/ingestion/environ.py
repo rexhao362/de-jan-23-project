@@ -1,8 +1,8 @@
 import json
 import pg8000.native
 from os import environ
-from src.utils.secrets_manager import secrets_manager
-from src.utils.environ import is_production_environ
+from gutils.secrets_manager import secrets_manager
+from gutils.environ import is_production_environ
 
 
 def env_variables():

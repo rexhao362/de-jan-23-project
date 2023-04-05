@@ -1,6 +1,6 @@
 """
 usage:
-from src.utils.secrets_manager import secrets_manager
+from gutils.secrets_manager import secrets_manager
 
 user = secrets_manager.get_secret_value("WAREHOUSE_DB_USER")
 if user:

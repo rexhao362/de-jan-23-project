@@ -1,4 +1,6 @@
-from src.lambdas.process.utils import ( load_file_from_s3, load_file_from_local, process, print_csv)
+import sys
+sys.path.append('./src/')
+from process.utils import ( load_file_from_s3, load_file_from_local, process, print_csv)
 from pandas import DataFrame
 import pytest
 import numpy as np
