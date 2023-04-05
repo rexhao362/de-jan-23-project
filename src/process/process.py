@@ -12,7 +12,8 @@ from utils import (write_to_bucket,
                                        bucket_cleanup,
                                        get_ingested_bucket_name,
                                        get_processed_bucket_name,
-                                       write_done_to_bucket)
+                                       write_done_to_bucket,
+                                       write_done_to_local)
 from build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
