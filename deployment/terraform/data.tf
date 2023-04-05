@@ -12,7 +12,7 @@ data "aws_region" "current" {}
 
 data "archive_file" "process_lambda" {
     type = "zip"
-    source_dir = "${path.module}/../src/process"
+    source_dir = "${path.module}/../../src/process"
     output_path = "${path.module}/zip/${local.process_package_name}"
 }
 
