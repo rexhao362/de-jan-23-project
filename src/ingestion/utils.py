@@ -131,7 +131,7 @@ def get_ingested_bucket_name():
     try:
         s3 = boto3.client('s3')
         list_buckets = s3.list_buckets()
-        bucket_prefix = 's3-de-ingestion-query-queens'
+        bucket_prefix = 'de-01-2023-q2-prj-ingestion-'
         bucket_name = ''
         for bucket in list_buckets['Buckets']:
             if bucket['Name'].startswith(bucket_prefix):

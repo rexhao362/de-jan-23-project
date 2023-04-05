@@ -5,6 +5,58 @@ import logging
 from os.path import (join, exists)
 from os import makedirs
 
+def get_ingested_bucket_name():
+    """
+    Returns name of ingested S3 bucket
+
+    Args:
+        no args
+
+    Returns:
+        The name of the ingested bucket name
+
+    Raises:
+        Error: Raises an exception.
+    """
+    try:
+        s3 = boto3.client('s3')
+        list_buckets = s3.list_buckets()
+        bucket_prefix = 'de-01-2023-q2-prj-ingestion-'
+        bucket_name = ''
+        for bucket in list_buckets['Buckets']:
+            if bucket['Name'].startswith(bucket_prefix):
+                bucket_name = bucket['Name']
+        return bucket_name
+
+    except Exception as e:
+        logging.error(e, 'Bucket name was not extracted')
+        
+        
+def get_processed_bucket_name():
+    """
+    Returns name of ingested S3 bucket
+
+    Args:
+        no args
+
+    Returns:
+        The name of the ingested bucket name
+
+    Raises:
+        Error: Raises an exception.
+    """
+    try:
+        s3 = boto3.client('s3')
+        list_buckets = s3.list_buckets()
+        bucket_prefix = 'de-01-2023-q2-prj-processed-'
+        bucket_name = ''
+        for bucket in list_buckets['Buckets']:
+            if bucket['Name'].startswith(bucket_prefix):
+                bucket_name = bucket['Name']
+        return bucket_name
+
+    except Exception as e:
+        logging.error(e, 'Bucket name was not extracted')
 
 def write_file_to_local(filepath: str,
                         table: pd.DataFrame, filename: str) -> None:

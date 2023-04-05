@@ -9,7 +9,9 @@ from utils import (write_to_bucket,
                                        load_file_from_s3,
                                        get_last_updated,
                                        process,
-                                       bucket_cleanup)
+                                       bucket_cleanup,
+                                       get_ingested_bucket_name,
+                                       get_processed_bucket_name)
 from build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
@@ -133,8 +135,8 @@ output_tables = [
 
 
 def main(event=None, context=None, path: str = '', force_local: bool = False, force_s3: bool = False,
-         ingestion_bucket_name: str = "query-queens-ingestion-bucket",
-         processing_bucket_name: str = "query-queens-processing-bucket",
+         ingestion_bucket_name: str = None,
+         processing_bucket_name: str = None,
          ingestion_directory_name: str = "ingestion",
          processing_directory_name: str = "processed") -> None:
     """
@@ -162,13 +164,20 @@ def main(event=None, context=None, path: str = '', force_local: bool = False, fo
     Raises:
         Exception: If could not load, process, remodel, or write table
     """
+    # figure out if local or not
     local = is_dev_environ() or force_local
     if force_s3:
         local = False
+    
+    # initialize internal variables for bucket names
+    if ((local == False) and not (ingestion_bucket_name and processing_bucket_name)):
+        ingestion_bucket_name = get_ingested_bucket_name
+        processing_bucket_name = get_processed_bucket_name
     INGESTION_BUCKET_NAME = ingestion_bucket_name if not local else join(
         path, ingestion_directory_name)
     PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
         path, processing_directory_name)
+    
 
     # TODO cleanup_bucket before execution, then
     # we can just raise exceptions and halt execution
@@ -257,7 +266,9 @@ def main_local(**kwargs) -> None:
     return main(force_local=True, **kwargs)
 
 
-def main_s3(**kwargs) -> None:
+def main_s3(ingestion_bucket_name: str = "query-queens-ingestion-bucket",
+         processing_bucket_name: str = "query-queens-processing-bucket",
+         **kwargs) -> None:
     """Compatibility wrapper for main, calls main forcing S3 and passes all kwargs.
 
     Args:
