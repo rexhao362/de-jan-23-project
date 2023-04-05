@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-from process.utils import (timestamp_to_date)
+import sys
+sys.path.append('./src/process')
+from utils import (timestamp_to_date)
 import logging
 """
 Functions used to build dimension & fact table dataframes

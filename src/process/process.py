@@ -1,13 +1,16 @@
 from os.path import join
 import logging
-from process.utils import (write_to_bucket,
+import sys
+sys.path.append('./src/process')
+sys.path.append('./src')
+from utils import (write_to_bucket,
                                        write_file_to_local,
                                        load_file_from_local,
                                        load_file_from_s3,
                                        get_last_updated,
                                        process,
                                        bucket_cleanup)
-from process.build import (build_dim_counterparty,
+from build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
                                        build_dim_design,
@@ -129,7 +132,7 @@ output_tables = [
 ]
 
 
-def main(event, context, path: str = '', force_local: bool = False, force_s3: bool = False,
+def main(event=None, context=None, path: str = '', force_local: bool = False, force_s3: bool = False,
          ingestion_bucket_name: str = "query-queens-ingestion-bucket",
          processing_bucket_name: str = "query-queens-processing-bucket",
          ingestion_directory_name: str = "ingestion",
