@@ -171,8 +171,8 @@ def main(event=None, context=None, path: str = '', force_local: bool = False, fo
     
     # initialize internal variables for bucket names
     if ((local == False) and not (ingestion_bucket_name and processing_bucket_name)):
-        ingestion_bucket_name = get_ingested_bucket_name
-        processing_bucket_name = get_processed_bucket_name
+        ingestion_bucket_name = get_ingested_bucket_name()
+        processing_bucket_name = get_processed_bucket_name()
     INGESTION_BUCKET_NAME = ingestion_bucket_name if not local else join(
         path, ingestion_directory_name)
     PROCESSING_BUCKET_NAME = processing_bucket_name if not local else join(
