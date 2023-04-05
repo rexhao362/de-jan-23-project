@@ -129,7 +129,7 @@ output_tables = [
 ]
 
 
-def main(path: str = '', force_local: bool = False, force_s3: bool = False,
+def main(event, context, path: str = '', force_local: bool = False, force_s3: bool = False,
          ingestion_bucket_name: str = "query-queens-ingestion-bucket",
          processing_bucket_name: str = "query-queens-processing-bucket",
          ingestion_directory_name: str = "ingestion",
