@@ -75,6 +75,25 @@ def write_file_to_local(filepath: str,
         makedirs(filepath)
     with open(join(filepath, filename), "wb") as outfile:
         outfile.write(parquet_binary)
+        
+def write_done_to_local(processing_directory: str) -> None:
+    """
+    Write parquet from pandas dataframe.
+
+    Args:
+        filepath: Filepath to the local processing bucket
+        table: Pandas dataframe containing the table to be processed
+        filename: filename for the output file at <filepath>/<filename>
+
+    Returns: None
+    """
+    filepath = join(processing_directory, '/status/')
+    filename = 'done.process'
+    done_binary = b'Done'
+    if not exists(filepath):
+        makedirs(filepath)
+    with open(join(filepath, filename), "wb") as outfile:
+        outfile.write(done_binary)
 
 
 def load_file_from_local(filepath: str) -> dict[int, dict[list, list]]:

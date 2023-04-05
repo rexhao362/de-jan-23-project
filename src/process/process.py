@@ -241,7 +241,8 @@ def main(event=None, context=None, path: str = '', force_local: bool = False, fo
             write_file(PROCESSING_BUCKET_NAME,
                                 table['dataframe'],
                                 output_path)
-        if not local: write_done_to_bucket(PROCESSING_BUCKET_NAME)
+        write_done = write_done_to_local if local else write_done_to_bucket
+        write_done_to_bucket(PROCESSING_BUCKET_NAME)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:
