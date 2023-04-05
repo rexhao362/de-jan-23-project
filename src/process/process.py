@@ -11,7 +11,8 @@ from utils import (write_to_bucket,
                                        process,
                                        bucket_cleanup,
                                        get_ingested_bucket_name,
-                                       get_processed_bucket_name)
+                                       get_processed_bucket_name,
+                                       write_done_to_bucket)
 from build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
@@ -240,6 +241,7 @@ def main(event=None, context=None, path: str = '', force_local: bool = False, fo
             write_file(PROCESSING_BUCKET_NAME,
                                 table['dataframe'],
                                 output_path)
+        if not local: write_done_to_bucket(PROCESSING_BUCKET_NAME)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:

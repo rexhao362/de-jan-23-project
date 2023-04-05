@@ -193,6 +193,31 @@ def timestamp_to_date(table: pd.DataFrame, column: str) -> pd.DataFrame:
     return table
 
 
+def write_done_to_bucket(bucket_name: str) -> dict:
+    response_object = {
+        "status": 404,
+        "response": None,
+    }
+
+    s3 = boto3.client("s3")
+    done_binary = b'Done'
+
+    try:
+        response = s3.put_object(
+            Body=done_binary, Bucket=bucket_name, Key='status/done.process')
+        status = response["ResponseMetadata"]["HTTPStatusCode"]
+        if status == 200:
+            response_object["status"] = status
+            response_object["response"] = response
+
+    except Exception as e:
+        logging.error("Could not put table into bucket")
+        raise e
+    
+    return response_object
+
+
+
 def write_to_bucket(bucket_name: str, table: pd.DataFrame, key: str) -> dict:
     """
     Converts pandas dataframe to parquet and
