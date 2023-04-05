@@ -4,9 +4,9 @@ class DataTable:
 
 import pyarrow.parquet as pq
 import gutils.path as path
-from utils.data_table_source import \
+from lutils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from utils.sql_data_types import get_sql_data_type
+from lutils.sql_data_types import get_sql_data_type
 
 default_parquet_extension = "parquet"
 

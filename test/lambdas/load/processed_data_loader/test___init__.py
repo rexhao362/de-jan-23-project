@@ -2,7 +2,7 @@ import sys
 sys.path.append('./src/')
 from load.data_loader import DataLoader
 from load.db_schema import db_schema
-from load.utils.data_table import DataTable
+from load.lutils.data_table import DataTable
 
 def test_creates_loader_with_default_db_schema():
     dl = DataLoader()

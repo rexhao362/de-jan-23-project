@@ -87,8 +87,8 @@ def write_done_to_local(processing_directory: str) -> None:
 
     Returns: None
     """
-    filepath = join(processing_directory, '/status/')
     filename = 'done.process'
+    filepath = join(processing_directory, 'status/', filename)
     done_binary = b'Done'
     if not exists(filepath):
         makedirs(filepath)

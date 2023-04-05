@@ -3,7 +3,7 @@ import logging
 import sys
 sys.path.append('./src/process')
 sys.path.append('./src')
-from utils import (write_to_bucket,
+from .utils import (write_to_bucket,
                                        write_file_to_local,
                                        load_file_from_local,
                                        load_file_from_s3,
@@ -14,7 +14,7 @@ from utils import (write_to_bucket,
                                        get_processed_bucket_name,
                                        write_done_to_bucket,
                                        write_done_to_local)
-from build import (build_dim_counterparty,
+from .build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
                                        build_dim_design,
@@ -243,13 +243,14 @@ def main(event=None, context=None, path: str = '', force_local: bool = False, fo
                                 table['dataframe'],
                                 output_path)
         write_done = write_done_to_local if local else write_done_to_bucket
-        write_done_to_bucket(PROCESSING_BUCKET_NAME)
+        write_done(PROCESSING_BUCKET_NAME)
         logging.info("All processed tables are written to the bucket.")
 
     except Exception as e:
         # Do something with the exception, tell Cloudwatch,
         # and clean up the bucket
         logging.error("Couldn't write tables to bucket.")
+        print(e)
         raise Exception(e)
 
 

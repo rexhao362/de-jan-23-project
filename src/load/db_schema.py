@@ -1,4 +1,7 @@
-from utils.data_table import DataTable
+import sys
+sys.path.insert(0, './src/process')
+sys.path.append('./src')
+from lutils.data_table import DataTable
 
 mvp_database_schema = [
     DataTable("dim_staff", {
