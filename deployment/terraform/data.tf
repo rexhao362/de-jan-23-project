@@ -10,11 +10,11 @@ data "aws_region" "current" {}
 #     output_path = "${path.module}/../function_zips/ingestion.zip"
 # }
 
-# data "archive_file" "process_lambda" {
-#     type = "zip"
-#     source_dir = "${path.module}/../src/lambdas/process"
-#     output_path = "${path.module}/../function_zips/process.zip"
-# }
+data "archive_file" "process_lambda" {
+    type = "zip"
+    source_dir = "${path.module}/../src/process"
+    output_path = "${path.module}/zip/${local.process_package_name}"
+}
 
 data "archive_file" "load_lambda" {
   type        = "zip"
