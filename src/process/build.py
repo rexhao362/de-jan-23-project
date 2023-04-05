@@ -3,7 +3,7 @@ import numpy as np
 import sys
 sys.path.append('./src/process')
 sys.path.append('./src')
-from .utils import (timestamp_to_date)
+from putils import (timestamp_to_date)
 import logging
 """
 Functions used to build dimension & fact table dataframes

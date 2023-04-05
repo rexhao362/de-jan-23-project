@@ -3,7 +3,7 @@ import logging
 import sys
 sys.path.append('./src/process')
 sys.path.append('./src')
-from .utils import (write_to_bucket,
+from putils import (write_to_bucket,
                                        write_file_to_local,
                                        load_file_from_local,
                                        load_file_from_s3,
@@ -14,7 +14,7 @@ from .utils import (write_to_bucket,
                                        get_processed_bucket_name,
                                        write_done_to_bucket,
                                        write_done_to_local)
-from .build import (build_dim_counterparty,
+from build import (build_dim_counterparty,
                                        build_dim_currency,
                                        build_dim_date,
                                        build_dim_design,

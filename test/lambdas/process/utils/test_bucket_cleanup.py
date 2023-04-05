@@ -29,7 +29,7 @@ def s3(aws_credentials):
 #         s3.create_bucket(Bucket=bucket_name)
 
 def test_returns_dict(s3):
-    from process.utils import bucket_cleanup
+    from process.putils import bucket_cleanup
     # s3.create_bucket(Bucket=bucket_name)
     # s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, 'address.json')
     # s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, 'counterparty.json')
@@ -43,7 +43,7 @@ def test_returns_dict(s3):
     assert type(result) == dict
 
 def test_returns_200_status_code_when_successful(s3):
-    from process.utils import bucket_cleanup
+    from process.putils import bucket_cleanup
     s3.create_bucket(Bucket=bucket_name)
     s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, 'address.json')
     s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, 'counterparty.json')
@@ -51,7 +51,7 @@ def test_returns_200_status_code_when_successful(s3):
     assert result['status'] == 200
 
 def test_returns_404_status_code_when_unsuccessful(s3):
-    from process.utils import bucket_cleanup
+    from process.putils import bucket_cleanup
     s3.create_bucket(Bucket=bucket_name)
     s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, 'address.json')
     s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, 'counterparty.json')
@@ -59,7 +59,7 @@ def test_returns_404_status_code_when_unsuccessful(s3):
     assert result['status'] == 404
     
 def test_bucket_is_empty_after_function_execution(s3):
-    from process.utils import bucket_cleanup
+    from process.putils import bucket_cleanup
     s3.create_bucket(Bucket=bucket_name)
     s3.upload_file('test/lambdas/process/json_files/address.json', bucket_name, 'address.json')
     s3.upload_file('test/lambdas/process/json_files/counterparty.json', bucket_name, 'counterparty.json')
