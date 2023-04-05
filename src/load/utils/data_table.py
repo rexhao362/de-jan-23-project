@@ -1,8 +1,12 @@
+class DataTable:
+    def __init__(self, name, schema, *, dont_import=False):
+        pass
+
 import pyarrow.parquet as pq
 import gutils.path as path
-from load.utils.data_table_source import \
+from utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from load.utils.sql_data_types import get_sql_data_type
+from utils.sql_data_types import get_sql_data_type
 
 default_parquet_extension = "parquet"
 
@@ -22,9 +26,9 @@ class DataTable:
         self.table = None
 
     def has_data(self):
-        return self.source != None and \
-            self.table != None and \
-            self.table.num_rows
+        return self.source is not None and \
+            self.table is not None and \
+            self.table.num_rows > 0
 
     def from_pyarrow(self, table):
         return self.__from_source(table, DataFromPyArrowTable() )

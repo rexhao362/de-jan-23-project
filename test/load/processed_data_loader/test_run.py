@@ -1,7 +1,11 @@
+# to allow running tests without PYTHONPATH
 import sys
 sys.path.append('./src/')
+# to allow for flattened lambda file structure
+sys.path.append('./src/load/')
+
 import pytest
-from load.data_loader import DataLoader
+from processed_data_loader import _ProcessedDataLoader
 
 @pytest.fixture
 def test_path():

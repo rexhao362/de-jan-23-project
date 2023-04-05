@@ -1,13 +1,22 @@
+# to allow running flattened lambdas locally
+import sys
+
+if __name__ == "__main__":
+    sys.path.append('./src')
+else:
+    sys.path.append('./')
+    sys.path.append('./src/load')
+
 from os import remove
 import logging
 from pg8000.native import Connection
-from gutils.secrets_manager import secrets_manager
 from gutils.environ import is_production_environ
-from load.db_schema import mvp_database_schema as default_database_schema
+from gutils.path import get_bucket_path
+from gutils.secrets_manager import secrets_manager
+from db_schema import mvp_database_schema as default_database_schema
 
 logger = logging.getLogger("DE_Q2_LOAD")
-if not is_production_environ():
-    logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 
 class _ProcessedDataLoader:
     def __init__(self, db_schema=default_database_schema):
@@ -104,24 +113,10 @@ class _ProcessedDataLoader:
 
 processed_data_loader = _ProcessedDataLoader()
 
-def lambda_handler(event, context):
-    import logging
-    from gutils.environ import is_production_environ
-    import gutils.path as path
-    from load.processed_data_loader import processed_data_loader
 
-    logger = logging.getLogger('DE_Q2_LOAD')
-    logger.setLevel(logging.INFO)
-    if not is_production_environ():
-        # this reroutes all logging to console in dev environment, useful for debugging
-        import sys
-        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-
-    logger.info('started')
-
-    s3_data_path = "s3://data" if is_production_environ() else "./local/aws/s3"
-    processed_bucket_name = "processed"
-    processed_bucket_path = path.join(s3_data_path, processed_bucket_name)
+# lambda
+def load_processed_data(event, context):
+    processed_bucket_path = get_bucket_path("processed", "./local/aws/s3")
 
     try:
         processed_data_loader.run(processed_bucket_path)
@@ -136,5 +131,12 @@ def lambda_handler(event, context):
         exit(1)
 
     finally:
-        processed_data_loader.cleanup()
+        #processed_data_loader.cleanup()
         logger.info('completed')
+
+# standalone execution
+if __name__ == '__main__':
+    import sys
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
+    load_processed_data({}, {})

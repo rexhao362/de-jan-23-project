@@ -1,6 +1,8 @@
+# to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./src/')
-from load.utils.data_table_source import \
+sys.path.append('./src/load')
+
+from utils.data_table_source import \
     BaseTableDataSource, DataFromPyArrowTable, DataFromParquetFile
 
 def test_creates_uninitialized_object_when_passed_no_arguments():

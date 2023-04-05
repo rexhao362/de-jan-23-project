@@ -1,5 +1,7 @@
+# to allow running tests without PYTHONPATH
 import sys
-sys.path.append('./src/')
+sys.path.append('./src')
+
 from os import environ
 from unittest.mock import patch
 import pytest

@@ -1,13 +1,13 @@
 # create buckets
 
 resource "aws_s3_bucket" "code_bucket" {
-    bucket_prefix = "s3-de-code-query-queens-"
+    bucket_prefix = "131-s3-de-code-query-queens-"
 }
 resource "aws_s3_bucket" "ingestion_bucket" {
-    bucket_prefix = "s3-de-ingestion-query-queens-"
+    bucket_prefix = "131-s3-de-ingestion-query-queens-"
 }
 resource "aws_s3_bucket" "process_bucket" {
-    bucket_prefix = "s3-de-process-query-queens-"
+    bucket_prefix = "131-s3-de-process-query-queens-"
 }
 
 # create lambda-objects

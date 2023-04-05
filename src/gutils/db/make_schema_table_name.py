@@ -1,6 +1,6 @@
 def make_schema_table_name(schema_name, table_name):
     """
-    Function to create PostgreSQL table name when using nop-public shema.
+    Function to create PostgreSQL table name when using nop-public schema.
 
     Args:
         schemschema_namea: schema name (string).

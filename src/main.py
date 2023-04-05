@@ -1,3 +1,7 @@
+# to allow running flattened lambdas locally
+import sys
+sys.path.append('./src/')
+
 import logging
 from gutils.environ import is_production_environ
 import gutils.path as path
@@ -34,5 +38,5 @@ except BaseException as exc:
     exit(1)
 
 finally:
-    processed_data_loader.cleanup()
+    #processed_data_loader.cleanup()
     logger.info('completed')

@@ -1,14 +1,17 @@
+# to allow running tests without PYTHONPATH
 import sys
 sys.path.append('./src/')
+sys.path.append('./src/load')
+
 import pytest
 import pyarrow as pa
-from load.utils.data_table_source import \
+from utils.data_table_source import \
     DataFromPyArrowTable, DataFromParquetFile
-from load.utils.data_table import DataTable
+from utils.data_table import DataTable
 
 @pytest.fixture
 def test_path():
-    return "test/lambdas/load/input_files"
+    return "./test/load/input_files"
 
 @pytest.fixture
 def test_table_name():
@@ -80,19 +83,20 @@ def test_constructs_empty_data_table_when_passed_name_and_schema(empty_test_data
 
 def test_loads_data_from_pyarrow_table(empty_test_data_table, test_table):
     dt = empty_test_data_table.from_pyarrow(test_table)
-    assert isinstance(dt.source, DataFromPyArrowTable) and dt.source.is_initialized(), \
-        'invalid value of "source" property'
-    assert dt.table != None, 'property "table" should be initialized'
-    assert dt.has_data(), "method has_data() should return True"
+    assert isinstance(dt.source, DataFromPyArrowTable), '"source" property should be of type DataFromPyArrowTable'
+    assert dt.source.is_initialized(), '"source" property is not initialized'
+    assert dt.table is not None, 'property "table" should be initialized'
+    assert dt.has_data() is True, "method has_data() should return True"
 
 # TODO: use mock
 def test_loads_data_from_parquet_file(empty_test_data_table, test_path):
     dt = empty_test_data_table.from_parquet(test_path)
     source = dt.source
-    assert isinstance(source, DataFromParquetFile) and source.is_initialized() and source.path != None, \
-        'invalid value of "source" property'
-    assert dt.table != None, 'property "table" should be initialized'
-    assert dt.has_data(), "method has_data() should return True"
+    assert isinstance(source, DataFromParquetFile), '"source" property should be of type DataFromParquetFile'
+    assert source.is_initialized(), '"source" property is not initialized'
+    assert source.path is not None, '"source" property cannot be None'
+    assert dt.table is not None, 'property "table" cannot be None'
+    assert dt.has_data() is True, "method has_data() should return True"
 
 def test_table_columns_as_per_schema(empty_test_data_table, test_table_with_extras, test_table_schema):
     dt = empty_test_data_table.from_pyarrow(test_table_with_extras)

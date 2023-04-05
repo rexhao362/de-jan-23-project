@@ -17,35 +17,41 @@ if db_config:
 """
 
 from os import environ
+import logging
+import traceback
 import boto3
 from botocore.exceptions import ClientError
 import json
 from gutils.environ import is_production_environ
 
+logger = logging.getLogger("DE_Q2_LOAD")
+logger.setLevel(logging.INFO)
+
+# DB config descriptions
 project_secrets = {
-        "totesys_database_config": {
-            "name": "TOTESYS_DB_CONFIG",
-            "variables": {
-                "user": "TOTESYS_DB_USER",
-                "password": "TOTESYS_DB_PASSWORD",
-                "host": { "name": "TOTESYS_DB_HOST", "default": "localhost"},
-                "port": { "name": "TOTESYS_DB_PORT", "default": 5432},
-                "database": "TOTESYS_DB_DATABASE",
-                "schema": "TOTESYS_DB_DATABASE_SCHEMA"
-            }
-        },
-        "warehouse_database_config": {
-            "name": "WAREHOUSE_DB_CONFIG",
-            "variables": {
-                "user": "WAREHOUSE_DB_USER",
-                "password": "WAREHOUSE_DB_PASSWORD",
-                "host": { "name": "WAREHOUSE_DB_HOST", "default": "localhost"},
-                "port": { "name": "WAREHOUSE_DB_PORT", "default": 5432},
-                "database": "WAREHOUSE_DB_DATABASE",
-                "schema": "WAREHOUSE_DB_DATABASE_SCHEMA"
-            }
+    "totesys_database_config": {
+        "name": "TOTESYS_DB_CONFIG",
+        "variables": {
+            "user": "TOTESYS_DB_USER",
+            "password": "TOTESYS_DB_PASSWORD",
+            "host": { "name": "TOTESYS_DB_HOST", "default": "localhost"},
+            "port": { "name": "TOTESYS_DB_PORT", "default": 5432},
+            "database": "TOTESYS_DB_DATABASE",
+            "schema": "TOTESYS_DB_DATABASE_SCHEMA"
+        }
+    },
+    "warehouse_database_config": {
+        "name": "WAREHOUSE_DB_CONFIG",
+        "variables": {
+            "user": "WAREHOUSE_DB_USER",
+            "password": "WAREHOUSE_DB_PASSWORD",
+            "host": { "name": "WAREHOUSE_DB_HOST", "default": "localhost"},
+            "port": { "name": "WAREHOUSE_DB_PORT", "default": 5432},
+            "database": "WAREHOUSE_DB_DATABASE",
+            "schema": "WAREHOUSE_DB_DATABASE_SCHEMA"
         }
     }
+}
 
 class _SecretsManager:
     """
@@ -146,28 +152,36 @@ class _SecretsManager:
 
             or None if unseccessful (no description provided, secret_name does not exist, config is incomplete)
         """
-        if not database_config_decription:
+        if database_config_decription is None:
             return None
 
-        if is_production_environ():
-            config_json = _SecretsManager.get_secret_value( database_config_decription["name"] )
-            return None if config_json is None else json.loads(config_json)
-        else:
-            try:
+        try:
+            values = {}
+            if is_production_environ():
+                config_json = _SecretsManager.get_secret_value( database_config_decription["name"] )
+                config = json.loads(config_json)
+                values = config["credentials"]
+                values["schema"] = config["schema"]
+            else:
                 vars = database_config_decription["variables"]
-                config = {
-                    "credentials": {
-                        "user": environ[ vars["user"] ],
-                        "password": environ[ vars["password"] ],
-                        "host": environ.get( vars["host"]["name"],  vars["host"]["default"] ),
-                        "port": int( environ.get( vars["port"]["name"],  vars["port"]["default"] )),
-                        "database": environ[ vars["database"] ],
-                    },
-                    "schema": environ[ vars["schema"] ]
-                }
-            except:
-                config = None
-            return config
+                for key, value in vars.items():
+                    values[key] = environ[value] if isinstance(value, str) \
+                        else environ.get( value["name"], value["default"] )
+            
+            return {
+                "credentials": {
+                    "user": values["user"],
+                    "password": values["password"],
+                    "host": values["host"],
+                    "port": int( values["port"] ),
+                    "database": values["database"]
+                },
+                "schema": values["schema"]
+            }
+        except BaseException as exc:
+            msg = ''.join( traceback.format_tb(exc.__traceback__) ) + str(exc)
+            logger.warning(msg)
+        return None
     
     @staticmethod
     def get_secret_totesys_db_config():
