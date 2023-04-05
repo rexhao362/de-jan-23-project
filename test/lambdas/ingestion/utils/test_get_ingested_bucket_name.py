@@ -1,10 +1,10 @@
 import sys
 sys.path.append('./src/')
 from ingestion.utils import get_ingested_bucket_name
+
 import pytest
 from moto import mock_s3
 import boto3
-import os.path
 import os
 
 # Mocking AWS credentials

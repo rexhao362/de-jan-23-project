@@ -1,16 +1,19 @@
 import os
-from ingestion.utils import get_table_data
-from ingestion.utils import make_table_dict
-from ingestion.utils import upload_to_s3
-from ingestion.utils import get_table_names
-from ingestion.dates import create_date_string
-from ingestion.dates import create_date_key
-from ingestion.dates import select_last_updated
-from ingestion.dates import retrieve_last_updated
-from ingestion.dates import store_last_updated
-from gutils.environ import is_dev_environ
-from gutils.path import join
 import logging
+import sys
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from utils import get_table_data  # noqa: E402
+from utils import make_table_dict  # noqa: E402
+from utils import upload_to_s3  # noqa: E402
+from utils import get_table_names  # noqa: E402
+from dates import create_date_string  # noqa: E402
+from dates import create_date_key  # noqa: E402
+from dates import select_last_updated  # noqa: E402
+from dates import retrieve_last_updated  # noqa: E402
+from dates import store_last_updated  # noqa: E402
+from gutils.environ import is_dev_environ  # noqa: E402
+from gutils.path import join  # noqa: E402
 
 
 def data_ingestion(path=None):
@@ -31,9 +34,11 @@ def data_ingestion(path=None):
     Raises:
         Error: Raises an exception.
     """
-    path = join(path, 'ingestion')
 
-    timestamp = retrieve_last_updated()
+    if is_dev_environ():
+        path = join(path, 'ingestion')
+
+    timestamp = retrieve_last_updated(path)
     date_time = select_last_updated(timestamp)
     date_now = create_date_string()
     date_key = create_date_key(date_now)
@@ -51,10 +56,14 @@ def data_ingestion(path=None):
     store_last_updated(date_time, date_now, path)
 
 
+def lambda_handler(context, event):
+    data_ingestion()
+
+
 if __name__ == "__main__":
     test_path = './local/aws/s3/'
     try:
-        data_ingestion(test_path)
+        data_ingestion(path=test_path)
 
     except Exception as e:
         logging.error(f"\nError: {e}")

@@ -2,6 +2,7 @@ import sys
 sys.path.append('./src/')
 from ingestion.utils import get_table_names
 
+
 def test_get_table_names_queries_database_for_table_names():
     result = get_table_names()
     table_names = ['address',

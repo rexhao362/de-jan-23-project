@@ -6,7 +6,6 @@ from ingestion.dates import select_last_updated
 from moto import mock_s3
 import boto3
 import pytest
-import os.path
 import os
 from freezegun import freeze_time
 

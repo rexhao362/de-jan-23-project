@@ -4,10 +4,13 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
-from ingestion.environ import schema
-from ingestion.environ import con
-from gutils.environ import is_dev_environ
-from gutils.environ import is_production_environ
+import sys
+sys.path.append('./src/ingestion')
+sys.path.append('./src')
+from connection import schema  # noqa: E402
+from connection import con  # noqa: E402
+from gutils.environ import is_dev_environ  # noqa: E402
+from gutils.environ import is_production_environ  # noqa: E402
 
 
 def get_table_names():
@@ -140,6 +143,7 @@ def get_ingested_bucket_name():
 
 
 def upload_to_s3(table_dict, date_key, path):
+
     """
     Uploads files made during data_ingestion() function to the
     necessary s3 bucket with the current date

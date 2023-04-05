@@ -2,6 +2,7 @@ import sys
 sys.path.append('./src/')
 from ingestion.utils import get_ingested_bucket_name
 from ingestion.dates import retrieve_last_updated
+
 import pytest
 from moto import mock_s3
 import boto3
