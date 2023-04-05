@@ -2,9 +2,9 @@ import sys
 sys.path.append('./src/')
 import os
 import pytest
-from src.ingestion.dates import retrieve_last_updated
-from src.ingestion.dates import select_last_updated
-from src.ingestion.dates import store_last_updated
+from ingestion.dates import retrieve_last_updated
+from ingestion.dates import select_last_updated
+from ingestion.dates import store_last_updated
 from moto import mock_s3
 import boto3
 

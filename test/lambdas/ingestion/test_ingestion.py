@@ -1,10 +1,10 @@
 import sys
 sys.path.append('./src/')
 from decimal import Decimal
-from src.ingestion.ingestion import data_ingestion
-from src.ingestion.utils import get_table_names
-from src.ingestion.utils import get_ingested_bucket_name
-from src.ingestion.utils import get_table_data
+from ingestion.ingestion import data_ingestion
+from ingestion.utils import get_table_names
+from ingestion.utils import get_ingested_bucket_name
+from ingestion.utils import get_table_data
 import os
 import json
 from datetime import datetime
