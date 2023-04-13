@@ -14,11 +14,11 @@ resource "aws_s3_bucket" "processed_bucket" {
 }
 
 # lambda objects
-# resource "aws_s3_object" "ingestion_lambda" {
-#   bucket = aws_s3_bucket.code_bucket.bucket
-#   key    = "ingestion.zip"
-#   source = "${path.module}/zip/ingestion.zip"
-# }
+resource "aws_s3_object" "ingestion_lambda" {
+  bucket = aws_s3_bucket.code_bucket.bucket
+  key    = local.ingestion_package_name
+  source = "${path.module}/zip/${local.ingestion_package_name}"
+}
 
 resource "aws_s3_object" "process_lambda" {
   bucket = aws_s3_bucket.code_bucket.bucket

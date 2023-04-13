@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - 123
+      - main
 
 jobs:
   run-tests:

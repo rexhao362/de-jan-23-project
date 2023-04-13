@@ -1,6 +1,11 @@
 locals {
   region_name = "us-east-1"
 
+  # ingestion
+  ingestion_module_name  = "ingestion"
+  ingestion_lambda_name  = "ingestion_lambda"
+  ingestion_package_name = "ingestion_lambda.zip"
+
   # process
   process_module_name  = "process"
   process_lambda_name  = "main"

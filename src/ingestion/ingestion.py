@@ -56,7 +56,7 @@ def data_ingestion(path=None):
     store_last_updated(date_time, date_now, path)
 
 
-def lambda_handler(context, event):
+def ingestion_lambda(context, event):
     data_ingestion()
 
 
